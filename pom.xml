@@ -107,6 +107,10 @@ Board of Regents of the University of Wisconsin-Madison.</license.copyrightOwner
 			<groupId>org.scijava</groupId>
 			<artifactId>scijava-common</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>com.google.guava</groupId>
+			<artifactId>guava</artifactId>
+		</dependency>
 
 		<!-- Test scope dependencies -->
 		<dependency>
