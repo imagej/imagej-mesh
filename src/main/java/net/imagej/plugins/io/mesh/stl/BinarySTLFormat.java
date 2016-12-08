@@ -30,12 +30,14 @@
 
 package net.imagej.plugins.io.mesh.stl;
 
-import com.sun.javafx.geom.Vec3f;
+import net.imagej.plugins.io.mesh.Vertex;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.apache.commons.math3.geometry.euclidean.threed.Vector3D;
 
 /**
  * The {@link STLFormat} implementation for standard binary STL files
@@ -94,34 +96,34 @@ public class BinarySTLFormat extends AbstractBinarySTLFormat {
 	private static void writeFacet(final ByteBuffer buffer,
 		final STLFacet facet)
 	{
-		writeVector(buffer, facet.normal);
-		writeVector(buffer, facet.vertex0);
-		writeVector(buffer, facet.vertex1);
-		writeVector(buffer, facet.vertex2);
+		writeVector(buffer, facet.getNormal());
+		writeVector(buffer, facet.getP0());
+		writeVector(buffer, facet.getP1());
+		writeVector(buffer, facet.getP2());
 		buffer.putShort((short) 0); // Attribute byte count
 	}
 
-	private static void writeVector(final ByteBuffer buffer, final Vec3f vector) {
-		buffer.putFloat(vector.x);
-		buffer.putFloat(vector.y);
-		buffer.putFloat(vector.z);
+	private static void writeVector(final ByteBuffer buffer, final Vector3D vector3d) {
+		buffer.putFloat((float)vector3d.getX());
+		buffer.putFloat((float)vector3d.getY());
+		buffer.putFloat((float)vector3d.getZ());
 	}
 
 	private static STLFacet readFacet(final ByteBuffer buffer) {
-		final Vec3f normal = readVector(buffer);
-		final Vec3f vertex0 = readVector(buffer);
-		final Vec3f vertex1 = readVector(buffer);
-		final Vec3f vertex2 = readVector(buffer);
+		final Vector3D normal = readVector(buffer);
+		final Vertex vertex0 = new Vertex(readVector(buffer));
+		final Vertex vertex1 = new Vertex(readVector(buffer));
+		final Vertex vertex2 = new Vertex(readVector(buffer));
 		final short attributeByteCount = buffer.getShort();
 
 		return new STLFacet(normal, vertex0, vertex1, vertex2, attributeByteCount);
 	}
 
-	private static Vec3f readVector(final ByteBuffer buffer) {
+	private static Vector3D readVector(final ByteBuffer buffer) {
 		final float x = buffer.getFloat();
 		final float y = buffer.getFloat();
 		final float z = buffer.getFloat();
 
-		return new Vec3f(x, y, z);
+		return new Vector3D(x, y, z);
 	}
 }
