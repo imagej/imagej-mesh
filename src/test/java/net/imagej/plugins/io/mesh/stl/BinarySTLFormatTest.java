@@ -40,11 +40,14 @@ import static net.imagej.plugins.io.mesh.stl.BinarySTLFormat.HEADER_BYTES;
 import com.google.common.base.Strings;
 import com.sun.javafx.geom.Vec3f;
 
+import net.imagej.plugins.io.mesh.Vertex;
+
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.Arrays;
 import java.util.List;
 
+import org.apache.commons.math3.geometry.euclidean.threed.Vector3D;
 import org.junit.Test;
 
 /**
@@ -66,10 +69,10 @@ public class BinarySTLFormatTest {
 
 	@Test
 	public void testWrite() throws Exception {
-		final STLFacet facet = new STLFacet(new Vec3f(0, 0, 1), new Vec3f(1, 0, 0),
-			new Vec3f(0, 1, 0), new Vec3f(0, 0, 0), (short) 0);
-		final STLFacet facet2 = new STLFacet(new Vec3f(-1, 0, 0), new Vec3f(0, 0,
-			1), new Vec3f(0, 1, 0), new Vec3f(0, 0, 0), (short) 0);
+		final STLFacet facet = new STLFacet(new Vector3D(0, 0, 1), new Vertex(1, 0, 0),
+			new Vertex(0, 1, 0), new Vertex(0, 0, 0), (short) 0);
+		final STLFacet facet2 = new STLFacet(new Vector3D(-1, 0, 0), new Vertex(0, 0,
+			1), new Vertex(0, 1, 0), new Vertex(0, 0, 0), (short) 0);
 		List<STLFacet> facets = Arrays.asList(facet, facet2);
 		final int expectedSize = HEADER_BYTES + COUNT_BYTES + facets.size() *
 			FACET_BYTES;
@@ -151,18 +154,18 @@ public class BinarySTLFormatTest {
 	private static void assertFacet(final STLFacet expectedFacet,
 		final List<float[]> actualFacet)
 	{
-		assertVector(expectedFacet.normal, actualFacet.get(0));
-		assertVector(expectedFacet.vertex0, actualFacet.get(1));
-		assertVector(expectedFacet.vertex1, actualFacet.get(2));
-		assertVector(expectedFacet.vertex2, actualFacet.get(3));
+		assertVector(expectedFacet.getNormal(), actualFacet.get(0));
+		assertVector(expectedFacet.getP0(), actualFacet.get(1));
+		assertVector(expectedFacet.getP1(), actualFacet.get(2));
+		assertVector(expectedFacet.getP2(), actualFacet.get(3));
 	}
 
-	private static void assertVector(final Vec3f expectedVector,
+	private static void assertVector(final Vector3D vector3d,
 		final float[] actualVector)
 	{
-		assertEquals(expectedVector.x, actualVector[0], 1e-12);
-		assertEquals(expectedVector.y, actualVector[1], 1e-12);
-		assertEquals(expectedVector.z, actualVector[2], 1e-12);
+		assertEquals(vector3d.getX(), actualVector[0], 1e-12);
+		assertEquals(vector3d.getY(), actualVector[1], 1e-12);
+		assertEquals(vector3d.getZ(), actualVector[2], 1e-12);
 	}
 
 	private static void writeFacet(final ByteBuffer buffer, List<float[]> vectors,
@@ -183,20 +186,20 @@ public class BinarySTLFormatTest {
 	private static void assertFacet(STLFacet expected, ByteBuffer buffer,
 		double delta)
 	{
-		assertVector(expected.normal, buffer, delta);
-		assertVector(expected.vertex0, buffer, delta);
-		assertVector(expected.vertex1, buffer, delta);
-		assertVector(expected.vertex2, buffer, delta);
+		assertVector(expected.getNormal(), buffer, delta);
+		assertVector(expected.getP0(), buffer, delta);
+		assertVector(expected.getP1(), buffer, delta);
+		assertVector(expected.getP2(), buffer, delta);
 
 		final short attributeByteCount = buffer.getShort();
 		assertEquals(expected.attributeByteCount, attributeByteCount);
 	}
 
-	private static void assertVector(final Vec3f expected,
+	private static void assertVector(final Vector3D vector3d,
 		final ByteBuffer buffer, final double delta)
 	{
-		assertEquals(expected.x, buffer.getFloat(), delta);
-		assertEquals(expected.y, buffer.getFloat(), delta);
-		assertEquals(expected.z, buffer.getFloat(), delta);
+		assertEquals(vector3d.getX(), buffer.getFloat(), delta);
+		assertEquals(vector3d.getY(), buffer.getFloat(), delta);
+		assertEquals(vector3d.getZ(), buffer.getFloat(), delta);
 	}
 }
