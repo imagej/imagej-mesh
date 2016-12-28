@@ -30,7 +30,7 @@
 
 package net.imagej.mesh.stl;
 
-import com.sun.javafx.geom.Vec3f;
+import org.apache.commons.math3.geometry.euclidean.threed.Vector3D;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -101,27 +101,27 @@ public class BinarySTLFormat extends AbstractBinarySTLFormat {
 		buffer.putShort((short) 0); // Attribute byte count
 	}
 
-	private static void writeVector(final ByteBuffer buffer, final Vec3f vector) {
-		buffer.putFloat(vector.x);
-		buffer.putFloat(vector.y);
-		buffer.putFloat(vector.z);
+	private static void writeVector(final ByteBuffer buffer, final Vector3D vector) {
+		buffer.putFloat((float) vector.getX());
+		buffer.putFloat((float) vector.getY());
+		buffer.putFloat((float) vector.getZ());
 	}
 
 	private static STLFacet readFacet(final ByteBuffer buffer) {
-		final Vec3f normal = readVector(buffer);
-		final Vec3f vertex0 = readVector(buffer);
-		final Vec3f vertex1 = readVector(buffer);
-		final Vec3f vertex2 = readVector(buffer);
+		final Vector3D normal = readVector(buffer);
+		final Vector3D vertex0 = readVector(buffer);
+		final Vector3D vertex1 = readVector(buffer);
+		final Vector3D vertex2 = readVector(buffer);
 		final short attributeByteCount = buffer.getShort();
 
 		return new STLFacet(normal, vertex0, vertex1, vertex2, attributeByteCount);
 	}
 
-	private static Vec3f readVector(final ByteBuffer buffer) {
+	private static Vector3D readVector(final ByteBuffer buffer) {
 		final float x = buffer.getFloat();
 		final float y = buffer.getFloat();
 		final float z = buffer.getFloat();
 
-		return new Vec3f(x, y, z);
+		return new Vector3D(x, y, z);
 	}
 }

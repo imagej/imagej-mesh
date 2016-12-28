@@ -38,7 +38,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 import com.google.common.base.Strings;
-import com.sun.javafx.geom.Vec3f;
+import org.apache.commons.math3.geometry.euclidean.threed.Vector3D;
 
 import net.imagej.mesh.stl.BinarySTLFormat;
 import net.imagej.mesh.stl.STLFacet;
@@ -69,10 +69,10 @@ public class BinarySTLFormatTest {
 
 	@Test
 	public void testWrite() throws Exception {
-		final STLFacet facet = new STLFacet(new Vec3f(0, 0, 1), new Vec3f(1, 0, 0),
-			new Vec3f(0, 1, 0), new Vec3f(0, 0, 0), (short) 0);
-		final STLFacet facet2 = new STLFacet(new Vec3f(-1, 0, 0), new Vec3f(0, 0,
-			1), new Vec3f(0, 1, 0), new Vec3f(0, 0, 0), (short) 0);
+		final STLFacet facet = new STLFacet(new Vector3D(0, 0, 1), new Vector3D(1, 0, 0),
+			new Vector3D(0, 1, 0), new Vector3D(0, 0, 0), (short) 0);
+		final STLFacet facet2 = new STLFacet(new Vector3D(-1, 0, 0), new Vector3D(0, 0,
+			1), new Vector3D(0, 1, 0), new Vector3D(0, 0, 0), (short) 0);
 		List<STLFacet> facets = Arrays.asList(facet, facet2);
 		final int expectedSize = HEADER_BYTES + COUNT_BYTES + facets.size() *
 			FACET_BYTES;
@@ -160,12 +160,12 @@ public class BinarySTLFormatTest {
 		assertVector(expectedFacet.vertex2, actualFacet.get(3));
 	}
 
-	private static void assertVector(final Vec3f expectedVector,
+	private static void assertVector(final Vector3D expectedVector,
 		final float[] actualVector)
 	{
-		assertEquals(expectedVector.x, actualVector[0], 1e-12);
-		assertEquals(expectedVector.y, actualVector[1], 1e-12);
-		assertEquals(expectedVector.z, actualVector[2], 1e-12);
+		assertEquals(expectedVector.getX(), actualVector[0], 1e-12);
+		assertEquals(expectedVector.getY(), actualVector[1], 1e-12);
+		assertEquals(expectedVector.getZ(), actualVector[2], 1e-12);
 	}
 
 	private static void writeFacet(final ByteBuffer buffer, List<float[]> vectors,
@@ -195,11 +195,11 @@ public class BinarySTLFormatTest {
 		assertEquals(expected.attributeByteCount, attributeByteCount);
 	}
 
-	private static void assertVector(final Vec3f expected,
+	private static void assertVector(final Vector3D expected,
 		final ByteBuffer buffer, final double delta)
 	{
-		assertEquals(expected.x, buffer.getFloat(), delta);
-		assertEquals(expected.y, buffer.getFloat(), delta);
-		assertEquals(expected.z, buffer.getFloat(), delta);
+		assertEquals(expected.getX(), buffer.getFloat(), delta);
+		assertEquals(expected.getY(), buffer.getFloat(), delta);
+		assertEquals(expected.getZ(), buffer.getFloat(), delta);
 	}
 }

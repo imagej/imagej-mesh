@@ -30,7 +30,7 @@
 
 package net.imagej.mesh.stl;
 
-import com.sun.javafx.geom.Vec3f;
+import org.apache.commons.math3.geometry.euclidean.threed.Vector3D;
 
 /**
  * A helper class to store a facet read from a STL file
@@ -39,14 +39,14 @@ import com.sun.javafx.geom.Vec3f;
  */
 public final class STLFacet {
 
-	public final Vec3f normal;
-	public final Vec3f vertex0;
-	public final Vec3f vertex1;
-	public final Vec3f vertex2;
+	public final Vector3D normal;
+	public final Vector3D vertex0;
+	public final Vector3D vertex1;
+	public final Vector3D vertex2;
 	public final short attributeByteCount;
 
-	public STLFacet(final Vec3f normal, final Vec3f vertex0, final Vec3f vertex1,
-		final Vec3f vertex2, final short attributeByteCount)
+	public STLFacet(final Vector3D normal, final Vector3D vertex0, final Vector3D vertex1,
+		final Vector3D vertex2, final short attributeByteCount)
 	{
 		this.normal = normal;
 		this.vertex0 = vertex0;
