@@ -1,9 +1,9 @@
-/*-
+/*
  * #%L
- * SciJava I/O plugins for 3D mesh structures.
+ * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2016 University of Idaho, Royal Veterinary College, and
- * Board of Regents of the University of Wisconsin-Madison.
+ * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -27,28 +27,27 @@
  * POSSIBILITY OF SUCH DAMAGE.
  * #L%
  */
+package net.imagej.mesh;
 
-package net.imagej.mesh.stl;
+import java.util.List;
+import java.util.Set;
 
-import org.apache.commons.math3.geometry.euclidean.threed.Vector3D;
-
-import net.imagej.mesh.TriangularFacet;
-import net.imagej.mesh.Vertex;
+import net.imglib2.RealLocalizable;
 
 /**
- * A helper class to store a facet read from a STL file
+ * Interface for Meshes
+ * 
+ * @author Tim-Oliver Buchholz (University of Konstanz)
  *
- * @author Richard Domander (Royal Veterinary College, London)
  */
-public final class STLFacet extends TriangularFacet {
+public interface Mesh {
+	
+	public Set<RealLocalizable> getVertices();
 
-	public final short attributeByteCount;
+	public List<Facet> getFacets();
 
-	public STLFacet(final Vector3D normal, final Vertex vertex0, final Vertex vertex1,
-		final Vertex vertex2, final short attributeByteCount)
-	{
-		super( vertex0, vertex1, vertex2 );
-		this.normal = normal;
-		this.attributeByteCount = attributeByteCount;
-	}
+	public boolean triangularFacets();
+
+	public double getSurfaceArea();
+
 }
