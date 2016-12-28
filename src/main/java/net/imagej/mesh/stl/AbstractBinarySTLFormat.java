@@ -28,7 +28,7 @@
  * #L%
  */
 
-package net.imagej.plugins.io.mesh.stl;
+package net.imagej.mesh.stl;
 
 import com.google.common.base.Strings;
 

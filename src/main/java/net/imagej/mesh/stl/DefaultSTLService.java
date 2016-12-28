@@ -28,52 +28,54 @@
  * #L%
  */
 
-package net.imagej.plugins.io.mesh.stl;
+package net.imagej.mesh.stl;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
-import org.scijava.Priority;
-import org.scijava.io.AbstractIOPlugin;
-import org.scijava.io.IOPlugin;
-import org.scijava.plugin.Parameter;
+import com.google.common.io.Files;
+import org.scijava.plugin.AbstractHandlerService;
 import org.scijava.plugin.Plugin;
-import net.imagej.plugins.io.mesh.stl.STLFacet;
-import net.imagej.plugins.io.mesh.stl.STLService;
+import org.scijava.service.Service;
 
 /**
- * {@link IOPlugin} for handling STL files
+ * Default service for working with STL formats
  *
  * @author Richard Domander (Royal Veterinary College, London)
- * @see STLService
  */
-@Plugin(type = IOPlugin.class, priority = Priority.LOW_PRIORITY - 1)
-public class STLIOPlugin extends AbstractIOPlugin<List<STLFacet>> {
-
-	@Parameter(required = false)
-	private STLService stlService;
+@Plugin(type = Service.class)
+public class DefaultSTLService extends AbstractHandlerService<File, STLFormat>
+	implements STLService
+{
 
 	@Override
-	public Class<List<STLFacet>> getDataType() {
-		return (Class) List.class;
+	public List<STLFacet> read(final File file) throws IOException {
+		final STLFormat format = getHandler(file);
+		if (format == null) return null;
+		return format.read(file);
 	}
 
 	@Override
-	public boolean supportsOpen(final String source) {
-		return stlService != null && stlService.supports(new File(source));
+	public void write(final File file, final List<STLFacet> facets) throws IOException {
+		final STLFormat format = getHandler(file);
+		if (format == null) return;
+		final byte[] bytes = format.write(facets);
+
+		Files.write(bytes, file);
 	}
 
-	@Override
-	public boolean supportsSave(final String destination) {
-		return stlService != null && stlService.supports(new File(destination));
-	}
+	// -- PTService methods --
 
 	@Override
-	public void save(final List<STLFacet> data, final String destination)
-		throws IOException, NullPointerException
-	{
-		stlService.write(new File(destination), data);
+	public Class<STLFormat> getPluginType() {
+		return STLFormat.class;
+	}
+
+	// -- Typed methods --
+
+	@Override
+	public Class<File> getType() {
+		return File.class;
 	}
 }

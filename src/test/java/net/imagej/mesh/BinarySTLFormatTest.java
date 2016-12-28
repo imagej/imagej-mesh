@@ -28,17 +28,20 @@
  * #L%
  */
 
-package net.imagej.plugins.io.mesh.stl;
+package net.imagej.mesh;
 
+import static net.imagej.mesh.stl.AbstractBinarySTLFormat.FACET_BYTES;
+import static net.imagej.mesh.stl.BinarySTLFormat.COUNT_BYTES;
+import static net.imagej.mesh.stl.BinarySTLFormat.HEADER;
+import static net.imagej.mesh.stl.BinarySTLFormat.HEADER_BYTES;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static net.imagej.plugins.io.mesh.stl.AbstractBinarySTLFormat.FACET_BYTES;
-import static net.imagej.plugins.io.mesh.stl.BinarySTLFormat.COUNT_BYTES;
-import static net.imagej.plugins.io.mesh.stl.BinarySTLFormat.HEADER;
-import static net.imagej.plugins.io.mesh.stl.BinarySTLFormat.HEADER_BYTES;
 
 import com.google.common.base.Strings;
 import com.sun.javafx.geom.Vec3f;
+
+import net.imagej.mesh.stl.BinarySTLFormat;
+import net.imagej.mesh.stl.STLFacet;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
