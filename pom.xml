@@ -10,7 +10,7 @@
 	</parent>
 
 	<groupId>net.imagej</groupId>
-	<artifactId>imagej-plugins-io-mesh</artifactId>
+	<artifactId>imagej-mesh</artifactId>
 	<version>0.1.0-SNAPSHOT</version>
 
 	<name>ImageJ Plugins: Mesh I/O</name>
