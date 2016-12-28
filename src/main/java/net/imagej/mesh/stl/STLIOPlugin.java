@@ -28,45 +28,53 @@
  * #L%
  */
 
-package net.imagej.plugins.io.mesh.stl;
+package net.imagej.mesh.stl;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
-import org.scijava.plugin.HandlerService;
-import org.scijava.service.SciJavaService;
+import org.scijava.Priority;
+import org.scijava.io.AbstractIOPlugin;
+import org.scijava.io.IOPlugin;
+import org.scijava.plugin.Parameter;
+import org.scijava.plugin.Plugin;
+
+import net.imagej.mesh.stl.STLFacet;
+import net.imagej.mesh.stl.STLService;
 
 /**
- * Interface for service that works with STL formats.
+ * {@link IOPlugin} for handling STL files
  *
  * @author Richard Domander (Royal Veterinary College, London)
+ * @see STLService
  */
-public interface STLService extends HandlerService<File, STLFormat>,
-	SciJavaService
-{
+@Plugin(type = IOPlugin.class, priority = Priority.LOW_PRIORITY - 1)
+public class STLIOPlugin extends AbstractIOPlugin<List<STLFacet>> {
 
-	/** Reads the data from the given file into a string. */
-	List<STLFacet> read(File file) throws IOException;
+	@Parameter(required = false)
+	private STLService stlService;
 
-	/** Writes the facets into the given file */
-	void write(File file, List<STLFacet> facets) throws IOException;
-
-	// -- HandlerService methods --
-
-	/** Gets the STL format which best handles the given file. */
 	@Override
-	STLFormat getHandler(File file);
+	public Class<List<STLFacet>> getDataType() {
+		return (Class) List.class;
+	}
 
-	// -- SingletonService methods --
-
-	/** Gets the list of available STL formats. */
 	@Override
-	List<STLFormat> getInstances();
+	public boolean supportsOpen(final String source) {
+		return stlService != null && stlService.supports(new File(source));
+	}
 
-	// -- Typed methods --
-
-	/** Gets whether the given file contains STL data in a supported format. */
 	@Override
-	boolean supports(File file);
+	public boolean supportsSave(final String destination) {
+		return stlService != null && stlService.supports(new File(destination));
+	}
+
+	@Override
+	public void save(final List<STLFacet> data, final String destination)
+		throws IOException, NullPointerException
+	{
+		stlService.write(new File(destination), data);
+	}
 }

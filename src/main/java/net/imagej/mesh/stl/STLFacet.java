@@ -28,54 +28,30 @@
  * #L%
  */
 
-package net.imagej.plugins.io.mesh.stl;
+package net.imagej.mesh.stl;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.List;
-
-import com.google.common.io.Files;
-import org.scijava.plugin.AbstractHandlerService;
-import org.scijava.plugin.Plugin;
-import org.scijava.service.Service;
+import com.sun.javafx.geom.Vec3f;
 
 /**
- * Default service for working with STL formats
+ * A helper class to store a facet read from a STL file
  *
  * @author Richard Domander (Royal Veterinary College, London)
  */
-@Plugin(type = Service.class)
-public class DefaultSTLService extends AbstractHandlerService<File, STLFormat>
-	implements STLService
-{
+public final class STLFacet {
 
-	@Override
-	public List<STLFacet> read(final File file) throws IOException {
-		final STLFormat format = getHandler(file);
-		if (format == null) return null;
-		return format.read(file);
-	}
+	public final Vec3f normal;
+	public final Vec3f vertex0;
+	public final Vec3f vertex1;
+	public final Vec3f vertex2;
+	public final short attributeByteCount;
 
-	@Override
-	public void write(final File file, final List<STLFacet> facets) throws IOException {
-		final STLFormat format = getHandler(file);
-		if (format == null) return;
-		final byte[] bytes = format.write(facets);
-
-		Files.write(bytes, file);
-	}
-
-	// -- PTService methods --
-
-	@Override
-	public Class<STLFormat> getPluginType() {
-		return STLFormat.class;
-	}
-
-	// -- Typed methods --
-
-	@Override
-	public Class<File> getType() {
-		return File.class;
+	public STLFacet(final Vec3f normal, final Vec3f vertex0, final Vec3f vertex1,
+		final Vec3f vertex2, final short attributeByteCount)
+	{
+		this.normal = normal;
+		this.vertex0 = vertex0;
+		this.vertex1 = vertex1;
+		this.vertex2 = vertex2;
+		this.attributeByteCount = attributeByteCount;
 	}
 }
