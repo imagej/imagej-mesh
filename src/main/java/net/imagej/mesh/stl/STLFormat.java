@@ -28,7 +28,7 @@
  * #L%
  */
 
-package net.imagej.plugins.io.mesh.stl;
+package net.imagej.mesh.stl;
 
 import java.io.File;
 import java.io.IOException;
