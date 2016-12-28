@@ -111,6 +111,10 @@ Board of Regents of the University of Wisconsin-Madison.</license.copyrightOwner
 			<groupId>com.google.guava</groupId>
 			<artifactId>guava</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-math3</artifactId>
+		</dependency>		
 
 		<!-- Test scope dependencies -->
 		<dependency>
