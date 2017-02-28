@@ -82,8 +82,8 @@
 		<url>https://github.com/imagej/imagej-plugins-io-mesh/issues</url>
 	</issueManagement>
 	<ciManagement>
-		<system>Jenkins</system>
-		<url>http://jenkins.imagej.net/job/ImageJ-plugins-io-mesh/</url>
+		<system>Travis CI</system>
+		<url>https://travis-ci.org/imagej/imagej-mesh</url>
 	</ciManagement>
 
 	<properties>
