@@ -10,10 +10,10 @@
 	</parent>
 
 	<groupId>net.imagej</groupId>
-	<artifactId>imagej-plugins-io-mesh</artifactId>
+	<artifactId>imagej-mesh</artifactId>
 	<version>0.1.0-SNAPSHOT</version>
 
-	<name>ImageJ Plugins: Mesh I/O</name>
+	<name>ImageJ: Mesh</name>
 	<description>SciJava I/O plugins for 3D mesh structures.</description>
 	<url>http://imagej.net/ImageJ_Plugins_Mesh_I/O</url>
 	<inceptionYear>2016</inceptionYear>
@@ -72,14 +72,14 @@
 	</mailingLists>
 
 	<scm>
-		<connection>scm:git:git://github.com/imagej/imagej-plugins-io-mesh</connection>
-		<developerConnection>scm:git:git@github.com:imagej/imagej-plugins-io-mesh</developerConnection>
+		<connection>scm:git:git://github.com/imagej/imagej-mesh</connection>
+		<developerConnection>scm:git:git@github.com:imagej/imagej-mesh</developerConnection>
 		<tag>HEAD</tag>
-		<url>https://github.com/imagej/imagej-plugins-io-mesh</url>
+		<url>https://github.com/imagej/imagej-mesh</url>
 	</scm>
 	<issueManagement>
 		<system>GitHub Issues</system>
-		<url>https://github.com/imagej/imagej-plugins-io-mesh/issues</url>
+		<url>https://github.com/imagej/imagej-mesh/issues</url>
 	</issueManagement>
 	<ciManagement>
 		<system>Travis CI</system>
@@ -87,7 +87,7 @@
 	</ciManagement>
 
 	<properties>
-		<package-name>net.imagej.plugins.io.mesh</package-name>
+		<package-name>net.imagej.mesh</package-name>
 
 		<license.licenseName>bsd_2</license.licenseName>
 		<license.copyrightOwners>University of Idaho, Royal Veterinary College, and
