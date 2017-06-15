@@ -30,14 +30,12 @@
 
 package net.imagej.mesh.stl;
 
-import net.imagej.mesh.Vertex;
+import org.apache.commons.math3.geometry.euclidean.threed.Vector3D;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.ArrayList;
 import java.util.List;
-
-import org.apache.commons.math3.geometry.euclidean.threed.Vector3D;
 
 /**
  * The {@link STLFormat} implementation for standard binary STL files
@@ -55,17 +53,17 @@ public class BinarySTLFormat extends AbstractBinarySTLFormat {
 		}
 
 		final ByteBuffer buffer = ByteBuffer.wrap(data).order(
-			ByteOrder.LITTLE_ENDIAN);
+				ByteOrder.LITTLE_ENDIAN);
 		final int facetCount = buffer.getInt(HEADER_BYTES);
 		final int expectedSize = HEADER_BYTES + COUNT_BYTES + facetCount *
-			FACET_BYTES;
+				FACET_BYTES;
 		if (expectedSize != buffer.capacity()) {
 			return facets;
 		}
 
 		buffer.position(FACET_START);
 		for (int offset = FACET_START; offset < buffer.capacity(); offset +=
-			FACET_BYTES)
+				FACET_BYTES)
 		{
 			STLFacet facet = readFacet(buffer);
 			facets.add(facet);
@@ -79,7 +77,7 @@ public class BinarySTLFormat extends AbstractBinarySTLFormat {
 		final int facetCount = facets == null ? 0 : facets.size();
 		final int bytes = HEADER_BYTES + COUNT_BYTES + facetCount * FACET_BYTES;
 		final ByteBuffer buffer = ByteBuffer.allocate(bytes).order(
-			ByteOrder.LITTLE_ENDIAN);
+				ByteOrder.LITTLE_ENDIAN);
 
 		buffer.put(HEADER.getBytes());
 		buffer.putInt(facetCount);
@@ -94,26 +92,26 @@ public class BinarySTLFormat extends AbstractBinarySTLFormat {
 	}
 
 	private static void writeFacet(final ByteBuffer buffer,
-		final STLFacet facet)
+								   final STLFacet facet)
 	{
-		writeVector(buffer, facet.getNormal());
-		writeVector(buffer, facet.getP0());
-		writeVector(buffer, facet.getP1());
-		writeVector(buffer, facet.getP2());
+		writeVector(buffer, facet.normal);
+		writeVector(buffer, facet.vertex0);
+		writeVector(buffer, facet.vertex1);
+		writeVector(buffer, facet.vertex2);
 		buffer.putShort((short) 0); // Attribute byte count
 	}
 
-	private static void writeVector(final ByteBuffer buffer, final Vector3D vector3d) {
-		buffer.putFloat((float)vector3d.getX());
-		buffer.putFloat((float)vector3d.getY());
-		buffer.putFloat((float)vector3d.getZ());
+	private static void writeVector(final ByteBuffer buffer, final Vector3D vector) {
+		buffer.putFloat((float) vector.getX());
+		buffer.putFloat((float) vector.getY());
+		buffer.putFloat((float) vector.getZ());
 	}
 
 	private static STLFacet readFacet(final ByteBuffer buffer) {
 		final Vector3D normal = readVector(buffer);
-		final Vertex vertex0 = new Vertex(readVector(buffer));
-		final Vertex vertex1 = new Vertex(readVector(buffer));
-		final Vertex vertex2 = new Vertex(readVector(buffer));
+		final Vector3D vertex0 = readVector(buffer);
+		final Vector3D vertex1 = readVector(buffer);
+		final Vector3D vertex2 = readVector(buffer);
 		final short attributeByteCount = buffer.getShort();
 
 		return new STLFacet(normal, vertex0, vertex1, vertex2, attributeByteCount);
