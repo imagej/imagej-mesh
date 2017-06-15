@@ -32,23 +32,26 @@ package net.imagej.mesh.stl;
 
 import org.apache.commons.math3.geometry.euclidean.threed.Vector3D;
 
-import net.imagej.mesh.TriangularFacet;
-import net.imagej.mesh.Vertex;
-
 /**
  * A helper class to store a facet read from a STL file
  *
  * @author Richard Domander (Royal Veterinary College, London)
  */
-public final class STLFacet extends TriangularFacet {
+public final class STLFacet {
 
+	public final Vector3D normal;
+	public final Vector3D vertex0;
+	public final Vector3D vertex1;
+	public final Vector3D vertex2;
 	public final short attributeByteCount;
 
-	public STLFacet(final Vector3D normal, final Vertex vertex0, final Vertex vertex1,
-		final Vertex vertex2, final short attributeByteCount)
+	public STLFacet(final Vector3D normal, final Vector3D vertex0, final Vector3D vertex1,
+					final Vector3D vertex2, final short attributeByteCount)
 	{
-		super( vertex0, vertex1, vertex2 );
 		this.normal = normal;
+		this.vertex0 = vertex0;
+		this.vertex1 = vertex1;
+		this.vertex2 = vertex2;
 		this.attributeByteCount = attributeByteCount;
 	}
 }
