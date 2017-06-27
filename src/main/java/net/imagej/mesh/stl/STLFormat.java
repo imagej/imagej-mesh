@@ -36,6 +36,10 @@ import java.util.List;
 
 import org.scijava.plugin.HandlerPlugin;
 
+import net.imagej.mesh.Triangle;
+import net.imagej.mesh.TrianglePool;
+import net.imagej.mesh.Vertex3Pool;
+
 /**
  * {@code STLFormat} plugins provide handling for different kinds of STL files
  * <p>
@@ -52,8 +56,8 @@ public interface STLFormat extends HandlerPlugin<File> {
 	 * Reads the STL facets from the given File which can then be converted into a
 	 * mesh
 	 */
-	List<STLFacet> read(final File stlFile) throws IOException;
+	List<Triangle> read(final TrianglePool tp, final Vertex3Pool vp, final File stlFile) throws IOException;
 
 	/** Writes the facets into a byte[] that can then be saved into a file */
-	byte[] write(final List<STLFacet> facets) throws IOException;
+	byte[] write(final List<Triangle> facets) throws IOException;
 }

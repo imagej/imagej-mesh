@@ -30,46 +30,51 @@
 
 package net.imagej.mesh.stl;
 
-import java.io.File;
-import java.io.IOException;
+import static org.junit.Assert.assertEquals;
+
 import java.util.List;
 
-import org.scijava.plugin.HandlerService;
-import org.scijava.service.SciJavaService;
+import org.junit.Test;
+import org.mastodon.collection.ref.RefArrayList;
 
+import net.imagej.mesh.DefaultMesh;
 import net.imagej.mesh.Mesh;
 import net.imagej.mesh.Triangle;
+import net.imagej.mesh.TrianglePool;
+import net.imagej.mesh.Vertex3Pool;
 
 /**
- * Interface for service that works with STL formats.
+ * Tests for {@link Mesh} and {@link DefaultMesh}
  *
- * @author Richard Domander (Royal Veterinary College, London)
+ * @author Kyle Harrington (University of Idaho, Moscow)
  */
-public interface STLService extends HandlerService<File, STLFormat>,
-	SciJavaService
-{
+public class MeshTest {
 
-	/** Reads the data from the given file into a string. */
-	List< Triangle > read(File file) throws IOException;
+	@Test
+	public void testWrite() throws Exception {
+		Mesh mesh = new DefaultMesh();
+		Vertex3Pool vp = mesh.getVertex3Pool();
+		TrianglePool tp = mesh.getTrianglePool();
+		
+		final Triangle facet = tp.create().init(
+				vp.create().init(1, 0, 0),
+				vp.create().init(0, 1, 0), 
+				vp.create().init(0, 0, 0), 
+				vp.create().init(0, 0, 1));
+		final Triangle facet2 = tp.create().init(
+				vp.create().init(0, 0, 1),
+				vp.create().init(0, 1, 0), 
+				vp.create().init(0, 0, 0), 
+				vp.create().init(-1, 0, 0));
+		List<Triangle> facets = new RefArrayList<>(tp);
+		facets.add(facet);
+		facets.add(facet2);
+		
+		mesh.addFacet( facet );
+		mesh.addFacet( facet2 );
 
-	/** Writes the facets into the given file */
-	void write(File file, List<Triangle> facets) throws IOException;
+		assertEquals( mesh.getTriangles().size(), 2 );
+		
+	}
 
-	// -- HandlerService methods --
-
-	/** Gets the STL format which best handles the given file. */
-	@Override
-	STLFormat getHandler(File file);
-
-	// -- SingletonService methods --
-
-	/** Gets the list of available STL formats. */
-	@Override
-	List<STLFormat> getInstances();
-
-	// -- Typed methods --
-
-	/** Gets whether the given file contains STL data in a supported format. */
-	@Override
-	boolean supports(File file);
 }

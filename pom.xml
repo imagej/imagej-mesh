@@ -11,7 +11,7 @@
 
 	<groupId>net.imagej</groupId>
 	<artifactId>imagej-mesh</artifactId>
-	<version>0.1.1-SNAPSHOT</version>
+	<version>0.1.2</version>
 
 	<name>ImageJ: Mesh</name>
 	<description>SciJava I/O plugins for 3D mesh structures.</description>
@@ -61,6 +61,14 @@
 				<role>debugger</role>
 				<role>reviewer</role>
 				<role>maintainer</role>
+			</roles>
+		</developer>
+		<developer>
+			<id>tpietzsch</id>
+			<name>Tobias Pietzsch</name>
+			<url>http://imagej.net/User:tpietzsch</url>
+			<roles>
+				<role>developer</role>
 			</roles>
 		</developer>
 	</developers>
@@ -147,6 +155,12 @@ Board of Regents of the University of Wisconsin-Madison.</license.copyrightOwner
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-math3</artifactId>
 		</dependency>		
+		
+		<dependency>
+			<groupId>org.mastodon</groupId>
+			<artifactId>mastodon-collection</artifactId>
+			<version>1.0.0-beta-4</version>
+		</dependency>
 
 		<!-- Test scope dependencies -->
 		<dependency>
