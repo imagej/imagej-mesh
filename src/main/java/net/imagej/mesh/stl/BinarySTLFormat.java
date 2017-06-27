@@ -30,18 +30,16 @@
 
 package net.imagej.mesh.stl;
 
-import org.apache.commons.math3.geometry.euclidean.threed.Vector3D;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.util.List;
+
 import org.mastodon.collection.ref.RefArrayList;
 
 import net.imagej.mesh.Triangle;
 import net.imagej.mesh.TrianglePool;
 import net.imagej.mesh.Vertex3;
 import net.imagej.mesh.Vertex3Pool;
-
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * The {@link STLFormat} implementation for standard binary STL files
@@ -108,6 +106,7 @@ public class BinarySTLFormat extends AbstractBinarySTLFormat {
 		buffer.putShort((short) 0); // Attribute byte count
 	}
 
+	@SuppressWarnings("unused")
 	private static void writeVector(final ByteBuffer buffer, final float x, float y, float z) {
 		buffer.putFloat(x);
 		buffer.putFloat(y);
@@ -127,6 +126,7 @@ public class BinarySTLFormat extends AbstractBinarySTLFormat {
 		final Vertex3 vertex0 = readVector(vp,buffer);
 		final Vertex3 vertex1 = readVector(vp,buffer);
 		final Vertex3 vertex2 = readVector(vp,buffer);
+		@SuppressWarnings("unused")
 		final short attributeByteCount = buffer.getShort();// sorry TODO
 
 		return tp.create(tref).init(vertex0, vertex1, vertex2, normal);

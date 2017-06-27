@@ -10,4 +10,6 @@ public interface Mesh {
 	public TrianglePool getTrianglePool();
 	
 	public Vertex3Pool getVertex3Pool();
+
+	public void addFacet(Triangle facet);
 }

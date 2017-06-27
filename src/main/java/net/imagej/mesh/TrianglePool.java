@@ -6,7 +6,6 @@ import org.mastodon.pool.BufferMappedElement;
 import org.mastodon.pool.BufferMappedElementArray;
 import org.mastodon.pool.Pool;
 import org.mastodon.pool.SingleArrayMemPool;
-import org.mastodon.pool.attributes.FloatArrayAttribute;
 import org.mastodon.pool.attributes.IndexAttribute;
 
 /**

@@ -40,4 +40,9 @@ public class DefaultMesh implements Mesh {
 		return vp;
 	}
 
+	@Override
+	public void addFacet(Triangle facet) {
+		this.triangles.add( facet );
+	}
+
 }

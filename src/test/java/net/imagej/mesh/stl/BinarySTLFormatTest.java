@@ -60,6 +60,7 @@ import org.mastodon.collection.ref.RefArrayList;
  * Tests for {@link BinarySTLFormat}
  *
  * @author Richard Domander (Royal Veterinary College, London)
+ * @author Kyle Harrington (University of Idaho, Moscow)
  */
 public class BinarySTLFormatTest {
 
