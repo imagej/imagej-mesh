@@ -1,4 +1,4 @@
-package net.imagej.mesh.stl;
+package net.imagej.mesh;
 
 import net.imagej.mesh.Vertex3Pool;
 import net.imagej.mesh.Vertex3;

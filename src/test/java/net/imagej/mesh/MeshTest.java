@@ -28,7 +28,7 @@
  * #L%
  */
 
-package net.imagej.mesh.stl;
+package net.imagej.mesh;
 
 import static org.junit.Assert.assertEquals;
 

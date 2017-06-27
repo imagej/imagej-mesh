@@ -42,14 +42,20 @@ public class Triangle extends PoolObject< Triangle, TrianglePool, BufferMappedEl
 	// index = 0,1,2
 	public Vertex3 getVertex( final int index, final Vertex3 ref )
 	{
+		return pool.vertex3Pool.getObject( getVertexId( index ), ref );
+	}
+	
+	// index = 0,1,2
+	public int getVertexId( final int index )
+	{
 		switch ( index )
 		{
 		case 0:
-			return pool.vertex3Pool.getObject( pool.iv1.get( this ), ref );
+			return pool.iv1.get( this );
 		case 1:
-			return pool.vertex3Pool.getObject( pool.iv2.get( this ), ref );
+			return pool.iv2.get( this );
 		case 2:
-			return pool.vertex3Pool.getObject( pool.iv3.get( this ), ref );
+			return pool.iv3.get( this );
 		default:
 			throw new IllegalArgumentException();
 		}
