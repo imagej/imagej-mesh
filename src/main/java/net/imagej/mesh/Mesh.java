@@ -12,4 +12,8 @@ public interface Mesh {
 	public Vertex3Pool getVertex3Pool();
 
 	public void addFacet(Triangle facet);
+
+	public void setTriangles(List<Triangle> read);
+
+	public void setVertices(List<Vertex3> vertices);
 }
