@@ -1,6 +1,7 @@
 package net.imagej.mesh;
 
 import org.mastodon.pool.PoolObjectLayout;
+import org.mastodon.pool.PoolObjectLayout.FloatArrayField;
 
 /**
  * The layout of a Triangle data structure in the memory of a RefPool
@@ -13,5 +14,6 @@ public class TriangleLayout extends PoolObjectLayout
 	final IndexField v1 = indexField();
 	final IndexField v2 = indexField();
 	final IndexField v3 = indexField();
+	final IndexField normal = indexField();
 	// indexArrayField ... but IndexArrayAttribute not yet implemented
 }

@@ -12,5 +12,5 @@ public class Vertex3Layout extends PoolObjectLayout
 {
 	final FloatArrayField position = floatArrayField( 3 );
 	final FloatArrayField normal = floatArrayField( 3 );
-	final FloatArrayField uv = floatArrayField( 2 );
+	final FloatArrayField uv = floatArrayField( 3 );
 }

@@ -27,6 +27,14 @@ public class Vertex3 extends PoolObject< Vertex3, Vertex3Pool, BufferMappedEleme
 		normal = pool.normal.createQuietAttributeValue( this );
 		uv = pool.uv.createQuietAttributeValue( this );
 	}
+	
+	public Vertex3 init(
+			final float x,
+			final float y,
+			final float z )
+	{
+		return init( x, y, z, 0, 0, 0, 0, 0, 0);
+	}
 
 	public Vertex3 init(
 			final float x,
@@ -36,7 +44,8 @@ public class Vertex3 extends PoolObject< Vertex3, Vertex3Pool, BufferMappedEleme
 			final float ny,
 			final float nz,
 			final float u,
-			final float v )
+			final float v,
+			final float w )
 	{
 		// like this:
 		pool.position.setQuiet( this, 0, x );
@@ -50,6 +59,7 @@ public class Vertex3 extends PoolObject< Vertex3, Vertex3Pool, BufferMappedEleme
 
 		pool.uv.setQuiet( this, 0, u );
 		pool.uv.setQuiet( this, 1, v );
+		pool.uv.setQuiet( this, 1, w );
 		return this;
 	}
 
@@ -137,9 +147,19 @@ public class Vertex3 extends PoolObject< Vertex3, Vertex3Pool, BufferMappedEleme
 		pool.uv.setQuiet( this, 1, v );
 	}
 	
+	public float getW()
+	{
+		return uv.get( 2 );
+	}
+	
+	public void setW( final float w)
+	{
+		pool.uv.setQuiet( this, 2, w );
+	}
+	
 	@Override
 	public String toString()
 	{
-		return String.format( "v(%.2f, %.2f, %.2f, ...)", getX(), position.get( 1 ), position.get( 2 ) );
+		return String.format( "v(%.2f, %.2f, %.2f, %.2f, %.2f, %.2f, %.2f, %.2f, %.2f)", getX(), getY(), getZ(), getNX(), getNY(), getNZ(), getU(), getV(), getW() );
 	}
 }

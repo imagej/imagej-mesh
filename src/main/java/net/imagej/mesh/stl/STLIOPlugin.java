@@ -41,6 +41,7 @@ import org.scijava.io.IOPlugin;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
 
+import net.imagej.mesh.Triangle;
 import net.imagej.mesh.stl.STLFacet;
 import net.imagej.mesh.stl.STLService;
 
@@ -51,13 +52,13 @@ import net.imagej.mesh.stl.STLService;
  * @see STLService
  */
 @Plugin(type = IOPlugin.class, priority = Priority.LOW_PRIORITY - 1)
-public class STLIOPlugin extends AbstractIOPlugin<List<STLFacet>> {
+public class STLIOPlugin extends AbstractIOPlugin<List<Triangle>> {
 
 	@Parameter(required = false)
 	private STLService stlService;
 
 	@Override
-	public Class<List<STLFacet>> getDataType() {
+	public Class<List<Triangle>> getDataType() {
 		return (Class) List.class;
 	}
 
@@ -72,7 +73,7 @@ public class STLIOPlugin extends AbstractIOPlugin<List<STLFacet>> {
 	}
 
 	@Override
-	public void save(final List<STLFacet> data, final String destination)
+	public void save(final List<Triangle> data, final String destination)
 		throws IOException, NullPointerException
 	{
 		stlService.write(new File(destination), data);

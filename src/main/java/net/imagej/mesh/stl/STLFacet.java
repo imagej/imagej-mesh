@@ -30,28 +30,28 @@
 
 package net.imagej.mesh.stl;
 
-import org.apache.commons.math3.geometry.euclidean.threed.Vector3D;
+import net.imagej.mesh.Triangle;
+import net.imagej.mesh.TrianglePool;
+import net.imagej.mesh.Vertex3;
 
 /**
  * A helper class to store a facet read from a STL file
  *
  * @author Richard Domander (Royal Veterinary College, London)
+ * @author Kyle Harrington (University of Idaho, Moscow)
  */
-public final class STLFacet {
+public final class STLFacet extends Triangle {
 
-	public final Vector3D normal;
-	public final Vector3D vertex0;
-	public final Vector3D vertex1;
-	public final Vector3D vertex2;
-	public final short attributeByteCount;
+	public final short attributeByteCount = 0;// sorry TODO
+	
+	public STLFacet(TrianglePool pool) {
+		super(pool);
+	}
 
-	public STLFacet(final Vector3D normal, final Vector3D vertex0, final Vector3D vertex1,
-					final Vector3D vertex2, final short attributeByteCount)
+	public Triangle init(final Vertex3 normal, final Vertex3 v0, final Vertex3 v1,
+					final Vertex3 v2, final short attributeByteCount)
 	{
-		this.normal = normal;
-		this.vertex0 = vertex0;
-		this.vertex1 = vertex1;
-		this.vertex2 = vertex2;
-		this.attributeByteCount = attributeByteCount;
+		return super.init( v0, v1, v2, normal );
+		//this.attributeByteCount = attributeByteCount;
 	}
 }

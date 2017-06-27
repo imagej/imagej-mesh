@@ -17,7 +17,7 @@ public class Vertex3PoolTest {
 		
 		for ( int i = 0; i < 10; ++i )
 		{
-			final Vertex3 v = vp.create().init( i, 0, 0, 1, 1, 1, 0, 0 );
+			final Vertex3 v = vp.create().init( i, 0, 0, 1, 1, 1, 0, 0, 0 );
 			myVertices.add( v );
 		}
 		

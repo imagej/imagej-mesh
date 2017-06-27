@@ -32,6 +32,10 @@ package net.imagej.mesh.stl;
 
 import com.google.common.base.Strings;
 
+import net.imagej.mesh.Triangle;
+import net.imagej.mesh.TrianglePool;
+import net.imagej.mesh.Vertex3Pool;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -64,7 +68,7 @@ public abstract class AbstractBinarySTLFormat extends
 	public static final int FACET_BYTES = 50;
 
 	@Override
-	public List<STLFacet> read(final File stlFile) throws IOException {
+	public List<Triangle> read(final TrianglePool tp, final Vertex3Pool vp, final File stlFile) throws IOException {
 		if (stlFile == null) {
 			return Collections.emptyList();
 		}
@@ -72,7 +76,7 @@ public abstract class AbstractBinarySTLFormat extends
 		final byte[] data = Files.readAllBytes(Paths.get(stlFile
 			.getAbsolutePath()));
 
-		return readFacets(data);
+		return readFacets(tp,vp,data);
 	}
 
 	@Override
@@ -99,6 +103,6 @@ public abstract class AbstractBinarySTLFormat extends
 		return File.class;
 	}
 
-	public abstract List<STLFacet> readFacets(final byte[] data)
+	public abstract List<Triangle> readFacets(final TrianglePool tp, final Vertex3Pool vp, final byte[] data)
 		throws IOException;
 }

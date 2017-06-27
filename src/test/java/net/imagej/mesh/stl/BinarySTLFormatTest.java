@@ -38,6 +38,14 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 import com.google.common.base.Strings;
+
+import net.imagej.mesh.DefaultMesh;
+import net.imagej.mesh.Mesh;
+import net.imagej.mesh.Triangle;
+import net.imagej.mesh.TrianglePool;
+import net.imagej.mesh.Vertex3;
+import net.imagej.mesh.Vertex3Pool;
+
 import org.apache.commons.math3.geometry.euclidean.threed.Vector3D;
 
 import java.nio.ByteBuffer;
@@ -46,6 +54,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.junit.Test;
+import org.mastodon.collection.ref.RefArrayList;
 
 /**
  * Tests for {@link BinarySTLFormat}
@@ -66,11 +75,23 @@ public class BinarySTLFormatTest {
 
 	@Test
 	public void testWrite() throws Exception {
-		final STLFacet facet = new STLFacet(new Vector3D(0, 0, 1), new Vector3D(1, 0, 0),
-				new Vector3D(0, 1, 0), new Vector3D(0, 0, 0), (short) 0);
-		final STLFacet facet2 = new STLFacet(new Vector3D(-1, 0, 0), new Vector3D(0, 0,
-				1), new Vector3D(0, 1, 0), new Vector3D(0, 0, 0), (short) 0);
-		List<STLFacet> facets = Arrays.asList(facet, facet2);
+		Mesh mesh = new DefaultMesh();
+		Vertex3Pool vp = mesh.getVertex3Pool();
+		TrianglePool tp = mesh.getTrianglePool();
+		
+		final Triangle facet = tp.create().init(
+				vp.create().init(1, 0, 0),
+				vp.create().init(0, 1, 0), 
+				vp.create().init(0, 0, 0), 
+				vp.create().init(0, 0, 1));
+		final Triangle facet2 = tp.create().init(
+				vp.create().init(0, 0, 1),
+				vp.create().init(0, 1, 0), 
+				vp.create().init(0, 0, 0), 
+				vp.create().init(-1, 0, 0));
+		List<Triangle> facets = new RefArrayList<>(tp);
+		facets.add(facet);
+		facets.add(facet2);
 		final int expectedSize = HEADER_BYTES + COUNT_BYTES + facets.size() *
 				FACET_BYTES;
 
@@ -89,12 +110,14 @@ public class BinarySTLFormatTest {
 		final int facetCount = buffer.getInt();
 		assertEquals("Wrong number of facets written", facets.size(), facetCount);
 
-		facets.forEach(f -> assertFacet(f, buffer, 1e-12));
+		facets.forEach(f -> assertTriangle(f, buffer, 1e-12));
 	}
 
 	@Test
 	public void testReadNull() throws Exception {
-		final List<STLFacet> facets = format.read(null);
+		final Vertex3Pool vp = new Vertex3Pool( 0 );
+		final TrianglePool tp = new TrianglePool( vp, 0 );
+		final List<Triangle> facets = format.read(tp,vp,null);
 
 		assertNotNull(facets);
 		assertEquals(0, facets.size());
@@ -103,7 +126,9 @@ public class BinarySTLFormatTest {
 	@Test
 	public void testReadBadSize() throws Exception {
 		final byte[] data = new byte[61];
-		final List<STLFacet> facets = format.readFacets(data);
+		final Vertex3Pool vp = new Vertex3Pool( 0 );
+		final TrianglePool tp = new TrianglePool( vp, 0 );
+		final List<Triangle> facets = format.readFacets(tp,vp,data);
 
 		assertNotNull(facets);
 		assertEquals(0, facets.size());
@@ -118,7 +143,9 @@ public class BinarySTLFormatTest {
 		buffer.put(header);
 		buffer.putInt(facetCount);
 
-		final List<STLFacet> facets = format.readFacets(buffer.array());
+		final Vertex3Pool vp = new Vertex3Pool( 0 );
+		final TrianglePool tp = new TrianglePool( vp, 0 );
+		final List<Triangle> facets = format.readFacets(tp,vp,buffer.array());
 
 		assertNotNull(facets);
 		assertEquals(0, facets.size());
@@ -143,21 +170,23 @@ public class BinarySTLFormatTest {
 		writeFacet(buffer, facet, attributeByteCount);
 		writeFacet(buffer, facet1, attributeByteCount);
 
-		final List<STLFacet> facets = format.readFacets(buffer.array());
+		final Vertex3Pool vp = new Vertex3Pool( 1 );// TODO these are set to 1 because of a bug in mastodon-collection
+		final TrianglePool tp = new TrianglePool( vp, 1 );
+		final List<Triangle> facets = format.readFacets(tp,vp,buffer.array());
 
-		assertFacet(facets.get(0), facet);
+		
+		assertTriangle(facets.get(0), facet);
 	}
 
-	private static void assertFacet(final STLFacet expectedFacet,
+	private static void assertTriangle(final Triangle expectedFacet,
 									final List<float[]> actualFacet)
 	{
-		assertVector(expectedFacet.normal, actualFacet.get(0));
-		assertVector(expectedFacet.vertex0, actualFacet.get(1));
-		assertVector(expectedFacet.vertex1, actualFacet.get(2));
-		assertVector(expectedFacet.vertex2, actualFacet.get(3));
+		assertVector(expectedFacet.getVertex(0), actualFacet.get(1));
+		assertVector(expectedFacet.getVertex(1), actualFacet.get(2));
+		assertVector(expectedFacet.getVertex(2), actualFacet.get(3));
 	}
 
-	private static void assertVector(final Vector3D expectedVector,
+	private static void assertVector(final Vertex3 expectedVector,
 									 final float[] actualVector)
 	{
 		assertEquals(expectedVector.getX(), actualVector[0], 1e-12);
@@ -180,23 +209,29 @@ public class BinarySTLFormatTest {
 		buffer.order(ByteOrder.LITTLE_ENDIAN).putFloat(z);
 	}
 
-	private static void assertFacet(STLFacet expected, ByteBuffer buffer,
+	private static void assertTriangle(Triangle expected, ByteBuffer buffer,
 									double delta)
 	{
-		assertVector(expected.normal, buffer, delta);
-		assertVector(expected.vertex0, buffer, delta);
-		assertVector(expected.vertex1, buffer, delta);
-		assertVector(expected.vertex2, buffer, delta);
+		//System.out.println(expected + " : " + buffer.array().toString());
+		assertVector(expected.getNormal(), buffer, delta);
+		assertVector(expected.getVertex(0), buffer, delta);
+		assertVector(expected.getVertex(1), buffer, delta);
+		assertVector(expected.getVertex(2), buffer, delta);
+		final short attributeByteCount = buffer.getShort();// TODO but still need to shift
 
-		final short attributeByteCount = buffer.getShort();
-		assertEquals(expected.attributeByteCount, attributeByteCount);
+		// TODO
+		//
+		//assertEquals(expected.attributeByteCount, attributeByteCount);
 	}
 
-	private static void assertVector(final Vector3D expected,
+	private static void assertVector(final Vertex3 expected,
 									 final ByteBuffer buffer, final double delta)
 	{
-		assertEquals(expected.getX(), buffer.getFloat(), delta);
-		assertEquals(expected.getY(), buffer.getFloat(), delta);
-		assertEquals(expected.getZ(), buffer.getFloat(), delta);
+		float bx = buffer.getFloat();
+		float by = buffer.getFloat();
+		float bz = buffer.getFloat();
+		assertEquals(expected.getX(), bx, delta);
+		assertEquals(expected.getY(), by, delta);
+		assertEquals(expected.getZ(), bz, delta);
 	}
 }

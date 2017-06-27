@@ -31,6 +31,12 @@
 package net.imagej.mesh.stl;
 
 import org.apache.commons.math3.geometry.euclidean.threed.Vector3D;
+import org.mastodon.collection.ref.RefArrayList;
+
+import net.imagej.mesh.Triangle;
+import net.imagej.mesh.TrianglePool;
+import net.imagej.mesh.Vertex3;
+import net.imagej.mesh.Vertex3Pool;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -45,8 +51,8 @@ import java.util.List;
 public class BinarySTLFormat extends AbstractBinarySTLFormat {
 
 	@Override
-	public List<STLFacet> readFacets(final byte[] data) {
-		final List<STLFacet> facets = new ArrayList<>();
+	public List<Triangle> readFacets(final TrianglePool tp, final Vertex3Pool vp, final byte[] data) {
+		final List<Triangle> facets = new RefArrayList<Triangle>(tp);
 
 		if (data.length < FACET_START) {
 			return facets;
@@ -65,7 +71,7 @@ public class BinarySTLFormat extends AbstractBinarySTLFormat {
 		for (int offset = FACET_START; offset < buffer.capacity(); offset +=
 				FACET_BYTES)
 		{
-			STLFacet facet = readFacet(buffer);
+			Triangle facet = readFacet(tp,vp,buffer);
 			facets.add(facet);
 		}
 
@@ -73,7 +79,7 @@ public class BinarySTLFormat extends AbstractBinarySTLFormat {
 	}
 
 	@Override
-	public byte[] write(final List<STLFacet> facets) {
+	public byte[] write(final List<Triangle> facets) {
 		final int facetCount = facets == null ? 0 : facets.size();
 		final int bytes = HEADER_BYTES + COUNT_BYTES + facetCount * FACET_BYTES;
 		final ByteBuffer buffer = ByteBuffer.allocate(bytes).order(
@@ -92,36 +98,47 @@ public class BinarySTLFormat extends AbstractBinarySTLFormat {
 	}
 
 	private static void writeFacet(final ByteBuffer buffer,
-								   final STLFacet facet)
+								   final Triangle facet)
 	{
-		writeVector(buffer, facet.normal);
-		writeVector(buffer, facet.vertex0);
-		writeVector(buffer, facet.vertex1);
-		writeVector(buffer, facet.vertex2);
+		// TODO Blend vertices
+		writeVector( buffer, facet.getNormal() );
+		writeVector(buffer, facet.getVertex(0));
+		writeVector(buffer, facet.getVertex(1));
+		writeVector(buffer, facet.getVertex(2));
 		buffer.putShort((short) 0); // Attribute byte count
 	}
 
-	private static void writeVector(final ByteBuffer buffer, final Vector3D vector) {
+	private static void writeVector(final ByteBuffer buffer, final float x, float y, float z) {
+		buffer.putFloat(x);
+		buffer.putFloat(y);
+		buffer.putFloat(z);
+	}
+	
+	private static void writeVector(final ByteBuffer buffer, final Vertex3 vector) {
 		buffer.putFloat((float) vector.getX());
 		buffer.putFloat((float) vector.getY());
 		buffer.putFloat((float) vector.getZ());
 	}
 
-	private static STLFacet readFacet(final ByteBuffer buffer) {
-		final Vector3D normal = readVector(buffer);
-		final Vector3D vertex0 = readVector(buffer);
-		final Vector3D vertex1 = readVector(buffer);
-		final Vector3D vertex2 = readVector(buffer);
-		final short attributeByteCount = buffer.getShort();
+	private static Triangle readFacet(final TrianglePool tp, final Vertex3Pool vp, final ByteBuffer buffer) {
+		final Triangle tref = tp.createRef();
+		
+		final Vertex3 normal = readVector(vp,buffer);
+		final Vertex3 vertex0 = readVector(vp,buffer);
+		final Vertex3 vertex1 = readVector(vp,buffer);
+		final Vertex3 vertex2 = readVector(vp,buffer);
+		final short attributeByteCount = buffer.getShort();// sorry TODO
 
-		return new STLFacet(normal, vertex0, vertex1, vertex2, attributeByteCount);
+		return tp.create(tref).init(vertex0, vertex1, vertex2, normal);
 	}
 
-	private static Vector3D readVector(final ByteBuffer buffer) {
+	private static Vertex3 readVector(final Vertex3Pool vp, final ByteBuffer buffer) {
+		final Vertex3 vref = vp.createRef();
+		
 		final float x = buffer.getFloat();
 		final float y = buffer.getFloat();
 		final float z = buffer.getFloat();
 
-		return new Vector3D(x, y, z);
+		return vp.create(vref).init(x, y, z, 0, 0, 0, 0, 0, 0);
 	}
 }

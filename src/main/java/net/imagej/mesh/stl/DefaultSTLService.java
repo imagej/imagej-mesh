@@ -35,6 +35,13 @@ import java.io.IOException;
 import java.util.List;
 
 import com.google.common.io.Files;
+
+import net.imagej.mesh.DefaultMesh;
+import net.imagej.mesh.Mesh;
+import net.imagej.mesh.Triangle;
+import net.imagej.mesh.TrianglePool;
+import net.imagej.mesh.Vertex3Pool;
+
 import org.scijava.plugin.AbstractHandlerService;
 import org.scijava.plugin.Plugin;
 import org.scijava.service.Service;
@@ -50,14 +57,17 @@ public class DefaultSTLService extends AbstractHandlerService<File, STLFormat>
 {
 
 	@Override
-	public List<STLFacet> read(final File file) throws IOException {
+	public List< Triangle > read(final File file) throws IOException {
 		final STLFormat format = getHandler(file);
+		final DefaultMesh mesh = new DefaultMesh();
+		final TrianglePool tp = mesh.getTrianglePool();
+		final Vertex3Pool vp = mesh.getVertex3Pool();
 		if (format == null) return null;
-		return format.read(file);
+		return format.read(tp,vp,file);
 	}
 
 	@Override
-	public void write(final File file, final List<STLFacet> facets) throws IOException {
+	public void write(final File file, final List<Triangle> facets) throws IOException {
 		final STLFormat format = getHandler(file);
 		if (format == null) return;
 		final byte[] bytes = format.write(facets);

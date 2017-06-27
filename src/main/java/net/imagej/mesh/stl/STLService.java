@@ -37,6 +37,9 @@ import java.util.List;
 import org.scijava.plugin.HandlerService;
 import org.scijava.service.SciJavaService;
 
+import net.imagej.mesh.Mesh;
+import net.imagej.mesh.Triangle;
+
 /**
  * Interface for service that works with STL formats.
  *
@@ -47,10 +50,10 @@ public interface STLService extends HandlerService<File, STLFormat>,
 {
 
 	/** Reads the data from the given file into a string. */
-	List<STLFacet> read(File file) throws IOException;
+	List< Triangle > read(File file) throws IOException;
 
 	/** Writes the facets into the given file */
-	void write(File file, List<STLFacet> facets) throws IOException;
+	void write(File file, List<Triangle> facets) throws IOException;
 
 	// -- HandlerService methods --
 
