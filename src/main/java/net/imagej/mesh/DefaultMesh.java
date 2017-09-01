@@ -1,5 +1,6 @@
 package net.imagej.mesh;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.mastodon.collection.ref.RefArrayList;
@@ -52,6 +53,17 @@ public class DefaultMesh implements Mesh {
 	public void setTriangles(List<Triangle> triangles) {
 		this.triangles.clear();
 		this.triangles.addAll(triangles);
+	}
+
+	/* Populate the liste of vertices using the list of triangles */
+	public void setVerticesFromTriangles() {
+		ArrayList<Vertex3> vs = new ArrayList<>();
+		for( Triangle tri : this.getTriangles() ) {
+			vs.add( tri.getVertex(0) );
+			vs.add( tri.getVertex(1) );
+			vs.add( tri.getVertex(2) );
+		}
+		this.setVertices(vs);
 	}
 
 	@Override
