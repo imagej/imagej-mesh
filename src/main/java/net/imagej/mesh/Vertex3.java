@@ -1,5 +1,6 @@
 package net.imagej.mesh;
 
+import net.imglib2.RealLocalizable;
 import org.mastodon.pool.BufferMappedElement;
 import org.mastodon.pool.PoolObject;
 import org.mastodon.pool.attributes.FloatArrayAttributeValue;
@@ -10,7 +11,7 @@ import org.mastodon.pool.attributes.FloatArrayAttributeValue;
  * @author Tobias Pietzsch (MPI-CBG)
  * @author Kyle Harrington (University of Idaho, Moscow)
  */
-public class Vertex3 extends PoolObject< Vertex3, Vertex3Pool, BufferMappedElement >
+public class Vertex3 extends PoolObject< Vertex3, Vertex3Pool, BufferMappedElement > implements RealLocalizable
 {
 	private final FloatArrayAttributeValue position;
 	private final FloatArrayAttributeValue normal;
@@ -161,5 +162,34 @@ public class Vertex3 extends PoolObject< Vertex3, Vertex3Pool, BufferMappedEleme
 	public String toString()
 	{
 		return String.format( "v(%.2f, %.2f, %.2f, %.2f, %.2f, %.2f, %.2f, %.2f, %.2f)", getX(), getY(), getZ(), getNX(), getNY(), getNZ(), getU(), getV(), getW() );
+	}
+
+	@Override
+	public void localize(float[] position) {
+		position[0] = getX();
+		position[1] = getY();
+		position[2] = getZ();
+	}
+
+	@Override
+	public void localize(double[] position) {
+		position[0] = getX();
+		position[1] = getY();
+		position[2] = getZ();
+	}
+
+	@Override
+	public float getFloatPosition(int d) {
+		return position.get( 0 );
+	}
+
+	@Override
+	public double getDoublePosition(int d) {
+		return position.get( 0 );
+	}
+
+	@Override
+	public int numDimensions() {
+		return 3;
 	}
 }
