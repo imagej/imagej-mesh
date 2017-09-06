@@ -1,7 +1,11 @@
 package net.imagej.mesh;
 
+import net.imglib2.RealLocalizable;
 import org.mastodon.pool.BufferMappedElement;
 import org.mastodon.pool.PoolObject;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * A class for storing triangles in a RefPool
@@ -60,6 +64,15 @@ public class Triangle extends PoolObject< Triangle, TrianglePool, BufferMappedEl
 			throw new IllegalArgumentException();
 		}
 	}
+
+	public List<RealLocalizable> getVertices()
+	{
+		List<RealLocalizable> verts = new ArrayList<>();
+		verts.add( getVertex(0) );
+		verts.add( getVertex(1) );
+		verts.add( getVertex(2) );
+		return verts;
+	}
 	
 	// index = 0,1,2
 	public Vertex3 getNormal( )
@@ -72,6 +85,15 @@ public class Triangle extends PoolObject< Triangle, TrianglePool, BufferMappedEl
 	{
 		return pool.vertex3Pool.getObject( pool.normal.get( this ), ref );
 	}
+
+	/*public List<RealLocalizable> getNormals()
+	{
+		List<RealLocalizable> verts = new ArrayList<>();
+		verts.add( getNormal(0) );
+		verts.add( getNormal(1) );
+		verts.add( getNormal(2) );
+		return verts;
+	}*/
 
 	@Override
 	public String toString()

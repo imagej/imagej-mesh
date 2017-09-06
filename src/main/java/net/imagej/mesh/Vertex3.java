@@ -180,12 +180,12 @@ public class Vertex3 extends PoolObject< Vertex3, Vertex3Pool, BufferMappedEleme
 
 	@Override
 	public float getFloatPosition(int d) {
-		return position.get( 0 );
+		return position.get( d );
 	}
 
 	@Override
 	public double getDoublePosition(int d) {
-		return position.get( 0 );
+		return position.get( d );
 	}
 
 	@Override
