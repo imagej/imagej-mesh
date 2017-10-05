@@ -110,6 +110,9 @@
 		<license.licenseName>bsd_2</license.licenseName>
 		<license.copyrightOwners>University of Idaho, Royal Veterinary College, and
 Board of Regents of the University of Wisconsin-Madison.</license.copyrightOwners>
+
+		<!-- NB: Deploy releases to the ImageJ Maven repository. -->
+		<releaseProfiles>deploy-to-imagej</releaseProfiles>
 	</properties>
 
 	<repositories>
