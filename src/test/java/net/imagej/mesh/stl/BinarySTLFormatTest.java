@@ -30,14 +30,19 @@
 
 package net.imagej.mesh.stl;
 
+import static net.imagej.mesh.stl.AbstractBinarySTLFormat.COUNT_BYTES;
 import static net.imagej.mesh.stl.AbstractBinarySTLFormat.FACET_BYTES;
-import static net.imagej.mesh.stl.BinarySTLFormat.COUNT_BYTES;
-import static net.imagej.mesh.stl.BinarySTLFormat.HEADER;
-import static net.imagej.mesh.stl.BinarySTLFormat.HEADER_BYTES;
+import static net.imagej.mesh.stl.AbstractBinarySTLFormat.HEADER;
+import static net.imagej.mesh.stl.AbstractBinarySTLFormat.HEADER_BYTES;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 import com.google.common.base.Strings;
+
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.util.Arrays;
+import java.util.List;
 
 import net.imagej.mesh.DefaultMesh;
 import net.imagej.mesh.Mesh;
@@ -45,13 +50,6 @@ import net.imagej.mesh.Triangle;
 import net.imagej.mesh.TrianglePool;
 import net.imagej.mesh.Vertex3;
 import net.imagej.mesh.Vertex3Pool;
-
-import org.apache.commons.math3.geometry.euclidean.threed.Vector3D;
-
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
-import java.util.Arrays;
-import java.util.List;
 
 import org.junit.Test;
 import org.mastodon.collection.ref.RefArrayList;

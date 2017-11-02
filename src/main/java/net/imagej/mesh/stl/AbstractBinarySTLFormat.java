@@ -32,10 +32,6 @@ package net.imagej.mesh.stl;
 
 import com.google.common.base.Strings;
 
-import net.imagej.mesh.Triangle;
-import net.imagej.mesh.TrianglePool;
-import net.imagej.mesh.Vertex3Pool;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -44,6 +40,10 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+
+import net.imagej.mesh.Triangle;
+import net.imagej.mesh.TrianglePool;
+import net.imagej.mesh.Vertex3Pool;
 
 import org.scijava.plugin.AbstractHandlerPlugin;
 import org.scijava.util.FileUtils;

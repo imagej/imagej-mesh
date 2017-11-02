@@ -8,6 +8,13 @@ import java.io.Writer;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
+import net.imagej.mesh.DefaultMesh;
+import net.imagej.mesh.Mesh;
+import net.imagej.mesh.Triangle;
+import net.imagej.mesh.TrianglePool;
+import net.imagej.mesh.Vertex3;
+import net.imagej.mesh.Vertex3Pool;
+
 import org.mastodon.collection.RefList;
 import org.mastodon.collection.ref.RefArrayList;
 import org.scijava.plugin.AbstractHandlerPlugin;
@@ -21,12 +28,6 @@ import org.smurn.jply.util.TesselationMode;
 import org.smurn.jply.util.TextureMode;
 
 import gnu.trove.map.hash.TIntIntHashMap;
-import net.imagej.mesh.DefaultMesh;
-import net.imagej.mesh.Mesh;
-import net.imagej.mesh.Triangle;
-import net.imagej.mesh.TrianglePool;
-import net.imagej.mesh.Vertex3;
-import net.imagej.mesh.Vertex3Pool;
 
 
 

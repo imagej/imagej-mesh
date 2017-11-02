@@ -1,7 +1,5 @@
 package net.imagej.mesh;
 
-import net.imagej.mesh.Vertex3Pool;
-import net.imagej.mesh.Vertex3;
 import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;

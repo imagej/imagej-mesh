@@ -1,7 +1,6 @@
 package net.imagej.mesh;
 
 import org.mastodon.pool.PoolObjectLayout;
-import org.mastodon.pool.PoolObjectLayout.FloatArrayField;
 
 /**
  * The layout of a Triangle data structure in the memory of a RefPool

@@ -34,11 +34,11 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
-import org.scijava.plugin.HandlerPlugin;
-
 import net.imagej.mesh.Triangle;
 import net.imagej.mesh.TrianglePool;
 import net.imagej.mesh.Vertex3Pool;
+
+import org.scijava.plugin.HandlerPlugin;
 
 /**
  * {@code STLFormat} plugins provide handling for different kinds of STL files

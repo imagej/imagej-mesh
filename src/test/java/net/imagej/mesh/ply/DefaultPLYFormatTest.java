@@ -4,9 +4,9 @@ import static org.junit.Assert.assertEquals;
 
 import java.io.File;
 
-import org.junit.Test;
-
 import net.imagej.mesh.Mesh;
+
+import org.junit.Test;
 
 public class DefaultPLYFormatTest {
 	@Test

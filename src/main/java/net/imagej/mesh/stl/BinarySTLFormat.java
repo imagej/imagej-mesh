@@ -34,12 +34,12 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.List;
 
-import org.mastodon.collection.ref.RefArrayList;
-
 import net.imagej.mesh.Triangle;
 import net.imagej.mesh.TrianglePool;
 import net.imagej.mesh.Vertex3;
 import net.imagej.mesh.Vertex3Pool;
+
+import org.mastodon.collection.ref.RefArrayList;
 
 /**
  * The {@link STLFormat} implementation for standard binary STL files

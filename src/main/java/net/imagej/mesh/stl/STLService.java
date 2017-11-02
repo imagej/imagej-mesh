@@ -34,11 +34,10 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
+import net.imagej.mesh.Triangle;
+
 import org.scijava.plugin.HandlerService;
 import org.scijava.service.SciJavaService;
-
-import net.imagej.mesh.Mesh;
-import net.imagej.mesh.Triangle;
 
 /**
  * Interface for service that works with STL formats.

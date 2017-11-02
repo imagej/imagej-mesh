@@ -3,9 +3,9 @@ package net.imagej.mesh.ply;
 import java.io.File;
 import java.io.IOException;
 
-import org.scijava.plugin.HandlerPlugin;
-
 import net.imagej.mesh.Mesh;
+
+import org.scijava.plugin.HandlerPlugin;
 
 /**
  * An interface for reading and writing PLY files

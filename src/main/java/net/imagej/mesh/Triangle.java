@@ -1,11 +1,12 @@
 package net.imagej.mesh;
 
-import net.imglib2.RealLocalizable;
-import org.mastodon.pool.BufferMappedElement;
-import org.mastodon.pool.PoolObject;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import net.imglib2.RealLocalizable;
+
+import org.mastodon.pool.BufferMappedElement;
+import org.mastodon.pool.PoolObject;
 
 /**
  * A class for storing triangles in a RefPool

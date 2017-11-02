@@ -37,12 +37,6 @@ import java.util.List;
 import org.junit.Test;
 import org.mastodon.collection.ref.RefArrayList;
 
-import net.imagej.mesh.DefaultMesh;
-import net.imagej.mesh.Mesh;
-import net.imagej.mesh.Triangle;
-import net.imagej.mesh.TrianglePool;
-import net.imagej.mesh.Vertex3Pool;
-
 /**
  * Tests for {@link Mesh} and {@link DefaultMesh}
  *

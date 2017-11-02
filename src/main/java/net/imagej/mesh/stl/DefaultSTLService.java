@@ -30,14 +30,13 @@
 
 package net.imagej.mesh.stl;
 
+import com.google.common.io.Files;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
-import com.google.common.io.Files;
-
 import net.imagej.mesh.DefaultMesh;
-import net.imagej.mesh.Mesh;
 import net.imagej.mesh.Triangle;
 import net.imagej.mesh.TrianglePool;
 import net.imagej.mesh.Vertex3Pool;

@@ -32,18 +32,15 @@ package net.imagej.mesh.stl;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
+
+import net.imagej.mesh.Triangle;
 
 import org.scijava.Priority;
 import org.scijava.io.AbstractIOPlugin;
 import org.scijava.io.IOPlugin;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
-
-import net.imagej.mesh.Triangle;
-import net.imagej.mesh.stl.STLFacet;
-import net.imagej.mesh.stl.STLService;
 
 /**
  * {@link IOPlugin} for handling STL files

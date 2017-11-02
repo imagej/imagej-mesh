@@ -1,6 +1,7 @@
 package net.imagej.mesh;
 
 import net.imglib2.RealLocalizable;
+
 import org.mastodon.pool.BufferMappedElement;
 import org.mastodon.pool.PoolObject;
 import org.mastodon.pool.attributes.FloatArrayAttributeValue;
