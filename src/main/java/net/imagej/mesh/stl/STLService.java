@@ -54,21 +54,9 @@ public interface STLService extends HandlerService<File, STLFormat>,
 	/** Writes the facets into the given file */
 	void write(File file, List<Triangle> facets) throws IOException;
 
-	// -- HandlerService methods --
-
-	/** Gets the STL format which best handles the given file. */
-	@Override
-	STLFormat getHandler(File file);
-
 	// -- SingletonService methods --
 
 	/** Gets the list of available STL formats. */
 	@Override
 	List<STLFormat> getInstances();
-
-	// -- Typed methods --
-
-	/** Gets whether the given file contains STL data in a supported format. */
-	@Override
-	boolean supports(File file);
 }
