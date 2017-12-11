@@ -189,6 +189,14 @@ public class Vertex3 extends PoolObject< Vertex3, Vertex3Pool, BufferMappedEleme
 		return position.get( d );
 	}
 
+	public void setFloatPosition(float val, int d) {
+		position.set(d,val);
+	}
+
+	public void setDoublePosition(double val, int d) {
+		position.set(d,(float)val);
+	}
+
 	@Override
 	public int numDimensions() {
 		return 3;

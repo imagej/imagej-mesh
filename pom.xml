@@ -120,6 +120,10 @@ Board of Regents of the University of Wisconsin-Madison.</license.copyrightOwner
 			<id>imagej.public</id>
 			<url>http://maven.imagej.net/content/groups/public</url>
 		</repository>
+		<repository>
+			<id>imagej.snapshots</id>
+			<url>http://maven.imagej.net/content/groups/snapshots</url>
+		</repository>
 	</repositories>
 
 	<dependencies>
@@ -162,7 +166,7 @@ Board of Regents of the University of Wisconsin-Madison.</license.copyrightOwner
 		<dependency>
 			<groupId>org.mastodon</groupId>
 			<artifactId>mastodon-collection</artifactId>
-			<version>1.0.0-beta-4</version>
+			<version>1.0.0-beta-10-SNAPSHOT</version>
 		</dependency>
 		
 		<dependency>

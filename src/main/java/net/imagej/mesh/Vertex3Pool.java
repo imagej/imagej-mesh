@@ -1,5 +1,6 @@
 package net.imagej.mesh;
 
+import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 
 import org.mastodon.pool.BufferMappedElement;
@@ -29,6 +30,16 @@ public class Vertex3Pool extends Pool< Vertex3, BufferMappedElement >
 		position = new FloatArrayAttribute<>( vertexLayout.position, this );
 		normal = new FloatArrayAttribute<>( vertexLayout.normal, this );
 		uv = new FloatArrayAttribute<>( vertexLayout.uv, this );
+	}
+
+	public Vertex3Pool(ByteBuffer bb)
+	{
+		super( bb.limit(), new Vertex3Layout(), Vertex3.class, SingleArrayMemPool.factory( BufferMappedElementArray.wrappingFactory(bb) ) );
+		this.vertexLayout = new Vertex3Layout();// we need to make these twice
+		position = new FloatArrayAttribute<>( vertexLayout.position, this );
+		normal = new FloatArrayAttribute<>( vertexLayout.normal, this );
+		uv = new FloatArrayAttribute<>( vertexLayout.uv, this );
+
 	}
 
 	public Vertex3 create()
