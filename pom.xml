@@ -161,12 +161,12 @@ Board of Regents of the University of Wisconsin-Madison.</license.copyrightOwner
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-math3</artifactId>
-		</dependency>		
-		
+		</dependency>
+
 		<dependency>
 			<groupId>org.mastodon</groupId>
 			<artifactId>mastodon-collection</artifactId>
-			<version>1.0.0-beta-10-SNAPSHOT</version>
+			<version>1.0.0-beta-12-SNAPSHOT</version>
 		</dependency>
 		
 		<dependency>

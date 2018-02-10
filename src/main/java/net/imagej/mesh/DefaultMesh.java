@@ -35,9 +35,7 @@ public class DefaultMesh implements Mesh {
 	}
 
 	@Override
-	public TrianglePool getTrianglePool() {
-		return tp;
-	}
+	public TrianglePool getTrianglePool() {	return tp;	}
 
 	@Override
 	public Vertex3Pool getVertex3Pool() {
@@ -55,7 +53,7 @@ public class DefaultMesh implements Mesh {
 		this.triangles.addAll(triangles);
 	}
 
-	/* Populate the liste of vertices using the list of triangles */
+	/* Populate the list of vertices using the list of triangles */
 	public void setVerticesFromTriangles() {
 		ArrayList<Vertex3> vs = new ArrayList<>();
 		for( Triangle tri : this.getTriangles() ) {
