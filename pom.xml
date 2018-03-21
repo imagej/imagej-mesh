@@ -115,6 +115,7 @@ Board of Regents of the University of Wisconsin-Madison.</license.copyrightOwner
 		<releaseProfiles>deploy-to-imagej</releaseProfiles>
 
 		<mastodon-collection.version>1.0.0-beta-14</mastodon-collection.version>
+		<jply.version>0.2.0</jply.version>
 	</properties>
 
 	<repositories>
@@ -172,9 +173,9 @@ Board of Regents of the University of Wisconsin-Madison.</license.copyrightOwner
 		</dependency>
 		
 		<dependency>
-		    <groupId>org.smurn</groupId>
-		    <artifactId>jply</artifactId>
-		    <version>0.2.0</version>
+			<groupId>org.smurn</groupId>
+			<artifactId>jply</artifactId>
+			<version>${jply.version}</version>
 		</dependency>
 
 		<!-- Test scope dependencies -->
