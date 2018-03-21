@@ -113,6 +113,8 @@ Board of Regents of the University of Wisconsin-Madison.</license.copyrightOwner
 
 		<!-- NB: Deploy releases to the ImageJ Maven repository. -->
 		<releaseProfiles>deploy-to-imagej</releaseProfiles>
+
+		<mastodon-collection.version>1.0.0-beta-14</mastodon-collection.version>
 	</properties>
 
 	<repositories>
@@ -166,7 +168,7 @@ Board of Regents of the University of Wisconsin-Madison.</license.copyrightOwner
 		<dependency>
 			<groupId>org.mastodon</groupId>
 			<artifactId>mastodon-collection</artifactId>
-			<version>1.0.0-beta-12-SNAPSHOT</version>
+			<version>${mastodon-collection.version}</version>
 		</dependency>
 		
 		<dependency>
