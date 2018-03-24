@@ -61,7 +61,7 @@ public class Vertex3 extends PoolObject< Vertex3, Vertex3Pool, BufferMappedEleme
 
 		pool.uv.setQuiet( this, 0, u );
 		pool.uv.setQuiet( this, 1, v );
-		pool.uv.setQuiet( this, 1, w );
+		pool.uv.setQuiet( this, 2, w );
 		return this;
 	}
 
