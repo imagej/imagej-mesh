@@ -139,7 +139,7 @@ Board of Regents of the University of Wisconsin-Madison.</license.copyrightOwner
 			<groupId>com.google.guava</groupId>
 			<artifactId>guava</artifactId>
 		</dependency>
-		
+
 		<!-- ImageJ dependencies -->
 		<dependency>
 			<groupId>net.imagej</groupId>
@@ -158,9 +158,9 @@ Board of Regents of the University of Wisconsin-Madison.</license.copyrightOwner
 		<dependency>
 			<groupId>net.imglib2</groupId>
 			<artifactId>imglib2-realtransform</artifactId>
-		</dependency>		
-	
-		<!-- Additional dependencies -->	
+		</dependency>
+
+		<!-- Additional dependencies -->
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-math3</artifactId>
@@ -171,7 +171,7 @@ Board of Regents of the University of Wisconsin-Madison.</license.copyrightOwner
 			<artifactId>mastodon-collection</artifactId>
 			<version>${mastodon-collection.version}</version>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>org.smurn</groupId>
 			<artifactId>jply</artifactId>

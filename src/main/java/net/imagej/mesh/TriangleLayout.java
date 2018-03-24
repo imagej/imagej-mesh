@@ -1,3 +1,4 @@
+
 package net.imagej.mesh;
 
 import org.mastodon.pool.PoolObjectLayout;
@@ -8,8 +9,8 @@ import org.mastodon.pool.PoolObjectLayout;
  * @author Tobias Pietzsch (MPI-CBG)
  * @author Kyle Harrington (University of Idaho, Moscow)
  */
-public class TriangleLayout extends PoolObjectLayout
-{
+public class TriangleLayout extends PoolObjectLayout {
+
 	final IndexField v1 = indexField();
 	final IndexField v2 = indexField();
 	final IndexField v3 = indexField();

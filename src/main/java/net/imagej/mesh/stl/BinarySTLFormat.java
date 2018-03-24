@@ -7,13 +7,13 @@
  * %%
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  * 1. Redistributions of source code must retain the above copyright notice,
  *    this list of conditions and the following disclaimer.
  * 2. Redistributions in binary form must reproduce the above copyright notice,
  *    this list of conditions and the following disclaimer in the documentation
  *    and/or other materials provided with the distribution.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -49,27 +49,29 @@ import org.mastodon.collection.ref.RefArrayList;
 public class BinarySTLFormat extends AbstractBinarySTLFormat {
 
 	@Override
-	public List<Triangle> readFacets(final TrianglePool tp, final Vertex3Pool vp, final byte[] data) {
-		final List<Triangle> facets = new RefArrayList<Triangle>(tp);
+	public List<Triangle> readFacets(final TrianglePool tp, final Vertex3Pool vp,
+		final byte[] data)
+	{
+		final List<Triangle> facets = new RefArrayList<>(tp);
 
 		if (data.length < FACET_START) {
 			return facets;
 		}
 
 		final ByteBuffer buffer = ByteBuffer.wrap(data).order(
-				ByteOrder.LITTLE_ENDIAN);
+			ByteOrder.LITTLE_ENDIAN);
 		final int facetCount = buffer.getInt(HEADER_BYTES);
 		final int expectedSize = HEADER_BYTES + COUNT_BYTES + facetCount *
-				FACET_BYTES;
+			FACET_BYTES;
 		if (expectedSize != buffer.capacity()) {
 			return facets;
 		}
 
 		buffer.position(FACET_START);
 		for (int offset = FACET_START; offset < buffer.capacity(); offset +=
-				FACET_BYTES)
+			FACET_BYTES)
 		{
-			Triangle facet = readFacet(tp,vp,buffer);
+			final Triangle facet = readFacet(tp, vp, buffer);
 			facets.add(facet);
 		}
 
@@ -81,7 +83,7 @@ public class BinarySTLFormat extends AbstractBinarySTLFormat {
 		final int facetCount = facets == null ? 0 : facets.size();
 		final int bytes = HEADER_BYTES + COUNT_BYTES + facetCount * FACET_BYTES;
 		final ByteBuffer buffer = ByteBuffer.allocate(bytes).order(
-				ByteOrder.LITTLE_ENDIAN);
+			ByteOrder.LITTLE_ENDIAN);
 
 		buffer.put(HEADER.getBytes());
 		buffer.putInt(facetCount);
@@ -96,10 +98,10 @@ public class BinarySTLFormat extends AbstractBinarySTLFormat {
 	}
 
 	private static void writeFacet(final ByteBuffer buffer,
-								   final Triangle facet)
+		final Triangle facet)
 	{
 		// TODO Blend vertices
-		writeVector( buffer, facet.getNormal() );
+		writeVector(buffer, facet.getNormal());
 		writeVector(buffer, facet.getVertex(0));
 		writeVector(buffer, facet.getVertex(1));
 		writeVector(buffer, facet.getVertex(2));
@@ -107,34 +109,42 @@ public class BinarySTLFormat extends AbstractBinarySTLFormat {
 	}
 
 	@SuppressWarnings("unused")
-	private static void writeVector(final ByteBuffer buffer, final float x, float y, float z) {
+	private static void writeVector(final ByteBuffer buffer, final float x,
+		final float y, final float z)
+	{
 		buffer.putFloat(x);
 		buffer.putFloat(y);
 		buffer.putFloat(z);
 	}
-	
-	private static void writeVector(final ByteBuffer buffer, final Vertex3 vector) {
-		buffer.putFloat((float) vector.getX());
-		buffer.putFloat((float) vector.getY());
-		buffer.putFloat((float) vector.getZ());
+
+	private static void writeVector(final ByteBuffer buffer,
+		final Vertex3 vector)
+	{
+		buffer.putFloat(vector.getX());
+		buffer.putFloat(vector.getY());
+		buffer.putFloat(vector.getZ());
 	}
 
-	private static Triangle readFacet(final TrianglePool tp, final Vertex3Pool vp, final ByteBuffer buffer) {
+	private static Triangle readFacet(final TrianglePool tp, final Vertex3Pool vp,
+		final ByteBuffer buffer)
+	{
 		final Triangle tref = tp.createRef();
-		
-		final Vertex3 normal = readVector(vp,buffer);
-		final Vertex3 vertex0 = readVector(vp,buffer);
-		final Vertex3 vertex1 = readVector(vp,buffer);
-		final Vertex3 vertex2 = readVector(vp,buffer);
+
+		final Vertex3 normal = readVector(vp, buffer);
+		final Vertex3 vertex0 = readVector(vp, buffer);
+		final Vertex3 vertex1 = readVector(vp, buffer);
+		final Vertex3 vertex2 = readVector(vp, buffer);
 		@SuppressWarnings("unused")
 		final short attributeByteCount = buffer.getShort();// sorry TODO
 
 		return tp.create(tref).init(vertex0, vertex1, vertex2, normal);
 	}
 
-	private static Vertex3 readVector(final Vertex3Pool vp, final ByteBuffer buffer) {
+	private static Vertex3 readVector(final Vertex3Pool vp,
+		final ByteBuffer buffer)
+	{
 		final Vertex3 vref = vp.createRef();
-		
+
 		final float x = buffer.getFloat();
 		final float y = buffer.getFloat();
 		final float z = buffer.getFloat();

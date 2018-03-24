@@ -7,13 +7,13 @@
  * %%
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  * 1. Redistributions of source code must retain the above copyright notice,
  *    this list of conditions and the following disclaimer.
  * 2. Redistributions in binary form must reproduce the above copyright notice,
  *    this list of conditions and the following disclaimer in the documentation
  *    and/or other materials provided with the distribution.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -68,7 +68,9 @@ public abstract class AbstractBinarySTLFormat extends
 	public static final int FACET_BYTES = 50;
 
 	@Override
-	public List<Triangle> read(final TrianglePool tp, final Vertex3Pool vp, final File stlFile) throws IOException {
+	public List<Triangle> read(final TrianglePool tp, final Vertex3Pool vp,
+		final File stlFile) throws IOException
+	{
 		if (stlFile == null) {
 			return Collections.emptyList();
 		}
@@ -76,7 +78,7 @@ public abstract class AbstractBinarySTLFormat extends
 		final byte[] data = Files.readAllBytes(Paths.get(stlFile
 			.getAbsolutePath()));
 
-		return readFacets(tp,vp,data);
+		return readFacets(tp, vp, data);
 	}
 
 	@Override
@@ -93,7 +95,7 @@ public abstract class AbstractBinarySTLFormat extends
 			// have an arbitrary header
 			return !"solid".equals(Arrays.toString(dataStart));
 		}
-		catch (IOException e) {
+		catch (final IOException e) {
 			return false;
 		}
 	}
@@ -103,6 +105,6 @@ public abstract class AbstractBinarySTLFormat extends
 		return File.class;
 	}
 
-	public abstract List<Triangle> readFacets(final TrianglePool tp, final Vertex3Pool vp, final byte[] data)
-		throws IOException;
+	public abstract List<Triangle> readFacets(final TrianglePool tp,
+		final Vertex3Pool vp, final byte[] data) throws IOException;
 }

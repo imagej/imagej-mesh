@@ -7,13 +7,13 @@
  * %%
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  * 1. Redistributions of source code must retain the above copyright notice,
  *    this list of conditions and the following disclaimer.
  * 2. Redistributions in binary form must reproduce the above copyright notice,
  *    this list of conditions and the following disclaimer in the documentation
  *    and/or other materials provided with the distribution.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -46,29 +46,25 @@ public class MeshTest {
 
 	@Test
 	public void testWrite() throws Exception {
-		Mesh mesh = new DefaultMesh();
-		Vertex3Pool vp = mesh.getVertex3Pool();
-		TrianglePool tp = mesh.getTrianglePool();
-		
-		final Triangle facet = tp.create().init(
-				vp.create().init(1, 0, 0),
-				vp.create().init(0, 1, 0), 
-				vp.create().init(0, 0, 0), 
-				vp.create().init(0, 0, 1));
-		final Triangle facet2 = tp.create().init(
-				vp.create().init(0, 0, 1),
-				vp.create().init(0, 1, 0), 
-				vp.create().init(0, 0, 0), 
-				vp.create().init(-1, 0, 0));
-		List<Triangle> facets = new RefArrayList<>(tp);
+		final Mesh mesh = new DefaultMesh();
+		final Vertex3Pool vp = mesh.getVertex3Pool();
+		final TrianglePool tp = mesh.getTrianglePool();
+
+		final Triangle facet = tp.create().init(vp.create().init(1, 0, 0), vp
+			.create().init(0, 1, 0), vp.create().init(0, 0, 0), vp.create().init(0, 0,
+				1));
+		final Triangle facet2 = tp.create().init(vp.create().init(0, 0, 1), vp
+			.create().init(0, 1, 0), vp.create().init(0, 0, 0), vp.create().init(-1,
+				0, 0));
+		final List<Triangle> facets = new RefArrayList<>(tp);
 		facets.add(facet);
 		facets.add(facet2);
-		
-		mesh.addFacet( facet );
-		mesh.addFacet( facet2 );
 
-		assertEquals( mesh.getTriangles().size(), 2 );
-		
+		mesh.addFacet(facet);
+		mesh.addFacet(facet2);
+
+		assertEquals(mesh.getTriangles().size(), 2);
+
 	}
 
 }
