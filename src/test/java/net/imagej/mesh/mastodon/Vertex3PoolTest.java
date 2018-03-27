@@ -1,7 +1,10 @@
 
-package net.imagej.mesh;
+package net.imagej.mesh.mastodon;
 
 import static org.junit.Assert.assertEquals;
+
+import net.imagej.mesh.mastodon.Vertex3;
+import net.imagej.mesh.mastodon.Vertex3Pool;
 
 import org.junit.Test;
 import org.mastodon.collection.RefList;

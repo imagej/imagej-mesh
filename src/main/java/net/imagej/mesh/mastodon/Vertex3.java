@@ -1,5 +1,5 @@
 
-package net.imagej.mesh;
+package net.imagej.mesh.mastodon;
 
 import net.imglib2.RealLocalizable;
 

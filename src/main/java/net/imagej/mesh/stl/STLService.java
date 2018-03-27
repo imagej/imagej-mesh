@@ -34,7 +34,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
-import net.imagej.mesh.Triangle;
+import net.imagej.mesh.mastodon.Triangle;
 
 import org.scijava.plugin.HandlerService;
 import org.scijava.service.SciJavaService;

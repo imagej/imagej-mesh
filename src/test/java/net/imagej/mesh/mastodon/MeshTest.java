@@ -28,11 +28,17 @@
  * #L%
  */
 
-package net.imagej.mesh;
+package net.imagej.mesh.mastodon;
 
 import static org.junit.Assert.assertEquals;
 
 import java.util.List;
+
+import net.imagej.mesh.mastodon.DefaultMesh;
+import net.imagej.mesh.mastodon.Mesh;
+import net.imagej.mesh.mastodon.Triangle;
+import net.imagej.mesh.mastodon.TrianglePool;
+import net.imagej.mesh.mastodon.Vertex3Pool;
 
 import org.junit.Test;
 import org.mastodon.collection.ref.RefArrayList;

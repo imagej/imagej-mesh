@@ -4,7 +4,7 @@ package net.imagej.mesh.ply;
 import java.io.File;
 import java.io.IOException;
 
-import net.imagej.mesh.Mesh;
+import net.imagej.mesh.mastodon.Mesh;
 
 import org.scijava.plugin.HandlerPlugin;
 

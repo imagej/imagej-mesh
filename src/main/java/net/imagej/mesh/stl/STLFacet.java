@@ -30,9 +30,9 @@
 
 package net.imagej.mesh.stl;
 
-import net.imagej.mesh.Triangle;
-import net.imagej.mesh.TrianglePool;
-import net.imagej.mesh.Vertex3;
+import net.imagej.mesh.mastodon.Triangle;
+import net.imagej.mesh.mastodon.TrianglePool;
+import net.imagej.mesh.mastodon.Vertex3;
 
 /**
  * A helper class to store a facet read from a STL file

@@ -1,5 +1,5 @@
 
-package net.imagej.mesh;
+package net.imagej.mesh.mastodon;
 
 import java.util.ArrayList;
 import java.util.List;

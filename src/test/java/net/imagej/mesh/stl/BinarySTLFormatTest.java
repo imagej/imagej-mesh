@@ -44,12 +44,12 @@ import java.nio.ByteOrder;
 import java.util.Arrays;
 import java.util.List;
 
-import net.imagej.mesh.DefaultMesh;
-import net.imagej.mesh.Mesh;
-import net.imagej.mesh.Triangle;
-import net.imagej.mesh.TrianglePool;
-import net.imagej.mesh.Vertex3;
-import net.imagej.mesh.Vertex3Pool;
+import net.imagej.mesh.mastodon.DefaultMesh;
+import net.imagej.mesh.mastodon.Mesh;
+import net.imagej.mesh.mastodon.Triangle;
+import net.imagej.mesh.mastodon.TrianglePool;
+import net.imagej.mesh.mastodon.Vertex3;
+import net.imagej.mesh.mastodon.Vertex3Pool;
 
 import org.junit.Test;
 import org.mastodon.collection.ref.RefArrayList;

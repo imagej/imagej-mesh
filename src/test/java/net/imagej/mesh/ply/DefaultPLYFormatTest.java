@@ -5,7 +5,7 @@ import static org.junit.Assert.assertEquals;
 
 import java.io.File;
 
-import net.imagej.mesh.Mesh;
+import net.imagej.mesh.mastodon.Mesh;
 
 import org.junit.Test;
 
