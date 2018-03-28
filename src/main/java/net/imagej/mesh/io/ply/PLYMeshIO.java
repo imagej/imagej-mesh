@@ -115,7 +115,7 @@ public class PLYMeshIO extends AbstractIOPlugin<Mesh> implements MeshIOPlugin {
 			"element vertex " + mesh.vertices().size() + "\n" + //
 			"property float x\nproperty float y\nproperty float z\n" + //
 			"property float nx\nproperty float ny\nproperty float nz\n" + //
-			"property float r\n property float g\n property float b\n";
+			"property float r\nproperty float g\nproperty float b\n";
 		final String triangleHeader = "element face " + mesh.triangles().size() +
 			"\nproperty list uchar int vertex_index\n";
 		final String endHeader = "end_header\n";

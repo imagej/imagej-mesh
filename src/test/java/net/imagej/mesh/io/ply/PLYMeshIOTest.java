@@ -34,7 +34,7 @@ public class PLYMeshIOTest {
 		final PLYMeshIO meshIO = new PLYMeshIO();
 		final Mesh mesh = sampleMesh(meshIO);
 		final byte[] bytes = meshIO.writeBinary(mesh);
-		assertEquals(5306, bytes.length);
+		assertEquals(5304, bytes.length);
 	}
 
 	@Test
