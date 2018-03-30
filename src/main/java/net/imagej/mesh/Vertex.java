@@ -1,13 +1,15 @@
 
 package net.imagej.mesh;
 
+import net.imglib2.RealLocalizable;
+
 /**
  * One vertex of a {@link Vertices} collection.
  *
  * @author Curtis Rueden
  * @see Vertices
  */
-public interface Vertex {
+public interface Vertex extends RealLocalizable {
 
 	/**
 	 * The mesh to which the vertex belongs.
@@ -107,5 +109,54 @@ public interface Vertex {
 	/** W value of vertex texture coordinate, as a double. */
 	default double w() {
 		return mesh().vertices().w(index());
+	}
+
+	// -- RealLocalizable methods --
+
+	@Override
+	default void localize(final float[] position) {
+		position[0] = xf();
+		position[1] = yf();
+		position[2] = zf();
+	}
+
+	@Override
+	default void localize(final double[] position) {
+		position[0] = x();
+		position[1] = y();
+		position[2] = z();
+	}
+
+	@Override
+	default float getFloatPosition(final int d) {
+		switch (d) {
+			case 0:
+				return xf();
+			case 1:
+				return yf();
+			case 2:
+				return zf();
+		}
+		throw new IndexOutOfBoundsException("" + d);
+	}
+
+	@Override
+	default double getDoublePosition(final int d) {
+		switch (d) {
+			case 0:
+				return x();
+			case 1:
+				return y();
+			case 2:
+				return z();
+		}
+		throw new IndexOutOfBoundsException("" + d);
+	}
+
+	// -- EuclideanSpace methods --
+
+	@Override
+	default int numDimensions() {
+		return 3;
 	}
 }
