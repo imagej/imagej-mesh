@@ -13,9 +13,9 @@
 	<artifactId>imagej-mesh</artifactId>
 	<version>0.4.0-SNAPSHOT</version>
 
-	<name>ImageJ: Mesh</name>
-	<description>SciJava I/O plugins for 3D mesh structures.</description>
-	<url>http://imagej.net/ImageJ_Plugins_Mesh_I/O</url>
+	<name>ImageJ Mesh</name>
+	<description>3D mesh structures for ImageJ.</description>
+	<url>http://imagej.net/ImageJ_Mesh</url>
 	<inceptionYear>2016</inceptionYear>
 	<organization>
 		<name>ImageJ</name>
