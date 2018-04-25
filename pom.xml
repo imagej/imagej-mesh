@@ -114,7 +114,6 @@ Board of Regents of the University of Wisconsin-Madison.</license.copyrightOwner
 		<!-- NB: Deploy releases to the ImageJ Maven repository. -->
 		<releaseProfiles>deploy-to-imagej</releaseProfiles>
 
-		<mastodon-collection.version>1.0.0-beta-14</mastodon-collection.version>
 		<jply.version>0.2.0</jply.version>
 	</properties>
 
@@ -164,12 +163,6 @@ Board of Regents of the University of Wisconsin-Madison.</license.copyrightOwner
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-math3</artifactId>
-		</dependency>
-
-		<dependency>
-			<groupId>org.mastodon</groupId>
-			<artifactId>mastodon-collection</artifactId>
-			<version>${mastodon-collection.version}</version>
 		</dependency>
 
 		<dependency>
