@@ -1,8 +1,8 @@
 /*-
  * #%L
- * SciJava I/O plugins for 3D mesh structures.
+ * 3D mesh structures for ImageJ.
  * %%
- * Copyright (C) 2016 University of Idaho, Royal Veterinary College, and
+ * Copyright (C) 2016 - 2018 University of Idaho, Royal Veterinary College, and
  * Board of Regents of the University of Wisconsin-Madison.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -28,30 +28,20 @@
  * #L%
  */
 
-package net.imagej.mesh.stl;
+package net.imagej.mesh.nio;
 
-import net.imagej.mesh.Triangle;
-import net.imagej.mesh.TrianglePool;
-import net.imagej.mesh.Vertex3;
+import net.imagej.mesh.AbstractMeshTest;
+import net.imagej.mesh.Mesh;
 
 /**
- * A helper class to store a facet read from a STL file
+ * Tests {@link BufferMesh}.
  *
- * @author Richard Domander (Royal Veterinary College, London)
- * @author Kyle Harrington (University of Idaho, Moscow)
+ * @author Curtis Rueden
  */
-public final class STLFacet extends Triangle {
+public class BufferMeshTest extends AbstractMeshTest {
 
-	public final short attributeByteCount = 0;// sorry TODO
-	
-	public STLFacet(TrianglePool pool) {
-		super(pool);
-	}
-
-	public Triangle init(final Vertex3 normal, final Vertex3 v0, final Vertex3 v1,
-					final Vertex3 v2, final short attributeByteCount)
-	{
-		return super.init( v0, v1, v2, normal );
-		//this.attributeByteCount = attributeByteCount;
+	@Override
+	public Mesh createMesh() {
+		return new BufferMesh(100);
 	}
 }

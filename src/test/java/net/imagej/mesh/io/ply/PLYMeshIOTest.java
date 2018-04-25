@@ -1,8 +1,8 @@
 /*-
  * #%L
- * SciJava I/O plugins for 3D mesh structures.
+ * 3D mesh structures for ImageJ.
  * %%
- * Copyright (C) 2016 University of Idaho, Royal Veterinary College, and
+ * Copyright (C) 2016 - 2018 University of Idaho, Royal Veterinary College, and
  * Board of Regents of the University of Wisconsin-Madison.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -28,35 +28,59 @@
  * #L%
  */
 
-package net.imagej.mesh.stl;
+package net.imagej.mesh.io.ply;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assume.assumeTrue;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
+import java.net.URI;
+import java.net.URISyntaxException;
 
-import net.imagej.mesh.Triangle;
+import net.imagej.mesh.Mesh;
 
-import org.scijava.plugin.HandlerService;
-import org.scijava.service.SciJavaService;
+import org.junit.Test;
 
 /**
- * Interface for service that works with STL formats.
+ * Tests {@link PLYMeshIO}.
  *
- * @author Richard Domander (Royal Veterinary College, London)
+ * @author Kyle Harrington (University of Idaho, Moscow)
+ * @author Curtis Rueden
  */
-public interface STLService extends HandlerService<File, STLFormat>,
-	SciJavaService
-{
+public class PLYMeshIOTest {
 
-	/** Reads the data from the given file into a string. */
-	List< Triangle > read(File file) throws IOException;
+	@Test
+	public void testOpen() throws Exception {
+		final PLYMeshIO meshIO = new PLYMeshIO();
+		final Mesh m = sampleMesh(meshIO);
+		assertEquals(158, m.triangles().size());
+		assertEquals(81, m.vertices().size());
+	}
 
-	/** Writes the facets into the given file */
-	void write(File file, List<Triangle> facets) throws IOException;
+	@Test
+	public void testBinaryWrite() throws Exception {
+		final PLYMeshIO meshIO = new PLYMeshIO();
+		final Mesh mesh = sampleMesh(meshIO);
+		final byte[] bytes = meshIO.writeBinary(mesh);
+		assertEquals(5287, bytes.length);
+	}
 
-	// -- SingletonService methods --
+	@Test
+	public void testAsciiWrite() throws Exception {
+		final PLYMeshIO meshIO = new PLYMeshIO();
+		final Mesh mesh = sampleMesh(meshIO);
+		final byte[] bytes = meshIO.writeAscii(mesh);
+		assertEquals(7420, bytes.length);
+	}
 
-	/** Gets the list of available STL formats. */
-	@Override
-	List<STLFormat> getInstances();
+	// -- Helper methods --
+
+	private Mesh sampleMesh(final PLYMeshIO meshIO) throws URISyntaxException,
+		IOException
+	{
+		final URI meshURI = getClass().getResource("cone.ply").toURI();
+		assumeTrue(new File(meshURI).exists());
+		return meshIO.open(meshURI.getPath());
+	}
 }

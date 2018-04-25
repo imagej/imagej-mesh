@@ -1,8 +1,8 @@
 /*-
  * #%L
- * SciJava I/O plugins for 3D mesh structures.
+ * 3D mesh structures for ImageJ.
  * %%
- * Copyright (C) 2016 University of Idaho, Royal Veterinary College, and
+ * Copyright (C) 2016 - 2018 University of Idaho, Royal Veterinary College, and
  * Board of Regents of the University of Wisconsin-Madison.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -28,47 +28,20 @@
  * #L%
  */
 
-package net.imagej.mesh;
+package net.imagej.mesh.naive;
 
-import static org.junit.Assert.assertEquals;
-
-import java.util.List;
-
-import org.junit.Test;
-import org.mastodon.collection.ref.RefArrayList;
+import net.imagej.mesh.AbstractMeshTest;
+import net.imagej.mesh.Mesh;
 
 /**
- * Tests for {@link Mesh} and {@link DefaultMesh}
+ * Tests {@link NaiveFloatMesh}.
  *
- * @author Kyle Harrington (University of Idaho, Moscow)
+ * @author Curtis Rueden
  */
-public class MeshTest {
+public class NaiveFloatMeshTest extends AbstractMeshTest {
 
-	@Test
-	public void testWrite() throws Exception {
-		Mesh mesh = new DefaultMesh();
-		Vertex3Pool vp = mesh.getVertex3Pool();
-		TrianglePool tp = mesh.getTrianglePool();
-		
-		final Triangle facet = tp.create().init(
-				vp.create().init(1, 0, 0),
-				vp.create().init(0, 1, 0), 
-				vp.create().init(0, 0, 0), 
-				vp.create().init(0, 0, 1));
-		final Triangle facet2 = tp.create().init(
-				vp.create().init(0, 0, 1),
-				vp.create().init(0, 1, 0), 
-				vp.create().init(0, 0, 0), 
-				vp.create().init(-1, 0, 0));
-		List<Triangle> facets = new RefArrayList<>(tp);
-		facets.add(facet);
-		facets.add(facet2);
-		
-		mesh.addFacet( facet );
-		mesh.addFacet( facet2 );
-
-		assertEquals( mesh.getTriangles().size(), 2 );
-		
+	@Override
+	public Mesh createMesh() {
+		return new NaiveFloatMesh();
 	}
-
 }

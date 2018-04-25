@@ -1,8 +1,8 @@
 /*-
  * #%L
- * SciJava I/O plugins for 3D mesh structures.
+ * 3D mesh structures for ImageJ.
  * %%
- * Copyright (C) 2016 University of Idaho, Royal Veterinary College, and
+ * Copyright (C) 2016 - 2018 University of Idaho, Royal Veterinary College, and
  * Board of Regents of the University of Wisconsin-Madison.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -28,51 +28,22 @@
  * #L%
  */
 
-package net.imagej.mesh.stl;
+package net.imagej.mesh.io;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.List;
+import net.imagej.mesh.Mesh;
 
-import net.imagej.mesh.Triangle;
-
-import org.scijava.Priority;
-import org.scijava.io.AbstractIOPlugin;
 import org.scijava.io.IOPlugin;
-import org.scijava.plugin.Parameter;
-import org.scijava.plugin.Plugin;
 
 /**
- * {@link IOPlugin} for handling STL files
+ * A plugin which reads and/or writes {@link Mesh} objects.
  *
- * @author Richard Domander (Royal Veterinary College, London)
- * @see STLService
+ * @author Curtis Rueden
+ * @author Kyle Harrington (University of Idaho, Moscow)
  */
-@Plugin(type = IOPlugin.class, priority = Priority.LOW_PRIORITY - 1)
-public class STLIOPlugin extends AbstractIOPlugin<List<Triangle>> {
-
-	@Parameter(required = false)
-	private STLService stlService;
+public interface MeshIOPlugin extends IOPlugin<Mesh> {
 
 	@Override
-	public Class<List<Triangle>> getDataType() {
-		return (Class) List.class;
-	}
-
-	@Override
-	public boolean supportsOpen(final String source) {
-		return stlService != null && stlService.supports(new File(source));
-	}
-
-	@Override
-	public boolean supportsSave(final String destination) {
-		return stlService != null && stlService.supports(new File(destination));
-	}
-
-	@Override
-	public void save(final List<Triangle> data, final String destination)
-		throws IOException, NullPointerException
-	{
-		stlService.write(new File(destination), data);
+	default Class<Mesh> getDataType() {
+		return Mesh.class;
 	}
 }

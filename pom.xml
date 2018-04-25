@@ -11,15 +11,15 @@
 
 	<groupId>net.imagej</groupId>
 	<artifactId>imagej-mesh</artifactId>
-	<version>0.3.1-SNAPSHOT</version>
+	<version>0.4.0-SNAPSHOT</version>
 
-	<name>ImageJ: Mesh</name>
-	<description>SciJava I/O plugins for 3D mesh structures.</description>
-	<url>http://imagej.net/ImageJ_Plugins_Mesh_I/O</url>
+	<name>ImageJ Mesh</name>
+	<description>3D mesh structures for ImageJ.</description>
+	<url>https://imagej.net/ImageJ_Mesh</url>
 	<inceptionYear>2016</inceptionYear>
 	<organization>
 		<name>ImageJ</name>
-		<url>http://imagej.net/</url>
+		<url>https://imagej.net/</url>
 	</organization>
 	<licenses>
 		<license>
@@ -32,7 +32,7 @@
 		<developer>
 			<id>kephale</id>
 			<name>Kyle Harrington</name>
-			<url>http://imagej.net/User:Kharrington</url>
+			<url>https://imagej.net/User:Kharrington</url>
 			<roles>
 				<role>founder</role>
 				<role>lead</role>
@@ -46,7 +46,7 @@
 		<developer>
 			<id>rimadoma</id>
 			<name>Richard Domander</name>
-			<url>http://imagej.net/User:Rdom</url>
+			<url>https://imagej.net/User:Rdom</url>
 			<roles>
 				<role>founder</role>
 				<role>developer</role>
@@ -55,7 +55,7 @@
 		<developer>
 			<id>ctrueden</id>
 			<name>Curtis Rueden</name>
-			<url>http://imagej.net/User:Rueden</url>
+			<url>https://imagej.net/User:Rueden</url>
 			<roles>
 				<role>founder</role>
 				<role>debugger</role>
@@ -66,7 +66,7 @@
 		<developer>
 			<id>tpietzsch</id>
 			<name>Tobias Pietzsch</name>
-			<url>http://imagej.net/User:tpietzsch</url>
+			<url>https://imagej.net/User:tpietzsch</url>
 			<roles>
 				<role>developer</role>
 			</roles>
@@ -139,7 +139,7 @@ Board of Regents of the University of Wisconsin-Madison.</license.copyrightOwner
 			<groupId>com.google.guava</groupId>
 			<artifactId>guava</artifactId>
 		</dependency>
-		
+
 		<!-- ImageJ dependencies -->
 		<dependency>
 			<groupId>net.imagej</groupId>
@@ -158,9 +158,9 @@ Board of Regents of the University of Wisconsin-Madison.</license.copyrightOwner
 		<dependency>
 			<groupId>net.imglib2</groupId>
 			<artifactId>imglib2-realtransform</artifactId>
-		</dependency>		
-	
-		<!-- Additional dependencies -->	
+		</dependency>
+
+		<!-- Additional dependencies -->
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-math3</artifactId>
@@ -171,7 +171,7 @@ Board of Regents of the University of Wisconsin-Madison.</license.copyrightOwner
 			<artifactId>mastodon-collection</artifactId>
 			<version>${mastodon-collection.version}</version>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>org.smurn</groupId>
 			<artifactId>jply</artifactId>

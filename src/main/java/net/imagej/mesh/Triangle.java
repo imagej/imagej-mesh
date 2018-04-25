@@ -1,115 +1,203 @@
+/*-
+ * #%L
+ * 3D mesh structures for ImageJ.
+ * %%
+ * Copyright (C) 2016 - 2018 University of Idaho, Royal Veterinary College, and
+ * Board of Regents of the University of Wisconsin-Madison.
+ * %%
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ * 
+ * 1. Redistributions of source code must retain the above copyright notice,
+ *    this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright notice,
+ *    this list of conditions and the following disclaimer in the documentation
+ *    and/or other materials provided with the distribution.
+ * 
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDERS OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ * #L%
+ */
+
 package net.imagej.mesh;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import net.imglib2.RealLocalizable;
-
-import org.mastodon.pool.BufferMappedElement;
-import org.mastodon.pool.PoolObject;
-
 /**
- * A class for storing triangles in a RefPool
+ * One triangle of a {@link Triangles} collection.
  *
- * @author Tobias Pietzsch (MPI-CBG)
- * @author Kyle Harrington (University of Idaho, Moscow)
+ * @author Curtis Rueden
+ * @see Triangles
  */
-public class Triangle extends PoolObject< Triangle, TrianglePool, BufferMappedElement >
-{
-	public Triangle( final TrianglePool pool )
-	{
-		super( pool );
-	}
-	
-	public Triangle init(
-			final Vertex3 v1,
-			final Vertex3 v2,
-			final Vertex3 v3,
-			final Vertex3 normal )
-	{
-		pool.iv1.setQuiet( this, pool.vertex3Pool.getId( v1 ) );
-		pool.iv2.setQuiet( this, pool.vertex3Pool.getId( v2 ) );
-		pool.iv3.setQuiet( this, pool.vertex3Pool.getId( v3 ) );
-		pool.normal.setQuiet( this, pool.vertex3Pool.getId( normal ) );
-		return this;
+public interface Triangle {
+
+	/**
+	 * The mesh to which the triangle belongs.
+	 * 
+	 * @see Mesh#triangles()
+	 */
+	Mesh mesh();
+
+	/** Index into the mesh's list of triangles. */
+	long index();
+
+	/** <strong>Index</strong> of first vertex in the triangle. */
+	default long vertex0() {
+		return mesh().triangles().vertex0(index());
 	}
 
-	@Override
-	protected void setToUninitializedState()
-	{}
-
-	// index = 0,1,2
-	public Vertex3 getVertex( final int index )
-	{
-		return getVertex( index, pool.vertex3Pool.createRef() );
+	/** <strong>Index</strong> of second vertex in the triangle. */
+	default long vertex1() {
+		return mesh().triangles().vertex1(index());
 	}
 
-	// index = 0,1,2
-	public Vertex3 getVertex( final int index, final Vertex3 ref )
-	{
-		return pool.vertex3Pool.getObject( getVertexId( index ), ref );
-	}
-	
-	// index = 0,1,2
-	public int getVertexId( final int index )
-	{
-		switch ( index )
-		{
-		case 0:
-			return pool.iv1.get( this );
-		case 1:
-			return pool.iv2.get( this );
-		case 2:
-			return pool.iv3.get( this );
-		default:
-			throw new IllegalArgumentException();
-		}
+	/** <strong>Index</strong> of third vertex in the triangle. */
+	default long vertex2() {
+		return mesh().triangles().vertex2(index());
 	}
 
-	public List<RealLocalizable> getVertices()
-	{
-		List<RealLocalizable> verts = new ArrayList<>();
-		verts.add( getVertex(0) );
-		verts.add( getVertex(1) );
-		verts.add( getVertex(2) );
-		return verts;
-	}
-	
-	// index = 0,1,2
-	public Vertex3 getNormal( )
-	{
-		return pool.vertex3Pool.getObject( pool.normal.get( this ), pool.vertex3Pool.createRef() );
+	/** X coordinate of triangle's first vertex, as a float. */
+	default float v0xf() {
+		final long vIndex = mesh().triangles().vertex0(index());
+		return mesh().vertices().xf(vIndex);
 	}
 
-	// index = 0,1,2
-	public Vertex3 getNormal( final Vertex3 ref )
-	{
-		return pool.vertex3Pool.getObject( pool.normal.get( this ), ref );
+	/** Y coordinate of triangle's first vertex, as a float. */
+	default float v0yf() {
+		final long vIndex = mesh().triangles().vertex0(index());
+		return mesh().vertices().yf(vIndex);
 	}
 
-	/*public List<RealLocalizable> getNormals()
-	{
-		List<RealLocalizable> verts = new ArrayList<>();
-		verts.add( getNormal(0) );
-		verts.add( getNormal(1) );
-		verts.add( getNormal(2) );
-		return verts;
-	}*/
+	/** Z coordinate of triangle's first vertex, as a float. */
+	default float v0zf() {
+		final long vIndex = mesh().triangles().vertex0(index());
+		return mesh().vertices().zf(vIndex);
+	}
 
-	@Override
-	public String toString()
-	{
-		final StringBuilder sb = new StringBuilder();
-		sb.append( "triangle(" );
-		final Vertex3 ref = pool.vertex3Pool.createRef();
-		sb.append( getVertex( 0, ref ) );
-		sb.append( ", " );
-		sb.append( getVertex( 1, ref ) );
-		sb.append( ", " );
-		sb.append( getVertex( 2, ref ) );
-		sb.append( ", " );
-		sb.append( getNormal( ref ) );
-		sb.append( ")" );
-		return sb.toString();
+	/** X coordinate of triangle's second vertex, as a float. */
+	default float v1xf() {
+		final long vIndex = mesh().triangles().vertex1(index());
+		return mesh().vertices().xf(vIndex);
+	}
+
+	/** Y coordinate of triangle's second vertex, as a float. */
+	default float v1yf() {
+		final long vIndex = mesh().triangles().vertex1(index());
+		return mesh().vertices().yf(vIndex);
+	}
+
+	/** Z coordinate of triangle's second vertex, as a float. */
+	default float v1zf() {
+		final long vIndex = mesh().triangles().vertex1(index());
+		return mesh().vertices().zf(vIndex);
+	}
+
+	/** X coordinate of triangle's third vertex, as a float. */
+	default float v2xf() {
+		final long vIndex = mesh().triangles().vertex2(index());
+		return mesh().vertices().xf(vIndex);
+	}
+
+	/** Y coordinate of triangle's third vertex, as a float. */
+	default float v2yf() {
+		final long vIndex = mesh().triangles().vertex2(index());
+		return mesh().vertices().yf(vIndex);
+	}
+
+	/** Z coordinate of triangle's third vertex, as a float. */
+	default float v2zf() {
+		final long vIndex = mesh().triangles().vertex2(index());
+		return mesh().vertices().zf(vIndex);
+	}
+
+	/** X coordinate of triangle's normal, as a float. */
+	default float nxf() {
+		return mesh().triangles().nxf(index());
+	}
+
+	/** Y coordinate of triangle's normal, as a float. */
+	default float nyf() {
+		return mesh().triangles().nyf(index());
+	}
+
+	/** Z coordinate of triangle's normal, as a float. */
+	default float nzf() {
+		return mesh().triangles().nzf(index());
+	}
+
+	/** X coordinate of triangle's first vertex, as a double. */
+	default double v0x() {
+		final long vIndex = mesh().triangles().vertex0(index());
+		return mesh().vertices().x(vIndex);
+	}
+
+	/** Y coordinate of triangle's first vertex, as a double. */
+	default double v0y() {
+		final long vIndex = mesh().triangles().vertex0(index());
+		return mesh().vertices().y(vIndex);
+	}
+
+	/** Z coordinate of triangle's first vertex, as a double. */
+	default double v0z() {
+		final long vIndex = mesh().triangles().vertex0(index());
+		return mesh().vertices().z(vIndex);
+	}
+
+	/** X coordinate of triangle's second vertex, as a double. */
+	default double v1x() {
+		final long vIndex = mesh().triangles().vertex1(index());
+		return mesh().vertices().x(vIndex);
+	}
+
+	/** Y coordinate of triangle's second vertex, as a double. */
+	default double v1y() {
+		final long vIndex = mesh().triangles().vertex1(index());
+		return mesh().vertices().y(vIndex);
+	}
+
+	/** Z coordinate of triangle's second vertex, as a double. */
+	default double v1z() {
+		final long vIndex = mesh().triangles().vertex1(index());
+		return mesh().vertices().z(vIndex);
+	}
+
+	/** X coordinate of triangle's third vertex, as a double. */
+	default double v2x() {
+		final long vIndex = mesh().triangles().vertex2(index());
+		return mesh().vertices().x(vIndex);
+	}
+
+	/** Y coordinate of triangle's third vertex, as a double. */
+	default double v2y() {
+		final long vIndex = mesh().triangles().vertex2(index());
+		return mesh().vertices().y(vIndex);
+	}
+
+	/** Z coordinate of triangle's third vertex, as a double. */
+	default double v2z() {
+		final long vIndex = mesh().triangles().vertex2(index());
+		return mesh().vertices().z(vIndex);
+	}
+
+	/** X coordinate of triangle's normal, as a double. */
+	default double nx() {
+		return mesh().triangles().nx(index());
+	}
+
+	/** Y coordinate of triangle's normal, as a double. */
+	default double ny() {
+		return mesh().triangles().ny(index());
+	}
+
+	/** Z coordinate of triangle's normal, as a double. */
+	default double nz() {
+		return mesh().triangles().nz(index());
 	}
 }

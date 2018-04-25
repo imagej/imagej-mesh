@@ -1,8 +1,8 @@
 /*-
  * #%L
- * SciJava I/O plugins for 3D mesh structures.
+ * 3D mesh structures for ImageJ.
  * %%
- * Copyright (C) 2016 University of Idaho, Royal Veterinary College, and
+ * Copyright (C) 2016 - 2018 University of Idaho, Royal Veterinary College, and
  * Board of Regents of the University of Wisconsin-Madison.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -28,36 +28,20 @@
  * #L%
  */
 
-package net.imagej.mesh.stl;
+package net.imagej.mesh.naive;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.List;
-
-import net.imagej.mesh.Triangle;
-import net.imagej.mesh.TrianglePool;
-import net.imagej.mesh.Vertex3Pool;
-
-import org.scijava.plugin.HandlerPlugin;
+import net.imagej.mesh.AbstractMeshTest;
+import net.imagej.mesh.Mesh;
 
 /**
- * {@code STLFormat} plugins provide handling for different kinds of STL files
- * <p>
- * STL files can be saved in binary or ascii
- * </p>
+ * Tests {@link NaiveDoubleMesh}.
  *
- * @author Richard Domander (Royal Veterinary College, London)
+ * @author Curtis Rueden
  */
-public interface STLFormat extends HandlerPlugin<File> {
+public class NaiveDoubleMeshTest extends AbstractMeshTest {
 
-	String EXTENSION = "stl";
-
-	/**
-	 * Reads the STL facets from the given File which can then be converted into a
-	 * mesh
-	 */
-	List<Triangle> read(final TrianglePool tp, final Vertex3Pool vp, final File stlFile) throws IOException;
-
-	/** Writes the facets into a byte[] that can then be saved into a file */
-	byte[] write(final List<Triangle> facets) throws IOException;
+	@Override
+	public Mesh createMesh() {
+		return new NaiveDoubleMesh();
+	}
 }
