@@ -13,7 +13,7 @@ import net.imagej.mesh.Mesh;
 import net.imagej.mesh.Triangle;
 import net.imagej.mesh.Vertex;
 import net.imagej.mesh.io.MeshIOPlugin;
-import net.imagej.mesh.naive.NaiveMesh;
+import net.imagej.mesh.naive.NaiveFloatMesh;
 
 import org.scijava.io.AbstractIOPlugin;
 import org.scijava.plugin.Plugin;
@@ -258,7 +258,7 @@ public class PLYMeshIO extends AbstractIOPlugin<Mesh> implements MeshIOPlugin {
 
 	@Override
 	public Mesh open(final String source) throws IOException {
-		final Mesh mesh = new NaiveMesh();
+		final Mesh mesh = new NaiveFloatMesh();
 		read(new File(source), mesh);
 		return mesh;
 	}

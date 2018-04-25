@@ -6,12 +6,12 @@ import net.imagej.mesh.Mesh;
 import org.scijava.util.FloatArray;
 import org.scijava.util.IntArray;
 
-public class NaiveMesh implements Mesh {
+public class NaiveFloatMesh implements Mesh {
 
 	private final Vertices vertices;
 	private final Triangles triangles;
 
-	public NaiveMesh() {
+	public NaiveFloatMesh() {
 		vertices = new Vertices();
 		triangles = new Triangles();
 	}
@@ -48,7 +48,7 @@ public class NaiveMesh implements Mesh {
 
 		@Override
 		public Mesh mesh() {
-			return NaiveMesh.this;
+			return NaiveFloatMesh.this;
 		}
 
 		@Override
@@ -158,7 +158,7 @@ public class NaiveMesh implements Mesh {
 
 		@Override
 		public Mesh mesh() {
-			return NaiveMesh.this;
+			return NaiveFloatMesh.this;
 		}
 
 		@Override

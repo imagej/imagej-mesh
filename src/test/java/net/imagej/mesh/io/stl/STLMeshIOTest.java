@@ -47,7 +47,7 @@ import java.util.List;
 
 import net.imagej.mesh.Mesh;
 import net.imagej.mesh.Triangle;
-import net.imagej.mesh.naive.NaiveMesh;
+import net.imagej.mesh.naive.NaiveFloatMesh;
 
 import org.junit.Test;
 
@@ -71,7 +71,7 @@ public class STLMeshIOTest {
 
 	@Test
 	public void testWrite() throws Exception {
-		final Mesh mesh = new NaiveMesh();
+		final Mesh mesh = new NaiveFloatMesh();
 
 		final double t0v0x = 1, t0v0y = 0, t0v0z = 0;
 		final double t0v1x = 0, t0v1y = 1, t0v1z = 0;
@@ -119,14 +119,14 @@ public class STLMeshIOTest {
 	@Test(expected = NullPointerException.class)
 	public void testReadNull() throws Exception {
 		final STLMeshIO meshIO = new STLMeshIO();
-		final Mesh mesh = new NaiveMesh();
+		final Mesh mesh = new NaiveFloatMesh();
 		meshIO.read(mesh, (byte[]) null);
 	}
 
 	@Test
 	public void testReadBadSize() throws Exception {
 		final STLMeshIO meshIO = new STLMeshIO();
-		final Mesh mesh = new NaiveMesh();
+		final Mesh mesh = new NaiveFloatMesh();
 		meshIO.read(mesh, new byte[61]);
 
 		assertEquals(0, mesh.vertices().size());
@@ -143,7 +143,7 @@ public class STLMeshIOTest {
 		buffer.putInt(facetCount);
 
 		final STLMeshIO meshIO = new STLMeshIO();
-		final Mesh mesh = new NaiveMesh();
+		final Mesh mesh = new NaiveFloatMesh();
 		meshIO.read(mesh, buffer.array());
 
 		assertEquals(0, mesh.vertices().size());
@@ -174,7 +174,7 @@ public class STLMeshIOTest {
 		writeFacet(buffer, facet1, attributeByteCount);
 
 		final STLMeshIO meshIO = new STLMeshIO();
-		final Mesh mesh = new NaiveMesh();
+		final Mesh mesh = new NaiveFloatMesh();
 		meshIO.read(mesh, buffer.array());
 
 		final Iterator<Triangle> triangles = mesh.triangles().iterator();

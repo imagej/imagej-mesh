@@ -15,7 +15,7 @@ import java.util.Arrays;
 import net.imagej.mesh.Mesh;
 import net.imagej.mesh.Triangle;
 import net.imagej.mesh.io.MeshIOPlugin;
-import net.imagej.mesh.naive.NaiveMesh;
+import net.imagej.mesh.naive.NaiveFloatMesh;
 
 import org.scijava.io.AbstractIOPlugin;
 import org.scijava.plugin.Plugin;
@@ -119,7 +119,7 @@ public class STLMeshIO extends AbstractIOPlugin<Mesh> implements MeshIOPlugin {
 
 	@Override
 	public Mesh open(final String source) throws IOException {
-		final Mesh mesh = new NaiveMesh();
+		final Mesh mesh = new NaiveFloatMesh();
 		read(mesh, new File(source));
 		return mesh;
 	}

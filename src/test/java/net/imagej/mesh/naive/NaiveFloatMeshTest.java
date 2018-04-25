@@ -34,14 +34,14 @@ import net.imagej.mesh.AbstractMeshTest;
 import net.imagej.mesh.Mesh;
 
 /**
- * Tests for {@link net.imagej.mesh.naive} meshes.
+ * Tests {@link NaiveFloatMesh}.
  *
  * @author Curtis Rueden
  */
-public class NaiveMeshTest extends AbstractMeshTest {
+public class NaiveFloatMeshTest extends AbstractMeshTest {
 
 	@Override
 	public Mesh createMesh() {
-		return new NaiveMesh();
+		return new NaiveFloatMesh();
 	}
 }
