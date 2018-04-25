@@ -90,11 +90,6 @@ public interface Vertex extends RealLocalizable {
 		return mesh().vertices().vf(index());
 	}
 
-	/** W value of vertex texture coordinate, as a float. */
-	default float wf() {
-		return mesh().vertices().wf(index());
-	}
-
 	/** X position of vertex, as a double. */
 	default double x() {
 		return mesh().vertices().x(index());
@@ -133,11 +128,6 @@ public interface Vertex extends RealLocalizable {
 	/** V value of vertex texture coordinate, as a double. */
 	default double v() {
 		return mesh().vertices().v(index());
-	}
-
-	/** W value of vertex texture coordinate, as a double. */
-	default double w() {
-		return mesh().vertices().w(index());
 	}
 
 	// -- RealLocalizable methods --

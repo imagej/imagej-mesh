@@ -61,7 +61,7 @@ public class NaiveFloatMesh implements Mesh {
 
 		private final FloatArray xs, ys, zs;
 		private final FloatArray nxs, nys, nzs;
-		private final FloatArray us, vs, ws;
+		private final FloatArray us, vs;
 
 		public Vertices() {
 			xs = new FloatArray();
@@ -72,7 +72,6 @@ public class NaiveFloatMesh implements Mesh {
 			nzs = new FloatArray();
 			us = new FloatArray();
 			vs = new FloatArray();
-			ws = new FloatArray();
 		}
 
 		@Override
@@ -126,13 +125,8 @@ public class NaiveFloatMesh implements Mesh {
 		}
 
 		@Override
-		public float wf(long vIndex) {
-			return ws.get(safeIndex(vIndex));
-		}
-
-		@Override
 		public long addf(float x, float y, float z, float nx, float ny, float nz,
-			float u, float v, float w)
+			float u, float v)
 		{
 			final int index = xs.size();
 			xs.add(x);
@@ -143,13 +137,12 @@ public class NaiveFloatMesh implements Mesh {
 			nzs.add(nz);
 			us.add(u);
 			vs.add(v);
-			ws.add(w);
 			return index;
 		}
 
 		@Override
 		public void setf(long vIndex, float x, float y, float z, float nx, float ny,
-			float nz, float u, float v, float w)
+			float nz, float u, float v)
 		{
 			final int index = safeIndex(vIndex);
 			xs.set(index, x);
@@ -160,7 +153,6 @@ public class NaiveFloatMesh implements Mesh {
 			nzs.set(index, nz);
 			us.set(index, u);
 			vs.set(index, v);
-			ws.set(index, w);
 		}
 
 		private int safeIndex(final long index) {

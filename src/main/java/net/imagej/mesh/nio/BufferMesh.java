@@ -156,13 +156,8 @@ public class BufferMesh implements Mesh {
 		}
 
 		@Override
-		public float wf(long vIndex) {
-			return Float.NaN;
-		}
-
-		@Override
 		public long addf(float x, float y, float z, float nx, float ny, float nz,
-			float u, float v, float w)
+			float u, float v)
 		{
 			final long index = size();
 			verts.put(x);
@@ -173,14 +168,13 @@ public class BufferMesh implements Mesh {
 			normals.put(nz);
 			texCoords.put(u);
 			texCoords.put(v);
-			// NB: w is ignored!
 			return index;
 		}
 
 		@Override
 		public void setf(long vIndex, float x, float y, float z, //
 			float nx, float ny, float nz, //
-			float u, float v, float w)
+			float u, float v)
 		{
 			final int ix = safeIndex(vIndex, 3, 0);
 			final int iy = safeIndex(vIndex, 3, 1);
@@ -193,7 +187,6 @@ public class BufferMesh implements Mesh {
 			normals.put(iz, nz);
 			texCoords.put(safeIndex(vIndex, 2, 0), u);
 			texCoords.put(safeIndex(vIndex, 2, 1), v);
-			// NB: w is ignored!
 		}
 	}
 

@@ -61,7 +61,7 @@ public class NaiveDoubleMesh implements Mesh {
 
 		private final DoubleArray xs, ys, zs;
 		private final DoubleArray nxs, nys, nzs;
-		private final DoubleArray us, vs, ws;
+		private final DoubleArray us, vs;
 
 		public Vertices() {
 			xs = new DoubleArray();
@@ -72,7 +72,6 @@ public class NaiveDoubleMesh implements Mesh {
 			nzs = new DoubleArray();
 			us = new DoubleArray();
 			vs = new DoubleArray();
-			ws = new DoubleArray();
 		}
 
 		@Override
@@ -126,13 +125,8 @@ public class NaiveDoubleMesh implements Mesh {
 		}
 
 		@Override
-		public double w(long vIndex) {
-			return ws.get(safeIndex(vIndex));
-		}
-
-		@Override
 		public long add(double x, double y, double z, double nx, double ny, double nz,
-			double u, double v, double w)
+			double u, double v)
 		{
 			final int index = xs.size();
 			xs.add(x);
@@ -143,13 +137,12 @@ public class NaiveDoubleMesh implements Mesh {
 			nzs.add(nz);
 			us.add(u);
 			vs.add(v);
-			ws.add(w);
 			return index;
 		}
 
 		@Override
 		public void set(long vIndex, double x, double y, double z, double nx, double ny,
-			double nz, double u, double v, double w)
+			double nz, double u, double v)
 		{
 			final int index = safeIndex(vIndex);
 			xs.set(index, x);
@@ -160,7 +153,6 @@ public class NaiveDoubleMesh implements Mesh {
 			nzs.set(index, nz);
 			us.set(index, u);
 			vs.set(index, v);
-			ws.set(index, w);
 		}
 
 		private int safeIndex(final long index) {
@@ -211,22 +203,17 @@ public class NaiveDoubleMesh implements Mesh {
 		}
 
 		@Override
-		public float wf(long vIndex) {
-			return (float) w(vIndex);
-		}
-
-		@Override
 		public long addf(float x, float y, float z, float nx, float ny, float nz,
-			float u, float v, float w)
+			float u, float v)
 		{
-			return add(x, y, z, nx, ny, nz, u, v, w);
+			return add(x, y, z, nx, ny, nz, u, v);
 		}
 
 		@Override
 		public void setf(long vIndex, float x, float y, float z, float nx, float ny,
-			float nz, float u, float v, float w)
+			float nz, float u, float v)
 		{
-			set(vIndex, x, y, z, nx, ny, nz, u, v, w);
+			set(vIndex, x, y, z, nx, ny, nz, u, v);
 		}
 	}
 

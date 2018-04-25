@@ -69,9 +69,6 @@ public interface Vertices extends Iterable<Vertex> {
 	/** V value of vertex texture coordinate, as a float. */
 	float vf(long vIndex);
 
-	/** W value of vertex texture coordinate, as a float. */
-	float wf(long vIndex);
-
 	/**
 	 * Adds a vertex.
 	 *
@@ -83,12 +80,11 @@ public interface Vertices extends Iterable<Vertex> {
 	 * @param nz Z coordinate of the vertex's normal.
 	 * @param u U value of vertex texture coordinate.
 	 * @param v V value of vertex texture coordinate.
-	 * @param w W value of vertex texture coordinate.
 	 * @return Index of newly added vertex.
 	 */
 	long addf(float x, float y, float z, //
 		float nx, float ny, float nz, //
-		float u, float v, float w);
+		float u, float v);
 
 	/**
 	 * Overwrites a vertex's position, normal and texture coordinates.
@@ -102,11 +98,10 @@ public interface Vertices extends Iterable<Vertex> {
 	 * @param nz Z coordinate of the vertex's normal.
 	 * @param u U value of vertex texture coordinate.
 	 * @param v V value of vertex texture coordinate.
-	 * @param w W value of vertex texture coordinate.
 	 */
 	void setf(long vIndex, float x, float y, float z, //
 		float nx, float ny, float nz, //
-		float u, float v, float w);
+		float u, float v);
 
 	/**
 	 * Adds a vertex.
@@ -117,7 +112,7 @@ public interface Vertices extends Iterable<Vertex> {
 	 * @return Index of newly added vertex.
 	 */
 	default long addf(final float x, final float y, final float z) {
-		return addf(x, y, z, 0, 0, 0, 0, 0, 0);
+		return addf(x, y, z, 0, 0, 0, 0, 0);
 	}
 
 	/**
@@ -131,7 +126,7 @@ public interface Vertices extends Iterable<Vertex> {
 	default void setf(final long vIndex, //
 		final float x, final float y, final float z)
 	{
-		setf(vIndex, x, y, z, 0, 0, 0, 0, 0, 0);
+		setf(vIndex, x, y, z, 0, 0, 0, 0, 0);
 	}
 
 	/** X position of a vertex, as a double. */
@@ -174,11 +169,6 @@ public interface Vertices extends Iterable<Vertex> {
 		return vf(vIndex);
 	}
 
-	/** W value of vertex texture coordinate, as a double. */
-	default double w(long vIndex) {
-		return wf(vIndex);
-	}
-
 	/**
 	 * Adds a vertex.
 	 *
@@ -202,16 +192,15 @@ public interface Vertices extends Iterable<Vertex> {
 	 * @param nz Z coordinate of the vertex's normal.
 	 * @param u U value of vertex texture coordinate.
 	 * @param v V value of vertex texture coordinate.
-	 * @param w W value of vertex texture coordinate.
 	 * @return Index of newly added vertex.
 	 */
 	default long add(double x, double y, double z, //
 		double nx, double ny, double nz, //
-		double u, double v, double w)
+		double u, double v)
 	{
 		return addf((float) x, (float) y, (float) z, //
 			(float) nx, (float) ny, (float) nz, //
-			(float) u, (float) v, (float) w);
+			(float) u, (float) v);
 	}
 
 	/**
@@ -225,7 +214,7 @@ public interface Vertices extends Iterable<Vertex> {
 	default void set(final long vIndex, final double x, final double y,
 		final double z)
 	{
-		set(vIndex, x, y, z, 0, 0, 0, 0, 0, 0);
+		set(vIndex, x, y, z, 0, 0, 0, 0, 0);
 	}
 
 	/**
@@ -240,16 +229,15 @@ public interface Vertices extends Iterable<Vertex> {
 	 * @param nz Z coordinate of the vertex's normal.
 	 * @param u U value of vertex texture coordinate.
 	 * @param v V value of vertex texture coordinate.
-	 * @param w W value of vertex texture coordinate.
 	 */
 	default void set(final long vIndex, final double x, final double y,
 		final double z, //
 		final double nx, final double ny, final double nz, //
-		final double u, final double v, final double w)
+		final double u, final double v)
 	{
 		set(vIndex, (float) x, (float) y, (float) z, //
 			(float) nx, (float) ny, (float) nz, //
-			(float) u, (float) v, (float) w);
+			(float) u, (float) v);
 	}
 
 	// -- Iterable methods --

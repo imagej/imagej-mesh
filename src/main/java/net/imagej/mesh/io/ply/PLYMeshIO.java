@@ -94,8 +94,8 @@ public class PLYMeshIO extends AbstractIOPlugin<Mesh> implements MeshIOPlugin {
 					float nx = (float) vertex.getDouble("nx");
 					float ny = (float) vertex.getDouble("ny");
 					float nz = (float) vertex.getDouble("nz");
-					float u = 0, v = 0, w = 0; // TODO: texture coordinate
-					final long vIndex = mesh.vertices().addf(x, y, z, nx, ny, nz, u, v, w);
+					float u = 0, v = 0; // TODO: texture coordinate
+					final long vIndex = mesh.vertices().addf(x, y, z, nx, ny, nz, u, v);
 					rowToVertIndex.put(vertCount++, vIndex);
 					vertex = reader.readElement();
 				}
@@ -144,7 +144,7 @@ public class PLYMeshIO extends AbstractIOPlugin<Mesh> implements MeshIOPlugin {
 			"element vertex " + mesh.vertices().size() + "\n" + //
 			"property float x\nproperty float y\nproperty float z\n" + //
 			"property float nx\nproperty float ny\nproperty float nz\n" + //
-			"property float r\nproperty float g\nproperty float b\n";
+			"property float u\nproperty float v\n";
 		final String triangleHeader = "element face " + mesh.triangles().size() +
 			"\nproperty list uchar int vertex_index\n";
 		final String endHeader = "end_header\n";
@@ -181,7 +181,6 @@ public class PLYMeshIO extends AbstractIOPlugin<Mesh> implements MeshIOPlugin {
 			buffer.putFloat(v.nzf());
 			buffer.putFloat(v.uf());
 			buffer.putFloat(v.vf());
-			buffer.putFloat(v.wf());
 			refToVertId.put(v.index(), vertId);
 			++vertId;
 		}
@@ -201,7 +200,7 @@ public class PLYMeshIO extends AbstractIOPlugin<Mesh> implements MeshIOPlugin {
 		final String header =
 			"ply\nformat ascii 1.0\ncomment This binary PLY mesh was created with imagej-mesh.\n";
 		final String vertexHeader = "element vertex " + mesh.vertices().size() +
-			"\nproperty float x\nproperty float y\nproperty float z\nproperty float nx\nproperty float ny\nproperty float nz\nproperty float r\n property float g\n property float b\n";
+			"\nproperty float x\nproperty float y\nproperty float z\nproperty float nx\nproperty float ny\nproperty float nz\nproperty float u\n property float v\n";
 		final String triangleHeader = "element face " + mesh.triangles().size() +
 			"\nproperty list uchar int vertex_index\n";
 		final String endHeader = "end_header\n";
@@ -252,8 +251,6 @@ public class PLYMeshIO extends AbstractIOPlugin<Mesh> implements MeshIOPlugin {
 			writer.write(Float.toString(v.uf()));
 			writer.write(' ');
 			writer.write(Float.toString(v.vf()));
-			writer.write(' ');
-			writer.write(Float.toString(v.wf()));
 			writer.write('\n');
 			refToVertId.put(v.index(), vertId);
 			++vertId;
