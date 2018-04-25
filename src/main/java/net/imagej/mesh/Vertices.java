@@ -163,6 +163,29 @@ public interface Vertices extends Iterable<Vertex> {
 	}
 
 	/**
+	 * Adds a vertex.
+	 *
+	 * @param x X position of the vertex.
+	 * @param y Y position of the vertex.
+	 * @param z Z position of the vertex.
+	 * @param nx X coordinate of the vertex's normal.
+	 * @param ny Y coordinate of the vertex's normal.
+	 * @param nz Z coordinate of the vertex's normal.
+	 * @param u U value of vertex texture coordinate.
+	 * @param v V value of vertex texture coordinate.
+	 * @param w W value of vertex texture coordinate.
+	 * @return Index of newly added vertex.
+	 */
+	default long add(double x, double y, double z, //
+		double nx, double ny, double nz, //
+		double u, double v, double w)
+	{
+		return addf((float) x, (float) y, (float) z, //
+			(float) nx, (float) ny, (float) nz, //
+			(float) u, (float) v, (float) w);
+	}
+
+	/**
 	 * Overwrites the position of a vertex.
 	 *
 	 * @param vIndex Index of vertex to overwrite.
