@@ -42,6 +42,6 @@ public class BufferMeshTest extends AbstractMeshTest {
 
 	@Override
 	public Mesh createMesh() {
-		return new BufferMesh(100);
+		return new BufferMesh(100, 100);
 	}
 }

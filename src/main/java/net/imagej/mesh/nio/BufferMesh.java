@@ -47,23 +47,32 @@ public class BufferMesh implements Mesh {
 	private final Vertices vertices;
 	private final Triangles triangles;
 
-	public BufferMesh(final int capacity) {
-		this(capacity, true);
+	public BufferMesh(final int vertexCapacity, final int triangleCapacity) {
+		this(vertexCapacity, triangleCapacity, true);
 	}
 
-	public BufferMesh(final int capacity, final boolean direct) {
-		this(capacity, direct ? ByteBuffer::allocateDirect : ByteBuffer::allocate);
+	public BufferMesh(final int vertexCapacity, final int triangleCapacity,
+		final boolean direct)
+	{
+		this(vertexCapacity, triangleCapacity, //
+			direct ? ByteBuffer::allocateDirect : ByteBuffer::allocate);
 	}
 
-	public BufferMesh(final int capacity,
+	public BufferMesh(final int vertexCapacity, final int triangleCapacity,
 		final Function<Integer, ByteBuffer> creator)
 	{
-		final FloatBuffer verts = creator.apply(capacity * 3).asFloatBuffer();
-		final FloatBuffer vNormals = creator.apply(capacity * 3).asFloatBuffer();
-		final FloatBuffer texCoords = creator.apply(capacity * 2).asFloatBuffer();
+		this(creator.apply(vertexCapacity * 3).asFloatBuffer(),
+			creator.apply(vertexCapacity * 3).asFloatBuffer(),
+			creator.apply(vertexCapacity * 2).asFloatBuffer(),
+			creator.apply(triangleCapacity * 3).asIntBuffer(),
+			creator.apply(triangleCapacity * 3).asFloatBuffer());
+	}
+
+	public BufferMesh(final FloatBuffer verts, final FloatBuffer vNormals,
+		final FloatBuffer texCoords, final IntBuffer indices,
+		final FloatBuffer tNormals)
+	{
 		vertices = new Vertices(verts, vNormals, texCoords);
-		final IntBuffer indices = creator.apply(capacity * 3).asIntBuffer();
-		final FloatBuffer tNormals = creator.apply(capacity * 3).asFloatBuffer();
 		triangles = new Triangles(indices, tNormals);
 	}
 
