@@ -274,12 +274,12 @@ public class PLYMeshIO extends AbstractIOPlugin<Mesh> implements MeshIOPlugin {
 
 	@Override
 	public boolean supportsOpen(final String source) {
-		return true;
+		return FileUtils.getExtension(source).toLowerCase().equals(EXTENSION);
 	}
 
 	@Override
 	public boolean supportsSave(final String source) {
-		return true;
+		return FileUtils.getExtension(source).toLowerCase().equals(EXTENSION);
 	}
 
 	@Override
@@ -294,4 +294,6 @@ public class PLYMeshIO extends AbstractIOPlugin<Mesh> implements MeshIOPlugin {
 		final byte[] bytes = writeBinary(data);
 		FileUtils.writeFile(new File(destination), bytes);
 	}
+
+	String EXTENSION = "ply";
 }

@@ -138,12 +138,12 @@ public class STLMeshIO extends AbstractIOPlugin<Mesh> implements MeshIOPlugin {
 
 	@Override
 	public boolean supportsOpen(final String source) {
-		return true;
+		return FileUtils.getExtension(source).toLowerCase().equals(EXTENSION);
 	}
 
 	@Override
 	public boolean supportsSave(final String source) {
-		return true;
+		return FileUtils.getExtension(source).toLowerCase().equals(EXTENSION);
 	}
 
 	@Override
