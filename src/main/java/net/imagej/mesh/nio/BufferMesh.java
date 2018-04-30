@@ -32,6 +32,7 @@ package net.imagej.mesh.nio;
 
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.util.function.Function;
@@ -62,11 +63,11 @@ public class BufferMesh implements Mesh {
 	public BufferMesh(final int vertexMax, final int triangleMax,
 		final Function<Integer, ByteBuffer> creator)
 	{
-		this(floats(creator.apply(vertexMax * 12)), //
-			floats(creator.apply(vertexMax * 12)), //
-			floats(creator.apply(vertexMax * 8)), //
-			ints(creator.apply(triangleMax * 12)), //
-			floats(creator.apply(triangleMax * 12)));
+		this(floats(create(creator, vertexMax * 12)), //
+			floats(create(creator, vertexMax * 12)), //
+			floats(create(creator, vertexMax * 8)), //
+			ints(create(creator, triangleMax * 12)), //
+			floats(create(creator, triangleMax * 12)));
 	}
 
 	public BufferMesh(final FloatBuffer verts, final FloatBuffer vNormals,
@@ -291,6 +292,12 @@ public class BufferMesh implements Mesh {
 			throw new IndexOutOfBoundsException("Value too large: " + value);
 		}
 		return (int) value;
+	}
+
+	private static ByteBuffer create(final Function<Integer, ByteBuffer> creator,
+		final int length)
+	{
+		return creator.apply(length).order(ByteOrder.nativeOrder());
 	}
 
 	private static FloatBuffer floats(final ByteBuffer bytes) {
