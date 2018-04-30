@@ -90,6 +90,10 @@ public class BufferMesh implements Mesh {
 
 	public class Vertices implements net.imagej.mesh.Vertices {
 
+		private static final int V_STRIDE = 3;
+		private static final int N_STRIDE = 3;
+		private static final int T_STRIDE = 2;
+
 		private FloatBuffer verts;
 		private FloatBuffer normals;
 		private FloatBuffer texCoords;
@@ -121,47 +125,47 @@ public class BufferMesh implements Mesh {
 
 		@Override
 		public long size() {
-			return verts.position() / 3;
+			return verts.position() / V_STRIDE;
 		}
 
 		@Override
 		public float xf(long vIndex) {
-			return verts.get(safeIndex(vIndex, 3, 0));
+			return verts.get(safeIndex(vIndex, V_STRIDE, 0));
 		}
 
 		@Override
 		public float yf(long vIndex) {
-			return verts.get(safeIndex(vIndex, 3, 1));
+			return verts.get(safeIndex(vIndex, V_STRIDE, 1));
 		}
 
 		@Override
 		public float zf(long vIndex) {
-			return verts.get(safeIndex(vIndex, 3, 2));
+			return verts.get(safeIndex(vIndex, V_STRIDE, 2));
 		}
 
 		@Override
 		public float nxf(long vIndex) {
-			return normals.get(safeIndex(vIndex, 3, 0));
+			return normals.get(safeIndex(vIndex, N_STRIDE, 0));
 		}
 
 		@Override
 		public float nyf(long vIndex) {
-			return normals.get(safeIndex(vIndex, 3, 1));
+			return normals.get(safeIndex(vIndex, N_STRIDE, 1));
 		}
 
 		@Override
 		public float nzf(long vIndex) {
-			return normals.get(safeIndex(vIndex, 3, 2));
+			return normals.get(safeIndex(vIndex, N_STRIDE, 2));
 		}
 
 		@Override
 		public float uf(long vIndex) {
-			return texCoords.get(safeIndex(vIndex, 2, 0));
+			return texCoords.get(safeIndex(vIndex, T_STRIDE, 0));
 		}
 
 		@Override
 		public float vf(long vIndex) {
-			return texCoords.get(safeIndex(vIndex, 2, 1));
+			return texCoords.get(safeIndex(vIndex, T_STRIDE, 1));
 		}
 
 		@Override
@@ -185,21 +189,21 @@ public class BufferMesh implements Mesh {
 			float nx, float ny, float nz, //
 			float u, float v)
 		{
-			final int ix = safeIndex(vIndex, 3, 0);
-			final int iy = safeIndex(vIndex, 3, 1);
-			final int iz = safeIndex(vIndex, 3, 2);
-			verts.put(ix, x);
-			verts.put(iy, y);
-			verts.put(iz, z);
-			normals.put(ix, nx);
-			normals.put(iy, ny);
-			normals.put(iz, nz);
-			texCoords.put(safeIndex(vIndex, 2, 0), u);
-			texCoords.put(safeIndex(vIndex, 2, 1), v);
+			verts.put(safeIndex(vIndex, V_STRIDE, 0), x);
+			verts.put(safeIndex(vIndex, V_STRIDE, 1), y);
+			verts.put(safeIndex(vIndex, V_STRIDE, 2), z);
+			normals.put(safeIndex(vIndex, N_STRIDE, 0), nx);
+			normals.put(safeIndex(vIndex, N_STRIDE, 1), ny);
+			normals.put(safeIndex(vIndex, N_STRIDE, 2), nz);
+			texCoords.put(safeIndex(vIndex, T_STRIDE, 0), u);
+			texCoords.put(safeIndex(vIndex, T_STRIDE, 1), v);
 		}
 	}
 
 	public class Triangles implements net.imagej.mesh.Triangles {
+
+		private static final int I_STRIDE = 3;
+		private static final int N_STRIDE = 3;
 
 		private IntBuffer indices;
 		private FloatBuffer normals;
@@ -224,37 +228,37 @@ public class BufferMesh implements Mesh {
 
 		@Override
 		public long size() {
-			return indices.position() / 3;
+			return indices.position() / I_STRIDE;
 		}
 
 		@Override
 		public long vertex0(long tIndex) {
-			return indices.get(safeIndex(tIndex, 3, 0));
+			return indices.get(safeIndex(tIndex, I_STRIDE, 0));
 		}
 
 		@Override
 		public long vertex1(long tIndex) {
-			return indices.get(safeIndex(tIndex, 3, 1));
+			return indices.get(safeIndex(tIndex, I_STRIDE, 1));
 		}
 
 		@Override
 		public long vertex2(long tIndex) {
-			return indices.get(safeIndex(tIndex, 3, 2));
+			return indices.get(safeIndex(tIndex, I_STRIDE, 2));
 		}
 
 		@Override
 		public float nxf(long tIndex) {
-			return normals.get(safeIndex(tIndex, 3, 0));
+			return normals.get(safeIndex(tIndex, N_STRIDE, 0));
 		}
 
 		@Override
 		public float nyf(long tIndex) {
-			return normals.get(safeIndex(tIndex, 3, 1));
+			return normals.get(safeIndex(tIndex, N_STRIDE, 1));
 		}
 
 		@Override
 		public float nzf(long tIndex) {
-			return normals.get(safeIndex(tIndex, 3, 2));
+			return normals.get(safeIndex(tIndex, N_STRIDE, 2));
 		}
 
 		@Override
