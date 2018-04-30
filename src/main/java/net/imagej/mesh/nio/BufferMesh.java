@@ -47,25 +47,25 @@ public class BufferMesh implements Mesh {
 	private final Vertices vertices;
 	private final Triangles triangles;
 
-	public BufferMesh(final int vertexCapacity, final int triangleCapacity) {
-		this(vertexCapacity, triangleCapacity, true);
+	public BufferMesh(final int vertexMax, final int triangleMax) {
+		this(vertexMax, triangleMax, true);
 	}
 
-	public BufferMesh(final int vertexCapacity, final int triangleCapacity,
+	public BufferMesh(final int vertexMax, final int triangleMax,
 		final boolean direct)
 	{
-		this(vertexCapacity, triangleCapacity, //
+		this(vertexMax, triangleMax, //
 			direct ? ByteBuffer::allocateDirect : ByteBuffer::allocate);
 	}
 
-	public BufferMesh(final int vertexCapacity, final int triangleCapacity,
+	public BufferMesh(final int vertexMax, final int triangleMax,
 		final Function<Integer, ByteBuffer> creator)
 	{
-		this(creator.apply(vertexCapacity * 12).asFloatBuffer(),
-			creator.apply(vertexCapacity * 12).asFloatBuffer(),
-			creator.apply(vertexCapacity * 8).asFloatBuffer(),
-			creator.apply(triangleCapacity * 12).asIntBuffer(),
-			creator.apply(triangleCapacity * 12).asFloatBuffer());
+		this(creator.apply(vertexMax * 12).asFloatBuffer(),
+			creator.apply(vertexMax * 12).asFloatBuffer(),
+			creator.apply(vertexMax * 8).asFloatBuffer(),
+			creator.apply(triangleMax * 12).asIntBuffer(),
+			creator.apply(triangleMax * 12).asFloatBuffer());
 	}
 
 	public BufferMesh(final FloatBuffer verts, final FloatBuffer vNormals,
