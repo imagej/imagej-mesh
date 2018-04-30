@@ -61,11 +61,11 @@ public class BufferMesh implements Mesh {
 	public BufferMesh(final int vertexCapacity, final int triangleCapacity,
 		final Function<Integer, ByteBuffer> creator)
 	{
-		this(creator.apply(vertexCapacity * 3).asFloatBuffer(),
-			creator.apply(vertexCapacity * 3).asFloatBuffer(),
-			creator.apply(vertexCapacity * 2).asFloatBuffer(),
-			creator.apply(triangleCapacity * 3).asIntBuffer(),
-			creator.apply(triangleCapacity * 3).asFloatBuffer());
+		this(creator.apply(vertexCapacity * 12).asFloatBuffer(),
+			creator.apply(vertexCapacity * 12).asFloatBuffer(),
+			creator.apply(vertexCapacity * 8).asFloatBuffer(),
+			creator.apply(triangleCapacity * 12).asIntBuffer(),
+			creator.apply(triangleCapacity * 12).asFloatBuffer());
 	}
 
 	public BufferMesh(final FloatBuffer verts, final FloatBuffer vNormals,
