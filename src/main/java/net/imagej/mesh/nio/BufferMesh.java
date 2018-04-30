@@ -30,6 +30,7 @@
 
 package net.imagej.mesh.nio;
 
+import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
@@ -61,11 +62,11 @@ public class BufferMesh implements Mesh {
 	public BufferMesh(final int vertexMax, final int triangleMax,
 		final Function<Integer, ByteBuffer> creator)
 	{
-		this(creator.apply(vertexMax * 12).asFloatBuffer(),
-			creator.apply(vertexMax * 12).asFloatBuffer(),
-			creator.apply(vertexMax * 8).asFloatBuffer(),
-			creator.apply(triangleMax * 12).asIntBuffer(),
-			creator.apply(triangleMax * 12).asFloatBuffer());
+		this(floats(creator.apply(vertexMax * 12)), //
+			floats(creator.apply(vertexMax * 12)), //
+			floats(creator.apply(vertexMax * 8)), //
+			ints(creator.apply(triangleMax * 12)), //
+			floats(creator.apply(triangleMax * 12)));
 	}
 
 	public BufferMesh(final FloatBuffer verts, final FloatBuffer vNormals,
@@ -125,7 +126,7 @@ public class BufferMesh implements Mesh {
 
 		@Override
 		public long size() {
-			return verts.position() / V_STRIDE;
+			return verts.limit() / V_STRIDE;
 		}
 
 		@Override
@@ -173,12 +174,15 @@ public class BufferMesh implements Mesh {
 			float u, float v)
 		{
 			final long index = size();
+			grow(verts, V_STRIDE);
 			verts.put(x);
 			verts.put(y);
 			verts.put(z);
+			grow(normals, N_STRIDE);
 			normals.put(nx);
 			normals.put(ny);
 			normals.put(nz);
+			grow(texCoords, T_STRIDE);
 			texCoords.put(u);
 			texCoords.put(v);
 			return index;
@@ -228,7 +232,7 @@ public class BufferMesh implements Mesh {
 
 		@Override
 		public long size() {
-			return indices.position() / I_STRIDE;
+			return indices.limit() / I_STRIDE;
 		}
 
 		@Override
@@ -264,9 +268,11 @@ public class BufferMesh implements Mesh {
 		@Override
 		public long addf(long v0, long v1, long v2, float nx, float ny, float nz) {
 			final long index = size();
+			grow(indices, I_STRIDE);
 			indices.put(safeInt(v0));
 			indices.put(safeInt(v1));
 			indices.put(safeInt(v2));
+			grow(normals, N_STRIDE);
 			normals.put(nx);
 			normals.put(ny);
 			normals.put(nz);
@@ -285,5 +291,26 @@ public class BufferMesh implements Mesh {
 			throw new IndexOutOfBoundsException("Value too large: " + value);
 		}
 		return (int) value;
+	}
+
+	private static FloatBuffer floats(final ByteBuffer bytes) {
+		final FloatBuffer floats = bytes.asFloatBuffer();
+		// NB: The limit must be set _after_ casting to float,
+		// or else the casted buffer will have a capacity of 0!
+		floats.limit(0);
+		return floats;
+	}
+
+	private static IntBuffer ints(final ByteBuffer bytes) {
+		final IntBuffer ints = bytes.asIntBuffer();
+		// NB: The limit must be set _after_ casting to int,
+		// or else the casted buffer will have a capacity of 0!
+		ints.limit(0);
+		return ints;
+	}
+
+	/** Expands the buffer limit in anticipation of {@code put} operations. */
+	private static void grow(final Buffer buffer, final int step) {
+		buffer.limit(buffer.limit() + step);
 	}
 }
