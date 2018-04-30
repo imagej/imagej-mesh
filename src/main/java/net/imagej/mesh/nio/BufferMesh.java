@@ -274,11 +274,13 @@ public class BufferMesh implements Mesh {
 		}
 	}
 
-	private int safeIndex(final long index, final int span, final int offset) {
+	private static int safeIndex(final long index, final int span,
+		final int offset)
+	{
 		return safeInt(span * index + offset);
 	}
 
-	private int safeInt(final long value) {
+	private static int safeInt(final long value) {
 		if (value > Integer.MAX_VALUE) {
 			throw new IndexOutOfBoundsException("Value too large: " + value);
 		}
