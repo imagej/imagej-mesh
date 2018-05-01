@@ -11,7 +11,7 @@
 
 	<groupId>net.imagej</groupId>
 	<artifactId>imagej-mesh</artifactId>
-	<version>0.5.2-SNAPSHOT</version>
+	<version>0.6.0-SNAPSHOT</version>
 
 	<name>ImageJ Mesh</name>
 	<description>3D mesh structures for ImageJ.</description>
