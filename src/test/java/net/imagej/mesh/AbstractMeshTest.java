@@ -32,11 +32,18 @@ package net.imagej.mesh;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
+import static org.junit.Assume.assumeTrue;
 
+import java.io.File;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
+import net.imagej.mesh.io.ply.PLYMeshIO;
+import net.imagej.mesh.nio.BufferMesh;
 import org.junit.Test;
 
 /**
@@ -139,10 +146,45 @@ public abstract class AbstractMeshTest {
 			t1v0x, t1v0y, t1v0z, //
 			t2v0x, t2v0y, t2v0z, //
 			t3nx, t3ny, t3nz);
+
+
+	}
+
+	@Test
+	public void testCalculateNormals() throws URISyntaxException, IOException {
+
+		final URI meshURI = getClass().getResource("/cone.ply").toURI();
+		assumeTrue(new File(meshURI).exists());
+		Mesh inputMesh = (new PLYMeshIO()).open(meshURI.getPath());
+		Mesh outMesh = new BufferMesh((int)inputMesh.vertices().size(), (int)inputMesh.triangles().size());
+		Meshes.calculateNormals(inputMesh,outMesh);
+
+		long v0idx, v1idx, v2idx;
+		for( int idx=0; idx <inputMesh.triangles().size(); idx++ ) {
+			v0idx=inputMesh.triangles().vertex0(idx);
+			v1idx=inputMesh.triangles().vertex1(idx);
+			v2idx=inputMesh.triangles().vertex2(idx);
+			assertVertexNormal(inputMesh,v0idx,outMesh.vertices().nx(v0idx),outMesh.vertices().ny(v0idx),outMesh.vertices().nz(v0idx));
+			assertVertexNormal(inputMesh,v1idx,outMesh.vertices().nx(v1idx),outMesh.vertices().ny(v1idx),outMesh.vertices().nz(v1idx));
+			assertVertexNormal(inputMesh,v2idx,outMesh.vertices().nx(v2idx),outMesh.vertices().ny(v2idx),outMesh.vertices().nz(v2idx));
+		}
+	}
+
+	private void assertVertexNormal(Mesh mesh, long vIndex, //
+									double nx, double ny, double nz)
+	{
+		// We know that our normal calculation does normalization, let's pre-normalize input normals
+		double mx = mesh.vertices().nx(vIndex);
+		double my = mesh.vertices().ny(vIndex);
+		double mz = mesh.vertices().nz(vIndex);
+		double meshMag = Math.sqrt( Math.pow(mx,2) + Math.pow(my,2) + Math.pow(mz,2) );
+		assertEquals(nx, mx/meshMag, 0.7);
+		assertEquals(ny, my/meshMag, 0.7);
+		assertEquals(nz, mz/meshMag, 0.7);
 	}
 
 	private void assertVertex(Mesh mesh, long vIndex, //
-		double x, double y, double z)
+							  double x, double y, double z)
 	{
 		assertEquals(x, mesh.vertices().x(vIndex), 0);
 		assertEquals(y, mesh.vertices().y(vIndex), 0);

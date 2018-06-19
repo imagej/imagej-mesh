@@ -173,15 +173,17 @@ public class Meshes {
         // Now populate dest
         final Map<Long, Long> vIndexMap = new HashMap<>();
         float[] vNormal;
+        double vNormalMag;
         int vCount;
         // Copy the vertices, keeping track when indices change.
         for (final Vertex v: src.vertices()) {
             long srcIndex = v.index();
             vCount = vNbrCount.get(v.index());
             vNormal = vNormals.get(v.index());
+            vNormalMag = Math.sqrt( Math.pow( vNormal[0], 2 ) + Math.pow( vNormal[1], 2 ) + Math.pow( vNormal[2], 2) );
             long destIndex = dest.vertices().add(//
                     v.x(), v.y(), v.z(), //
-                    vNormal[0] / vCount, vNormal[1] / vCount, vNormal[2] / vCount, //
+                    vNormal[0] / vNormalMag, vNormal[1] / vNormalMag, vNormal[2] / vNormalMag, //
                     v.u(), v.v());
             if (srcIndex != destIndex) {
                 // NB: If the destination vertex index matches the source, we skip

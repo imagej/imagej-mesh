@@ -115,6 +115,7 @@ Board of Regents of the University of Wisconsin-Madison.</license.copyrightOwner
 		<releaseProfiles>deploy-to-imagej</releaseProfiles>
 
 		<jply.version>0.2.0</jply.version>
+		<imagej-mesh-io.version>0.1.0</imagej-mesh-io.version>
 	</properties>
 
 	<repositories>
@@ -145,6 +146,18 @@ Board of Regents of the University of Wisconsin-Madison.</license.copyrightOwner
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>net.imagej</groupId>
+			<artifactId>imagej-mesh-io</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>net.imagej</groupId>
+			<artifactId>imagej-mesh-io</artifactId>
+			<version>0.1.1-SNAPSHOT</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
