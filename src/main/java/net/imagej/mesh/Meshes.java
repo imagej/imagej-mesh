@@ -110,7 +110,7 @@ public class Meshes {
             final long v0 = vIndexMap.getOrDefault(v0src, v0src);
             final long v1 = vIndexMap.getOrDefault(v1src, v1src);
             final long v2 = vIndexMap.getOrDefault(v2src, v2src);
-            System.out.println(tri.index() + " " + src.triangles().size());
+
             dest.triangles().add(v0, v1, v2, tri.nx(), tri.ny(), tri.nz());
         }
     }

@@ -108,7 +108,7 @@ public interface Triangles extends Iterable<Triangle> {
 		final float v20y = v2y - v0y;
 		final float v20z = v2z - v0z;
 
-    final float nx = v10y * v20z - v10z * v20y;
+    	final float nx = v10y * v20z - v10z * v20y;
 		final float ny = v10z * v20x - v10x * v20z;
 		final float nz = v10x * v20y - v10y * v20x;
 
@@ -241,11 +241,12 @@ public interface Triangles extends Iterable<Triangle> {
 		final double v20y = v2y - v0y;
 		final double v20z = v2z - v0z;
 
-    final double nx = v10y * v20z - v10z * v20y;
+    	final double nx = v10y * v20z - v10z * v20y;
 		final double ny = v10z * v20x - v10x * v20z;
 		final double nz = v10x * v20y - v10y * v20x;
+		final double nmag = Math.sqrt( Math.pow(nx,2) + Math.pow(ny,2) + Math.pow(nz,2) );
 
-		return add(v0, v1, v2, nx, ny, nz);
+		return add(v0, v1, v2, nx/nmag, ny/nmag, nz/nmag);
 	}
 
 	/**

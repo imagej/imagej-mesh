@@ -156,11 +156,20 @@ public abstract class AbstractMeshTest {
         inputMesh.vertices().add(1,0,-1);
         inputMesh.triangles().add(0, 1, 2, 1, 0, 0);
 
+        Mesh lazyInputMesh = new NaiveDoubleMesh();
+        lazyInputMesh.vertices().add(1, 1, 1);
+        lazyInputMesh.vertices().add(1, -1, 1);
+        lazyInputMesh.vertices().add(1,0,-1);
+        lazyInputMesh.triangles().add(0, 1, 2);
+
         Mesh outMesh = new BufferMesh((int) inputMesh.vertices().size(), (int) inputMesh.triangles().size());
         Meshes.calculateNormals(inputMesh, outMesh);
 
         for (int idx = 0; idx < inputMesh.triangles().size(); idx++) {
+            // calculateNormals test
             assertTriangleNormal(inputMesh,0, outMesh.triangles().nx(idx), outMesh.triangles().ny(idx), outMesh.triangles().nz(idx));
+            // Add triangles automatic normals calc test
+            assertTriangleNormal(inputMesh,0, lazyInputMesh.triangles().nx(idx), lazyInputMesh.triangles().ny(idx), lazyInputMesh.triangles().nz(idx));
         }
     }
 
