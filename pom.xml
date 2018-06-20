@@ -152,6 +152,7 @@ Board of Regents of the University of Wisconsin-Madison.</license.copyrightOwner
 		<dependency>
 			<groupId>net.imagej</groupId>
 			<artifactId>imagej-mesh-io</artifactId>
+			<version>0.1.0</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
