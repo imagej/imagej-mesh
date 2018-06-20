@@ -151,9 +151,9 @@ public class Meshes {
             final float nx = v10y * v20z - v10z * v20y;
             final float ny = v10z * v20x - v10x * v20z;
             final float nz = v10x * v20y - v10y * v20x;
-            final float nmag = (float)Math.sqrt( Math.pow(nx,2) + Math.pow(ny,2) + Math.pow(nz,2) );
+            final float nmag = (float) Math.sqrt(Math.pow(nx, 2) + Math.pow(ny, 2) + Math.pow(nz, 2));
 
-            triNormals.put(tri.index(), new float[]{nx/nmag, ny/nmag, nz/nmag});
+            triNormals.put(tri.index(), new float[]{nx / nmag, ny / nmag, nz / nmag});
         }
 
         // Next, compute the normals per vertex based on face normals
