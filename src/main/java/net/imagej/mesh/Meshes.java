@@ -110,6 +110,7 @@ public class Meshes {
             final long v0 = vIndexMap.getOrDefault(v0src, v0src);
             final long v1 = vIndexMap.getOrDefault(v1src, v1src);
             final long v2 = vIndexMap.getOrDefault(v2src, v2src);
+            System.out.println(tri.index() + " " + src.triangles().size());
             dest.triangles().add(v0, v1, v2, tri.nx(), tri.ny(), tri.nz());
         }
     }
@@ -150,8 +151,9 @@ public class Meshes {
             final float nx = v10y * v20z - v10z * v20y;
             final float ny = v10z * v20x - v10x * v20z;
             final float nz = v10x * v20y - v10y * v20x;
+            final float nmag = (float)Math.sqrt( Math.pow(nx,2) + Math.pow(ny,2) + Math.pow(nz,2) );
 
-            triNormals.put(tri.index(), new float[]{nx, ny, nz});
+            triNormals.put(tri.index(), new float[]{nx/nmag, ny/nmag, nz/nmag});
         }
 
         // Next, compute the normals per vertex based on face normals
