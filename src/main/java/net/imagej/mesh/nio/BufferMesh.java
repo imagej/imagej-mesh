@@ -203,6 +203,31 @@ public class BufferMesh implements Mesh {
 			texCoords.put(safeIndex(vIndex, T_STRIDE, 0), u);
 			texCoords.put(safeIndex(vIndex, T_STRIDE, 1), v);
 		}
+
+		@Override
+		public void setPositionf(final long vIndex, final float x,
+			final float y, final float z)
+		{
+			verts.put(safeIndex(vIndex, V_STRIDE, 0), x);
+			verts.put(safeIndex(vIndex, V_STRIDE, 1), y);
+			verts.put(safeIndex(vIndex, V_STRIDE, 2), z);
+		}
+
+		@Override
+		public void setNormalf(final long vIndex, final float nx,
+			final float ny, final float nz)
+		{
+			normals.put(safeIndex(vIndex, N_STRIDE, 0), nx);
+			normals.put(safeIndex(vIndex, N_STRIDE, 1), ny);
+			normals.put(safeIndex(vIndex, N_STRIDE, 2), nz);
+		}
+
+		@Override
+		public void setTexturef(final long vIndex, final float u, final float v)
+		{
+			texCoords.put(safeIndex(vIndex, T_STRIDE, 0), u);
+			texCoords.put(safeIndex(vIndex, T_STRIDE, 1), v);
+		}
 	}
 
 	public class Triangles implements net.imagej.mesh.Triangles {
