@@ -235,7 +235,7 @@ public interface Vertices extends Iterable<Vertex> {
 		final double nx, final double ny, final double nz, //
 		final double u, final double v)
 	{
-		set(vIndex, (float) x, (float) y, (float) z, //
+		setf(vIndex, (float) x, (float) y, (float) z, //
 			(float) nx, (float) ny, (float) nz, //
 			(float) u, (float) v);
 	}
