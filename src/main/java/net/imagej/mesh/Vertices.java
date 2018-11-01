@@ -116,7 +116,8 @@ public interface Vertices extends Iterable<Vertex> {
 	}
 
 	/**
-	 * Overwrites a vertex's position.
+	 * Overwrites the position of a vertex, sets normal and texture coordinates
+	 * to {@code 0}
 	 *
 	 * @param vIndex Index of vertex to overwrite.
 	 * @param x X position of the vertex.
@@ -204,7 +205,8 @@ public interface Vertices extends Iterable<Vertex> {
 	}
 
 	/**
-	 * Overwrites the position of a vertex.
+	 * Overwrites the position of a vertex, sets normal and texture coordinates
+	 * to {@code 0}
 	 *
 	 * @param vIndex Index of vertex to overwrite.
 	 * @param x X position of the vertex.
