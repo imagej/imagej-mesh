@@ -157,13 +157,11 @@ public class Meshes {
         }
 
         // Next, compute the normals per vertex based on face normals
-        HashMap<Long, Integer> vNbrCount = new HashMap<>();
         HashMap<Long, float[]> vNormals = new HashMap<>();// Note: these are cumulative until normalized by vNbrCount
         float[] cumNormal, triNormal;
         for (final Triangle tri: src.triangles()) {
             triNormal = triNormals.get(tri.index());
             for (long idx: new long[]{tri.vertex0(), tri.vertex1(), tri.vertex2()}) {
-                vNbrCount.put(idx, vNbrCount.getOrDefault(idx, 0) + 1);
                 cumNormal = vNormals.getOrDefault(idx, new float[]{0, 0, 0});
                 cumNormal[0] += triNormal[0];
                 cumNormal[1] += triNormal[1];
@@ -176,11 +174,9 @@ public class Meshes {
         final Map<Long, Long> vIndexMap = new HashMap<>();
         float[] vNormal;
         double vNormalMag;
-        int vCount;
         // Copy the vertices, keeping track when indices change.
         for (final Vertex v: src.vertices()) {
             long srcIndex = v.index();
-            vCount = vNbrCount.get(v.index());
             vNormal = vNormals.get(v.index());
             vNormalMag = Math.sqrt(Math.pow(vNormal[0], 2) + Math.pow(vNormal[1], 2) + Math.pow(vNormal[2], 2));
             long destIndex = dest.vertices().add(//
