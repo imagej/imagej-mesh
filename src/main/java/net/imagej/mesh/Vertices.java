@@ -104,6 +104,35 @@ public interface Vertices extends Iterable<Vertex> {
 		float u, float v);
 
 	/**
+	 * Overwrites a vertex's position.
+	 *
+	 * @param vIndex Index of vertex to overwrite.
+	 * @param x X position of the vertex.
+	 * @param y Y position of the vertex.
+	 * @param z Z position of the vertex.
+	 */
+	void setPositionf(long vIndex, float x, float y, float z);
+
+	/**
+	 * Overwrites a vertex's normal.
+	 *
+	 * @param vIndex Index of vertex to overwrite.
+	 * @param nx X coordinate of the vertex's normal.
+	 * @param ny Y coordinate of the vertex's normal.
+	 * @param nz Z coordinate of the vertex's normal.
+	 */
+	void setNormalf(long vIndex, float nx, float ny, float nz);
+
+	/**
+	 * Overwrites a vertex's texture coordinates.
+	 *
+	 * @param vIndex Index of vertex to overwrite.
+	 * @param u U value of vertex texture coordinate.
+	 * @param v V value of vertex texture coordinate.
+	 */
+	void setTexturef(long vIndex, float u, float v);
+
+	/**
 	 * Adds a vertex.
 	 *
 	 * @param x X position of the vertex.
@@ -116,7 +145,8 @@ public interface Vertices extends Iterable<Vertex> {
 	}
 
 	/**
-	 * Overwrites a vertex's position.
+	 * Overwrites the position of a vertex, sets normal and texture coordinates
+	 * to {@code 0}
 	 *
 	 * @param vIndex Index of vertex to overwrite.
 	 * @param x X position of the vertex.
@@ -204,7 +234,8 @@ public interface Vertices extends Iterable<Vertex> {
 	}
 
 	/**
-	 * Overwrites the position of a vertex.
+	 * Overwrites the position of a vertex, sets normal and texture coordinates
+	 * to {@code 0}
 	 *
 	 * @param vIndex Index of vertex to overwrite.
 	 * @param x X position of the vertex.
@@ -235,10 +266,51 @@ public interface Vertices extends Iterable<Vertex> {
 		final double nx, final double ny, final double nz, //
 		final double u, final double v)
 	{
-		set(vIndex, (float) x, (float) y, (float) z, //
+		setf(vIndex, (float) x, (float) y, (float) z, //
 			(float) nx, (float) ny, (float) nz, //
 			(float) u, (float) v);
 	}
+
+	/**
+	 * Overwrites a vertex's position.
+	 *
+	 * @param vIndex Index of vertex to overwrite.
+	 * @param x X position of the vertex.
+	 * @param y Y position of the vertex.
+	 * @param z Z position of the vertex.
+	 */
+	default void setPosition(final long vIndex, final double x, final double y,
+		final double z)
+	{
+		setPositionf(vIndex, (float) x, (float) y, (float) z);
+	}
+
+	/**
+	 * Overwrites a vertex's normal.
+	 *
+	 * @param vIndex Index of vertex to overwrite.
+	 * @param nx X coordinate of the vertex's normal.
+	 * @param ny Y coordinate of the vertex's normal.
+	 * @param nz Z coordinate of the vertex's normal.
+	 */
+	default void setNormal(final long vIndex, final double nx, final double ny,
+		final double nz)
+	{
+		setNormalf(vIndex, (float) nx, (float) ny, (float) nz);
+	}
+
+	/**
+	 * Overwrites a vertex's texture coordinates.
+	 *
+	 * @param vIndex Index of vertex to overwrite.
+	 * @param u U value of vertex texture coordinate.
+	 * @param v V value of vertex texture coordinate.
+	 */
+	default void setTexture(final long vIndex, final double u, final double v)
+	{
+		setTexturef(vIndex, (float) u, (float) v);
+	}
+
 
 	// -- Iterable methods --
 

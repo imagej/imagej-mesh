@@ -155,6 +155,35 @@ public class NaiveFloatMesh implements Mesh {
 			vs.set(index, v);
 		}
 
+		@Override
+		public void setPositionf(final long vIndex, final float x,
+			final float y, final float z)
+		{
+			final int index = safeIndex(vIndex);
+			xs.set(index, x);
+			ys.set(index, y);
+			zs.set(index, z);
+
+		}
+
+		@Override
+		public void setNormalf(final long vIndex, final float nx,
+			final float ny, final float nz)
+		{
+			final int index = safeIndex(vIndex);
+			nxs.set(index, nx);
+			nys.set(index, ny);
+			nzs.set(index, nz);
+		}
+
+		@Override
+		public void setTexturef(final long vIndex, final float u, final float v)
+		{
+			final int index = safeIndex(vIndex);
+			us.set(index, u);
+			vs.set(index, v);
+		}
+
 		private int safeIndex(final long index) {
 			if (index > Integer.MAX_VALUE) {
 				throw new IndexOutOfBoundsException("Index too large: " + index);

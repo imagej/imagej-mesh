@@ -155,6 +155,35 @@ public class NaiveDoubleMesh implements Mesh {
 			vs.set(index, v);
 		}
 
+		@Override
+		public void setPosition(final long vIndex, final double x,
+			final double y, final double z)
+		{
+			final int index = safeIndex(vIndex);
+			xs.set(index, x);
+			ys.set(index, y);
+			zs.set(index, z);
+		}
+
+		@Override
+		public void setNormal(final long vIndex, final double nx,
+			final double ny, final double nz)
+		{
+			final int index = safeIndex(vIndex);
+			nxs.set(index, nx);
+			nys.set(index, ny);
+			nzs.set(index, nz);
+		}
+
+		@Override
+		public void setTexture(final long vIndex, final double u,
+			final double v)
+		{
+			final int index = safeIndex(vIndex);
+			us.set(index, u);
+			vs.set(index, v);
+		}
+
 		private int safeIndex(final long index) {
 			if (index > Integer.MAX_VALUE) {
 				throw new IndexOutOfBoundsException("Index too large: " + index);
@@ -214,6 +243,26 @@ public class NaiveDoubleMesh implements Mesh {
 			float nz, float u, float v)
 		{
 			set(vIndex, x, y, z, nx, ny, nz, u, v);
+		}
+
+		@Override
+		public void setPositionf(final long vIndex, final float x,
+			final float y, final float z)
+		{
+			setPosition(vIndex, x, y, z);
+		}
+
+		@Override
+		public void setNormalf(final long vIndex, final float nx,
+			final float ny, final float nz)
+		{
+			setNormal(vIndex, nx, ny, nz);
+		}
+
+		@Override
+		public void setTexturef(final long vIndex, final float u, final float v)
+		{
+			setTexture(vIndex, u, v);
 		}
 	}
 
