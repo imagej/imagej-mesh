@@ -1,6 +1,9 @@
 package net.imagej.refmesh;
 
 import java.util.Iterator;
+import net.imagej.mesh.Triangles;
+import net.imagej.mesh.Vertices;
+import org.joml.Vector3f;
 import org.mastodon.Ref;
 
 import static net.imagej.refmesh.RefMesh.safeInt;
@@ -59,6 +62,17 @@ public class TriangleRef implements Ref< TriangleRef >
 	public int hashCode()
 	{
 		return pool.hashCode() + 31 * index;
+	}
+
+	public Vector3f getNormal()
+	{
+		return getNormal( new Vector3f() );
+	}
+
+	public Vector3f getNormal( final Vector3f dest )
+	{
+		final Triangles ts = pool.triangles;
+		return dest.set( ts.nxf( index ), ts.nyf( index ), ts.nzf( index ) );
 	}
 
 	public VertexRef vertex0()

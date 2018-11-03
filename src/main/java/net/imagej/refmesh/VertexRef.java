@@ -1,13 +1,14 @@
 package net.imagej.refmesh;
 
 import net.imagej.mesh.Vertices;
+import net.imglib2.RealLocalizable;
 import org.joml.Vector2f;
 import org.joml.Vector2fc;
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
 import org.mastodon.Ref;
 
-public class VertexRef implements Ref< VertexRef >
+public class VertexRef implements Ref< VertexRef >, RealLocalizable
 {
 	/**
 	 * Current index in pool.
@@ -114,31 +115,69 @@ public class VertexRef implements Ref< VertexRef >
 		return this;
 	}
 
-	/*
-	 * not sure about these...
-	 */
-
-	private Vector3f tmp3 = new Vector3f();
-
-	private Vector2f tmp2 = new Vector2f();
-
-	public VertexRef setPosition( final VertexRef v )
-	{
-		return setPosition( v.getPosition( tmp3 ) );
-	}
-
-	public VertexRef setNormal( final VertexRef v )
-	{
-		return setNormal( v.getNormal( tmp3 ) );
-	}
-
-	public VertexRef setTexture( final VertexRef v )
-	{
-		return setTexture( v.getTexture( tmp2 ) );
-	}
-
 	public VertexRef set( final VertexRef v )
 	{
-		return setPosition( v ).setNormal( v ).setTexture( v );
+		final Vertices vv = v.pool.vertices;
+		final int vi = v.getInternalPoolIndex();
+		pool.vertices.setf( index, vv.xf( vi ), vv.yf( vi ), vv.zf( vi ), vv.nxf( vi ), vv.nyf( vi ), vv.nzf( vi ), vv.uf( vi ), vv.vf( vi ) );
+		return this;
+	}
+
+	/*
+	 * RealLocalizable
+	 */
+
+	@Override
+	public void localize( final float[] position )
+	{
+		final Vertices vs = pool.vertices;
+		position[ 0 ] = vs.xf( index );
+		position[ 1 ] = vs.yf( index );
+		position[ 2 ] = vs.zf( index );
+	}
+
+	@Override
+	public void localize( final double[] position )
+	{
+		final Vertices vs = pool.vertices;
+		position[ 0 ] = vs.x( index );
+		position[ 1 ] = vs.y( index );
+		position[ 2 ] = vs.z( index );
+	}
+
+	@Override
+	public float getFloatPosition( final int d )
+	{
+		switch ( d )
+		{
+		case 0:
+			return pool.vertices.xf( index );
+		case 1:
+			return pool.vertices.yf( index );
+		case 2:
+			return pool.vertices.zf( index );
+		}
+		throw new IndexOutOfBoundsException( "" + d );
+	}
+
+	@Override
+	public double getDoublePosition( final int d )
+	{
+		switch ( d )
+		{
+		case 0:
+			return pool.vertices.x( index );
+		case 1:
+			return pool.vertices.y( index );
+		case 2:
+			return pool.vertices.z( index );
+		}
+		throw new IndexOutOfBoundsException( "" + d );
+	}
+
+	@Override
+	public int numDimensions()
+	{
+		return 3;
 	}
 }

@@ -5,10 +5,11 @@ import java.util.NoSuchElementException;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import net.imagej.mesh.Vertices;
 import org.joml.Vector2fc;
-import org.joml.Vector3f;
 import org.joml.Vector3fc;
 import org.mastodon.Options;
 import org.mastodon.RefPool;
+import org.mastodon.collection.ref.RefPoolBackedRefCollection;
+import org.mastodon.collection.util.AbstractRefPoolCollectionWrapper;
 
 import static net.imagej.refmesh.RefMesh.safeInt;
 
@@ -101,6 +102,26 @@ public class VertexPool implements RefPool< VertexRef >, Iterable< VertexRef >
 	public int size()
 	{
 		return safeInt( vertices.size() );
+	}
+
+	private final AbstractRefPoolCollectionWrapper< VertexRef, VertexPool > asRefCollection = new AbstractRefPoolCollectionWrapper< VertexRef, VertexPool >( this )
+	{
+		@Override
+		public int size()
+		{
+			return pool.size();
+		}
+
+		@Override
+		public Iterator< VertexRef > iterator()
+		{
+			return pool.iterator();
+		}
+	};
+
+	public RefPoolBackedRefCollection< VertexRef > asRefCollection()
+	{
+		return asRefCollection;
 	}
 
 	private class Iter implements Iterator< VertexRef >

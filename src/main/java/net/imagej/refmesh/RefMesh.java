@@ -37,7 +37,7 @@ public class RefMesh
 	 * HELPERS
 	 */
 
-	static int safeInt( final long index )
+	public static int safeInt( final long index )
 	{
 		if ( index > Integer.MAX_VALUE )
 		{

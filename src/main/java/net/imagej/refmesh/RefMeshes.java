@@ -34,10 +34,15 @@ import java.util.HashMap;
 import java.util.Map;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
+import org.mastodon.collection.RefList;
 import org.mastodon.collection.RefObjectMap;
 import org.mastodon.collection.RefRefMap;
+import org.mastodon.collection.ref.RefArrayList;
 import org.mastodon.collection.ref.RefObjectHashMap;
 import org.mastodon.collection.ref.RefRefHashMap;
+import org.mastodon.kdtree.IncrementalNearestNeighborSearch;
+import org.mastodon.kdtree.IncrementalNearestNeighborSearchOnKDTree;
+import org.mastodon.kdtree.KDTree;
 
 /**
  * Illustrates how Meshes.calculateNormals would look with RefMesh wrapper
@@ -45,6 +50,110 @@ import org.mastodon.collection.ref.RefRefHashMap;
  */
 public class RefMeshes
 {
+	public static void mergeVertices( RefMesh src, RefMesh dest )
+	{
+		mergeVertices_ReuseProxies( src, dest );
+	}
+
+	public static void mergeVertices( RefMesh src, RefMesh dest, Method method )
+	{
+		switch( method )
+		{
+		case REUSEPROXIES:
+			mergeVertices_ReuseProxies( src, dest );
+			break;
+		case REFCOLLECTIONS:
+		default:
+			mergeVertices_Naive( src, dest );
+			break;
+		}
+	}
+
+	public static void mergeVertices_ReuseProxies( RefMesh src, RefMesh dest )
+	{
+		final double EPSILON = 0.0000001;
+
+		final VertexRef tmpVx0 = src.vertices().createRef();
+		final VertexRef tmpVx1 = src.vertices().createRef();
+		final VertexRef tmpVx2 = src.vertices().createRef();
+		final VertexRef tmpVx3 = src.vertices().createRef();
+		final TriangleRef tmpTr0 = src.triangles().createRef();
+
+		// Copy unique vertices
+		long t0 = System.currentTimeMillis();
+		final RefRefMap< VertexRef, VertexRef > vMap = new RefRefHashMap<>( src.vertices(), dest.vertices() );
+		final IncrementalNearestNeighborSearch< VertexRef > neighbors = new IncrementalNearestNeighborSearchOnKDTree<>(
+				KDTree.kdtree( src.vertices().asRefCollection(), src.vertices() ) );
+		final RefList< VertexRef > mapsToDestVertex = new RefArrayList<>( src.vertices() );
+		for ( final VertexRef vertex : src.vertices() )
+		{
+			if ( vMap.containsKey( vertex ) )
+				continue;
+
+			neighbors.search( vertex );
+			mapsToDestVertex.clear();
+			mapsToDestVertex.add( vertex );
+			VertexRef destVertex = null;
+			while ( neighbors.hasNext() && destVertex == null )
+			{
+				final VertexRef neighbor = neighbors.next();
+				final double squareDistance = neighbors.getSquareDistance();
+				if ( squareDistance > EPSILON )
+					destVertex = dest.vertices().add( tmpVx0 ).set( vertex );
+				else
+				{
+					destVertex = vMap.get( neighbor, tmpVx0 );
+					if ( destVertex == null )
+						mapsToDestVertex.add( neighbor );
+				}
+			}
+			for ( VertexRef v : mapsToDestVertex )
+				vMap.put( v, destVertex, tmpVx1 );
+		}
+
+		// Copy the triangles, taking care to use destination indices.
+		for ( final TriangleRef tri : src.triangles() )
+		{
+			final VertexRef v0 = vMap.get( tri.vertex0( tmpVx3 ), tmpVx0 );
+			final VertexRef v1 = vMap.get( tri.vertex1( tmpVx3 ), tmpVx1 );
+			final VertexRef v2 = vMap.get( tri.vertex2( tmpVx3 ), tmpVx2 );
+			dest.triangles().add( v0, v1, v2, tri.getNormal(), tmpTr0 );
+		}
+	}
+
+	public static void mergeVertices_Naive( RefMesh src, RefMesh dest )
+	{
+		final double EPSILON = 0.0000001;
+
+		// Copy unique vertices
+		final RefRefMap<VertexRef, VertexRef> vMap = new RefRefHashMap<>( src.vertices(), dest.vertices() );
+		final IncrementalNearestNeighborSearch< VertexRef > neighbors = new IncrementalNearestNeighborSearchOnKDTree<>(
+				KDTree.kdtree( src.vertices().asRefCollection(), src.vertices() ) );
+		for ( final VertexRef vertex : src.vertices() )
+		{
+			neighbors.search( vertex );
+			VertexRef destVertex = null;
+			while ( neighbors.hasNext() && destVertex == null )
+			{
+				final VertexRef neighbor = neighbors.next();
+				if ( neighbors.getSquareDistance() > EPSILON )
+					destVertex = dest.vertices().add().set( vertex );
+				else
+					destVertex = vMap.get( neighbor );
+			}
+			vMap.put( vertex, destVertex );
+		}
+
+		// Copy the triangles, taking care to use destination indices.
+		for ( final TriangleRef tri : src.triangles() )
+		{
+			final VertexRef v0 = vMap.get( tri.vertex0() );
+			final VertexRef v1 = vMap.get( tri.vertex1() );
+			final VertexRef v2 = vMap.get( tri.vertex2() );
+			dest.triangles().add( v0, v1, v2, tri.getNormal() );
+		}
+	}
+
 	public enum Method
 	{
 		NAIVE,
@@ -187,6 +296,7 @@ public class RefMeshes
 		final VertexRef tmpVx1 = src.vertices().createRef();
 		final VertexRef tmpVx2 = src.vertices().createRef();
 		final VertexRef tmpVx3 = src.vertices().createRef();
+		final TriangleRef tmpTr0 = src.triangles().createRef();
 
 		// Compute the triangle normals.
 		final RefObjectMap< TriangleRef, Vector3f > triNormals = new RefObjectHashMap<>( src.triangles() );
@@ -233,7 +343,7 @@ public class RefMeshes
 			final VertexRef v1 = vMap.get( tri.vertex1( tmpVx3 ), tmpVx1 );
 			final VertexRef v2 = vMap.get( tri.vertex2( tmpVx3 ), tmpVx2 );
 			final Vector3f triNormal = triNormals.get( tri );
-			dest.triangles().add( v0, v1, v2, triNormal );
+			dest.triangles().add( v0, v1, v2, triNormal, tmpTr0 );
 		}
 	}
 
@@ -243,6 +353,7 @@ public class RefMeshes
 		final VertexRef tmpVx1 = src.vertices().createRef();
 		final VertexRef tmpVx2 = src.vertices().createRef();
 		final VertexRef tmpVx3 = src.vertices().createRef();
+		final TriangleRef tmpTr0 = src.triangles().createRef();
 		final Vector3f tmpVc0 = new Vector3f();
 		final Vector3f tmpVc1 = new Vector3f();
 		final Vector3f tmpVc2 = new Vector3f();
@@ -308,7 +419,7 @@ public class RefMeshes
 				v2 = dest.vertices().getObject( key.getInternalPoolIndex(), tmpVx2 );
 
 			final Vector3f triNormal = triNormals.get( tri );
-			dest.triangles().add( v0, v1, v2, triNormal );
+			dest.triangles().add( v0, v1, v2, triNormal, tmpTr0 );
 		}
 	}
 }
