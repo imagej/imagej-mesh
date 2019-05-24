@@ -7,13 +7,13 @@
  * %%
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  * 1. Redistributions of source code must retain the above copyright notice,
  *    this list of conditions and the following disclaimer.
  * 2. Redistributions in binary form must reproduce the above copyright notice,
  *    this list of conditions and the following disclaimer in the documentation
  *    and/or other materials provided with the distribution.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -31,238 +31,283 @@
 package net.imagej.mesh.naive;
 
 import net.imagej.mesh.Mesh;
-
+import net.imagej.mesh.Triangle;
+import net.imagej.mesh.Vertex;
 import org.scijava.util.FloatArray;
 import org.scijava.util.IntArray;
 
+import java.util.Iterator;
+
 public class NaiveFloatMesh implements Mesh {
 
-	private final Vertices vertices;
-	private final Triangles triangles;
+    private final Vertices vertices;
+    private final Triangles triangles;
 
-	public NaiveFloatMesh() {
-		vertices = new Vertices();
-		triangles = new Triangles();
-	}
+    public NaiveFloatMesh() {
+        vertices = new Vertices();
+        triangles = new Triangles();
+    }
 
-	@Override
-	public Vertices vertices() {
-		return vertices;
-	}
+    @Override
+    public Vertices vertices() {
+        return vertices;
+    }
 
-	@Override
-	public Triangles triangles() {
-		return triangles;
-	}
+    @Override
+    public Triangles triangles() {
+        return triangles;
+    }
 
-	// -- Inner classes --
+    @Override
+    public Mesh createVariable() {
+        return new NaiveFloatMesh();
+    }
 
-	public class Vertices implements net.imagej.mesh.Vertices {
+    // -- Inner classes --
 
-		private final FloatArray xs, ys, zs;
-		private final FloatArray nxs, nys, nzs;
-		private final FloatArray us, vs;
+    public class Vertices implements net.imagej.mesh.Vertices {
 
-		public Vertices() {
-			xs = new FloatArray();
-			ys = new FloatArray();
-			zs = new FloatArray();
-			nxs = new FloatArray();
-			nys = new FloatArray();
-			nzs = new FloatArray();
-			us = new FloatArray();
-			vs = new FloatArray();
-		}
+        private final FloatArray xs, ys, zs;
+        private final FloatArray nxs, nys, nzs;
+        private final FloatArray us, vs;
 
-		@Override
-		public Mesh mesh() {
-			return NaiveFloatMesh.this;
-		}
+        public Vertices() {
+            xs = new FloatArray();
+            ys = new FloatArray();
+            zs = new FloatArray();
+            nxs = new FloatArray();
+            nys = new FloatArray();
+            nzs = new FloatArray();
+            us = new FloatArray();
+            vs = new FloatArray();
+        }
 
-		@Override
-		public long size() {
-			return xs.size();
-		}
+        @Override
+        public Mesh mesh() {
+            return NaiveFloatMesh.this;
+        }
 
-		@Override
-		public float xf(long vIndex) {
-			return xs.get(safeIndex(vIndex));
-		}
+        @Override
+        public long size() {
+            return xs.size();
+        }
 
-		@Override
-		public float yf(long vIndex) {
-			return ys.get(safeIndex(vIndex));
-		}
+        @Override
+        public float xf(long vIndex) {
+            return xs.get(safeIndex(vIndex));
+        }
 
-		@Override
-		public float zf(long vIndex) {
-			return zs.get(safeIndex(vIndex));
-		}
+        @Override
+        public float yf(long vIndex) {
+            return ys.get(safeIndex(vIndex));
+        }
 
-		@Override
-		public float nxf(long vIndex) {
-			return nxs.get(safeIndex(vIndex));
-		}
+        @Override
+        public float zf(long vIndex) {
+            return zs.get(safeIndex(vIndex));
+        }
 
-		@Override
-		public float nyf(long vIndex) {
-			return nys.get(safeIndex(vIndex));
-		}
+        @Override
+        public float nxf(long vIndex) {
+            return nxs.get(safeIndex(vIndex));
+        }
 
-		@Override
-		public float nzf(long vIndex) {
-			return nzs.get(safeIndex(vIndex));
-		}
+        @Override
+        public float nyf(long vIndex) {
+            return nys.get(safeIndex(vIndex));
+        }
 
-		@Override
-		public float uf(long vIndex) {
-			return us.get(safeIndex(vIndex));
-		}
+        @Override
+        public float nzf(long vIndex) {
+            return nzs.get(safeIndex(vIndex));
+        }
 
-		@Override
-		public float vf(long vIndex) {
-			return vs.get(safeIndex(vIndex));
-		}
+        @Override
+        public float uf(long vIndex) {
+            return us.get(safeIndex(vIndex));
+        }
 
-		@Override
-		public long addf(float x, float y, float z, float nx, float ny, float nz,
-			float u, float v)
-		{
-			final int index = xs.size();
-			xs.add(x);
-			ys.add(y);
-			zs.add(z);
-			nxs.add(nx);
-			nys.add(ny);
-			nzs.add(nz);
-			us.add(u);
-			vs.add(v);
-			return index;
-		}
+        @Override
+        public float vf(long vIndex) {
+            return vs.get(safeIndex(vIndex));
+        }
 
-		@Override
-		public void setf(long vIndex, float x, float y, float z, float nx, float ny,
-			float nz, float u, float v)
-		{
-			final int index = safeIndex(vIndex);
-			xs.set(index, x);
-			ys.set(index, y);
-			zs.set(index, z);
-			nxs.set(index, nx);
-			nys.set(index, ny);
-			nzs.set(index, nz);
-			us.set(index, u);
-			vs.set(index, v);
-		}
+        @Override
+        public long addf(float x, float y, float z, float nx, float ny, float nz,
+                         float u, float v) {
+            final int index = xs.size();
+            xs.add(x);
+            ys.add(y);
+            zs.add(z);
+            nxs.add(nx);
+            nys.add(ny);
+            nzs.add(nz);
+            us.add(u);
+            vs.add(v);
+            return index;
+        }
 
-		@Override
-		public void setPositionf(final long vIndex, final float x,
-			final float y, final float z)
-		{
-			final int index = safeIndex(vIndex);
-			xs.set(index, x);
-			ys.set(index, y);
-			zs.set(index, z);
+        @Override
+        public void setf(long vIndex, float x, float y, float z, float nx, float ny,
+                         float nz, float u, float v) {
+            final int index = safeIndex(vIndex);
+            xs.set(index, x);
+            ys.set(index, y);
+            zs.set(index, z);
+            nxs.set(index, nx);
+            nys.set(index, ny);
+            nzs.set(index, nz);
+            us.set(index, u);
+            vs.set(index, v);
+        }
 
-		}
+        @Override
+        public void setPositionf(final long vIndex, final float x,
+                                 final float y, final float z) {
+            final int index = safeIndex(vIndex);
+            xs.set(index, x);
+            ys.set(index, y);
+            zs.set(index, z);
 
-		@Override
-		public void setNormalf(final long vIndex, final float nx,
-			final float ny, final float nz)
-		{
-			final int index = safeIndex(vIndex);
-			nxs.set(index, nx);
-			nys.set(index, ny);
-			nzs.set(index, nz);
-		}
+        }
 
-		@Override
-		public void setTexturef(final long vIndex, final float u, final float v)
-		{
-			final int index = safeIndex(vIndex);
-			us.set(index, u);
-			vs.set(index, v);
-		}
+        @Override
+        public void setNormalf(final long vIndex, final float nx,
+                               final float ny, final float nz) {
+            final int index = safeIndex(vIndex);
+            nxs.set(index, nx);
+            nys.set(index, ny);
+            nzs.set(index, nz);
+        }
 
-		private int safeIndex(final long index) {
-			if (index > Integer.MAX_VALUE) {
-				throw new IndexOutOfBoundsException("Index too large: " + index);
-			}
-			return (int) index;
-		}
-	}
+        @Override
+        public void setTexturef(final long vIndex, final float u, final float v) {
+            final int index = safeIndex(vIndex);
+            us.set(index, u);
+            vs.set(index, v);
+        }
 
-	public class Triangles implements net.imagej.mesh.Triangles {
+        @Override
+        public net.imagej.mesh.Vertices createVariable() {
+            return new Vertices();
+        }
 
-		private final IntArray v0s, v1s, v2s;
-		private final FloatArray nxs, nys, nzs;
+        @Override
+        public void set(net.imagej.mesh.Vertices copy) {
+            xs.clear();
+            ys.clear();
+            zs.clear();
+            nxs.clear();
+            nys.clear();
+            nzs.clear();
+            us.clear();
+            vs.clear();
 
-		public Triangles() {
-			v0s = new IntArray();
-			v1s = new IntArray();
-			v2s = new IntArray();
-			nxs = new FloatArray();
-			nys = new FloatArray();
-			nzs = new FloatArray();
-		}
+            Iterator<Vertex> i = copy.iterator();
+            while (i.hasNext()) {
+                add(i.next());
+            }
+        }
 
-		@Override
-		public Mesh mesh() {
-			return NaiveFloatMesh.this;
-		}
+        private int safeIndex(final long index) {
+            if (index > Integer.MAX_VALUE) {
+                throw new IndexOutOfBoundsException("Index too large: " + index);
+            }
+            return (int) index;
+        }
+    }
 
-		@Override
-		public long size() {
-			return v1s.size();
-		}
+    public class Triangles implements net.imagej.mesh.Triangles {
 
-		@Override
-		public long vertex0(long tIndex) {
-			return v0s.get(safeIndex(tIndex));
-		}
+        private final IntArray v0s, v1s, v2s;
+        private final FloatArray nxs, nys, nzs;
 
-		@Override
-		public long vertex1(long tIndex) {
-			return v1s.get(safeIndex(tIndex));
-		}
+        public Triangles() {
+            v0s = new IntArray();
+            v1s = new IntArray();
+            v2s = new IntArray();
+            nxs = new FloatArray();
+            nys = new FloatArray();
+            nzs = new FloatArray();
+        }
 
-		@Override
-		public long vertex2(long tIndex) {
-			return v2s.get(safeIndex(tIndex));
-		}
+        @Override
+        public Mesh mesh() {
+            return NaiveFloatMesh.this;
+        }
 
-		@Override
-		public float nxf(long tIndex) {
-			return nxs.get(safeIndex(tIndex));
-		}
+        @Override
+        public long size() {
+            return v1s.size();
+        }
 
-		@Override
-		public float nyf(long tIndex) {
-			return nys.get(safeIndex(tIndex));
-		}
+        @Override
+        public long vertex0(long tIndex) {
+            return v0s.get(safeIndex(tIndex));
+        }
 
-		@Override
-		public float nzf(long tIndex) {
-			return nzs.get(safeIndex(tIndex));
-		}
+        @Override
+        public long vertex1(long tIndex) {
+            return v1s.get(safeIndex(tIndex));
+        }
 
-		@Override
-		public long addf(long v0, long v1, long v2, float nx, float ny, float nz) {
-			final int index = v0s.size();
-			v0s.add(safeIndex(v0));
-			v1s.add(safeIndex(v1));
-			v2s.add(safeIndex(v2));
-			nxs.add(nx);
-			nys.add(ny);
-			nzs.add(nz);
-			return index;
-		}
+        @Override
+        public long vertex2(long tIndex) {
+            return v2s.get(safeIndex(tIndex));
+        }
 
-		private int safeIndex(final long index) {
-			if (index > Integer.MAX_VALUE) {
-				throw new IndexOutOfBoundsException("Index too large: " + index);
-			}
-			return (int) index;
-		}
-	}
+        @Override
+        public float nxf(long tIndex) {
+            return nxs.get(safeIndex(tIndex));
+        }
+
+        @Override
+        public float nyf(long tIndex) {
+            return nys.get(safeIndex(tIndex));
+        }
+
+        @Override
+        public float nzf(long tIndex) {
+            return nzs.get(safeIndex(tIndex));
+        }
+
+        @Override
+        public long addf(long v0, long v1, long v2, float nx, float ny, float nz) {
+            final int index = v0s.size();
+            v0s.add(safeIndex(v0));
+            v1s.add(safeIndex(v1));
+            v2s.add(safeIndex(v2));
+            nxs.add(nx);
+            nys.add(ny);
+            nzs.add(nz);
+            return index;
+        }
+
+        @Override
+        public net.imagej.mesh.Triangles createVariable() {
+            return new Triangles();
+        }
+
+        @Override
+        public void set(net.imagej.mesh.Triangles copy) {
+            v0s.clear();
+            v1s.clear();
+            v2s.clear();
+            nxs.clear();
+            nys.clear();
+            nzs.clear();
+
+            Iterator<Triangle> i = copy.iterator();
+            while (i.hasNext()) {
+                add(i.next());
+            }
+        }
+
+        private int safeIndex(final long index) {
+            if (index > Integer.MAX_VALUE) {
+                throw new IndexOutOfBoundsException("Index too large: " + index);
+            }
+            return (int) index;
+        }
+    }
 }

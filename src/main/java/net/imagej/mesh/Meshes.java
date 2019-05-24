@@ -50,7 +50,7 @@ public class Meshes {
      */
     public static RealPoint center(final Mesh m) {
         RealPoint p = new RealPoint(0, 0, 0);
-        for (final Vertex v: m.vertices()) {
+        for (final Vertex v : m.vertices()) {
             p.move(v);
         }
         for (int d = 0; d < 3; d++) {
@@ -63,7 +63,7 @@ public class Meshes {
         final float[] boundingBox = new float[]{Float.POSITIVE_INFINITY,
                 Float.POSITIVE_INFINITY, Float.POSITIVE_INFINITY, Float.NEGATIVE_INFINITY,
                 Float.NEGATIVE_INFINITY, Float.NEGATIVE_INFINITY};
-        for (final Vertex v: mesh.vertices()) {
+        for (final Vertex v : mesh.vertices()) {
             final float x = v.xf(), y = v.yf(), z = v.zf();
             if (x < boundingBox[0]) boundingBox[0] = x;
             if (y < boundingBox[1]) boundingBox[1] = y;
@@ -85,7 +85,7 @@ public class Meshes {
                             final net.imagej.mesh.Mesh dest) {
         final Map<Long, Long> vIndexMap = new HashMap<>();
         // Copy the vertices, keeping track when indices change.
-        for (final Vertex v: src.vertices()) {
+        for (final Vertex v : src.vertices()) {
             long srcIndex = v.index();
             long destIndex = dest.vertices().add(//
                     v.x(), v.y(), v.z(), //
@@ -103,7 +103,7 @@ public class Meshes {
             }
         }
         // Copy the triangles, taking care to use destination indices.
-        for (final Triangle tri: src.triangles()) {
+        for (final Triangle tri : src.triangles()) {
             final long v0src = tri.vertex0();
             final long v1src = tri.vertex1();
             final long v2src = tri.vertex2();
@@ -125,7 +125,7 @@ public class Meshes {
 
         // Compute the triangle normals.
         HashMap<Long, float[]> triNormals = new HashMap<>();
-        for (final Triangle tri: src.triangles()) {
+        for (final Triangle tri : src.triangles()) {
             final int v0 = (int) tri.vertex0();
             final int v1 = (int) tri.vertex1();
             final int v2 = (int) tri.vertex2();
@@ -159,9 +159,9 @@ public class Meshes {
         // Next, compute the normals per vertex based on face normals
         HashMap<Long, float[]> vNormals = new HashMap<>();// Note: these are cumulative until normalized by vNbrCount
         float[] cumNormal, triNormal;
-        for (final Triangle tri: src.triangles()) {
+        for (final Triangle tri : src.triangles()) {
             triNormal = triNormals.get(tri.index());
-            for (long idx: new long[]{tri.vertex0(), tri.vertex1(), tri.vertex2()}) {
+            for (long idx : new long[]{tri.vertex0(), tri.vertex1(), tri.vertex2()}) {
                 cumNormal = vNormals.getOrDefault(idx, new float[]{0, 0, 0});
                 cumNormal[0] += triNormal[0];
                 cumNormal[1] += triNormal[1];
@@ -175,7 +175,7 @@ public class Meshes {
         float[] vNormal;
         double vNormalMag;
         // Copy the vertices, keeping track when indices change.
-        for (final Vertex v: src.vertices()) {
+        for (final Vertex v : src.vertices()) {
             long srcIndex = v.index();
             vNormal = vNormals.get(v.index());
             vNormalMag = Math.sqrt(Math.pow(vNormal[0], 2) + Math.pow(vNormal[1], 2) + Math.pow(vNormal[2], 2));
@@ -195,7 +195,7 @@ public class Meshes {
             }
         }
         // Copy the triangles, taking care to use destination indices.
-        for (final Triangle tri: src.triangles()) {
+        for (final Triangle tri : src.triangles()) {
             final long v0src = tri.vertex0();
             final long v1src = tri.vertex1();
             final long v2src = tri.vertex2();
