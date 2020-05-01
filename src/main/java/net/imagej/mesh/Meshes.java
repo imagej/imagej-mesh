@@ -208,6 +208,20 @@ public class Meshes {
     }
 
     /**
+     * Simplifies a given mesh. Normals and uv coordinates will be ignored and not added to the output mesh.
+     *
+     * @param mesh Source mesh
+     * @param target_percent the amount in percent to attempt to achieve. For example: 0.25f would result in creating
+     *                       a mesh with 25% of triangles contained in the original.
+     * @param agressiveness sharpness to increase the threshold. 5..8 are good numbers. more iterations yield higher
+     *                      quality. Minimum 4 and maximum 20 are recommended.
+     * @return the simplified mesh The result will not include normals or uv coordinates.
+     */
+    public static Mesh simplify(Mesh mesh, float target_percent, float agressiveness) {
+        return new SimplifyMesh(mesh).simplify(target_percent, agressiveness);
+    }
+
+    /**
      * Creates a new mesh from a given mesh without any duplicate vertices.
      * Normals and uv coordinates will be ignored and not added to the output mesh.
      *
