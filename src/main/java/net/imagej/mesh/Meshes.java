@@ -30,7 +30,10 @@
 
 package net.imagej.mesh;
 
+import net.imglib2.RandomAccessibleInterval;
 import net.imglib2.RealPoint;
+import net.imglib2.type.BooleanType;
+import net.imglib2.type.numeric.RealType;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -233,4 +236,24 @@ public class Meshes {
         return RemoveDuplicateVertices.calculate(mesh, precision);
     }
 
+    /**
+     * Creates mesh e.g. from IterableRegion by using the marching cubes algorithm.
+     *
+     * @param source The binary input image for the marching cubes algorithm.
+     * @return The result mesh of the marching cubes algorithm.
+     */
+    public static <T extends BooleanType<T>> Mesh marchingCubes(RandomAccessibleInterval<T> source) {
+        return MarchingCubesBooleanType.calculate(source);
+    }
+
+    /**
+     * Creates mesh e.g. from IterableRegion by using the marching cubes algorithm.
+     *
+     * @param source  The input image for the marching cubes algorithm.
+     * @param isoLevel The threshold to distinguish between foreground and background values.
+     * @return The result mesh of the marching cubes algorithm.
+     */
+    public static <T extends RealType<T>> Mesh marchingCubes(RandomAccessibleInterval<T> source, double isoLevel) {
+        return MarchingCubesRealType.calculate(source, isoLevel);
+    }
 }
