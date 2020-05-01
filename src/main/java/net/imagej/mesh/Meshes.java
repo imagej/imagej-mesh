@@ -206,4 +206,17 @@ public class Meshes {
             dest.triangles().add(v0, v1, v2, triNormal[0], triNormal[1], triNormal[2]);
         }
     }
+
+    /**
+     * Creates a new mesh from a given mesh without any duplicate vertices.
+     * Normals and uv coordinates will be ignored and not added to the output mesh.
+     *
+     * @param mesh Source mesh
+     * @param precision decimal digits to take into account when comparing mesh vertices
+     * @return new mesh without duplicate vertices. The result will not include normals or uv coordinates.
+     */
+    public static Mesh removeDuplicateVertices(Mesh mesh, int precision) {
+        return RemoveDuplicateVertices.calculate(mesh, precision);
+    }
+
 }
