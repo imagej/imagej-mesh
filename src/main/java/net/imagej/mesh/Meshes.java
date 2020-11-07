@@ -30,7 +30,10 @@
 
 package net.imagej.mesh;
 
+import net.imglib2.RandomAccessibleInterval;
 import net.imglib2.RealPoint;
+import net.imglib2.type.BooleanType;
+import net.imglib2.type.numeric.RealType;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -205,5 +208,52 @@ public class Meshes {
             triNormal = triNormals.get(tri.index());
             dest.triangles().add(v0, v1, v2, triNormal[0], triNormal[1], triNormal[2]);
         }
+    }
+
+    /**
+     * Simplifies a given mesh. Normals and uv coordinates will be ignored and not added to the output mesh.
+     *
+     * @param mesh Source mesh
+     * @param target_percent the amount in percent to attempt to achieve. For example: 0.25f would result in creating
+     *                       a mesh with 25% of triangles contained in the original.
+     * @param agressiveness sharpness to increase the threshold. 5..8 are good numbers. more iterations yield higher
+     *                      quality. Minimum 4 and maximum 20 are recommended.
+     * @return the simplified mesh The result will not include normals or uv coordinates.
+     */
+    public static Mesh simplify(Mesh mesh, float target_percent, float agressiveness) {
+        return new SimplifyMesh(mesh).simplify(target_percent, agressiveness);
+    }
+
+    /**
+     * Creates a new mesh from a given mesh without any duplicate vertices.
+     * Normals and uv coordinates will be ignored and not added to the output mesh.
+     *
+     * @param mesh Source mesh
+     * @param precision decimal digits to take into account when comparing mesh vertices
+     * @return new mesh without duplicate vertices. The result will not include normals or uv coordinates.
+     */
+    public static Mesh removeDuplicateVertices(Mesh mesh, int precision) {
+        return RemoveDuplicateVertices.calculate(mesh, precision);
+    }
+
+    /**
+     * Creates mesh e.g. from IterableRegion by using the marching cubes algorithm.
+     *
+     * @param source The binary input image for the marching cubes algorithm.
+     * @return The result mesh of the marching cubes algorithm.
+     */
+    public static <T extends BooleanType<T>> Mesh marchingCubes(RandomAccessibleInterval<T> source) {
+        return MarchingCubesBooleanType.calculate(source);
+    }
+
+    /**
+     * Creates mesh e.g. from IterableRegion by using the marching cubes algorithm.
+     *
+     * @param source  The input image for the marching cubes algorithm.
+     * @param isoLevel The threshold to distinguish between foreground and background values.
+     * @return The result mesh of the marching cubes algorithm.
+     */
+    public static <T extends RealType<T>> Mesh marchingCubes(RandomAccessibleInterval<T> source, double isoLevel) {
+        return MarchingCubesRealType.calculate(source, isoLevel);
     }
 }
