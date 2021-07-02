@@ -100,8 +100,8 @@
 		<url>https://github.com/imagej/imagej-mesh/issues</url>
 	</issueManagement>
 	<ciManagement>
-		<system>Travis CI</system>
-		<url>https://travis-ci.org/imagej/imagej-mesh</url>
+		<system>GitHub Actions</system>
+		<url>https://github.com/imagej/imagej-mesh/actions</url>
 	</ciManagement>
 
 	<properties>
@@ -112,7 +112,7 @@
 Board of Regents of the University of Wisconsin-Madison.</license.copyrightOwners>
 
 		<!-- NB: Deploy releases to the SciJava Maven repository. -->
-		<releaseProfiles>deploy-to-scijava</releaseProfiles>
+		<releaseProfiles>sign,deploy-to-scijava</releaseProfiles>
 
 		<jply.version>0.2.0</jply.version>
 	</properties>
