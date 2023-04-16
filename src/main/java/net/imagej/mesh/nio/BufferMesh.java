@@ -306,20 +306,20 @@ public class BufferMesh implements Mesh {
 		}
 	}
 
-	private static int safeIndex(final long index, final int span,
+	static int safeIndex(final long index, final int span,
 		final int offset)
 	{
 		return safeInt(span * index + offset);
 	}
 
-	private static int safeInt(final long value) {
+	static int safeInt(final long value) {
 		if (value > Integer.MAX_VALUE) {
 			throw new IndexOutOfBoundsException("Value too large: " + value);
 		}
 		return (int) value;
 	}
 
-	private static ByteBuffer create(final Function<Integer, ByteBuffer> creator,
+	static ByteBuffer create(final Function<Integer, ByteBuffer> creator,
 		final int length)
 	{
 		return creator.apply(length).order(ByteOrder.nativeOrder());
@@ -333,7 +333,7 @@ public class BufferMesh implements Mesh {
 		return floats;
 	}
 
-	private static IntBuffer ints(final ByteBuffer bytes) {
+	static IntBuffer ints(final ByteBuffer bytes) {
 		final IntBuffer ints = bytes.asIntBuffer();
 		// NB: The limit must be set _after_ casting to int,
 		// or else the casted buffer will have a capacity of 0!
@@ -342,7 +342,7 @@ public class BufferMesh implements Mesh {
 	}
 
 	/** Expands the buffer limit in anticipation of {@code put} operations. */
-	private static void grow(final Buffer buffer, final int step) {
+	static void grow(final Buffer buffer, final int step) {
 		buffer.limit(buffer.limit() + step);
 	}
 }
