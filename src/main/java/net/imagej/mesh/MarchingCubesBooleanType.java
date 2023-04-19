@@ -180,15 +180,15 @@ class MarchingCubesBooleanType {
 						/* Create the triangle */
 						final byte[] TRIANGLE = MarchingCubesRealType.TRIANGLE_TABLE[mindex];
 						for (int i = 0; i < TRIANGLE.length; i += 3) {
-							final double v0x = vertlist[TRIANGLE[i]][0];
-							final double v0y = vertlist[TRIANGLE[i]][1];
-							final double v0z = vertlist[TRIANGLE[i]][2];
+							final double v2x = vertlist[TRIANGLE[i]][0];
+							final double v2y = vertlist[TRIANGLE[i]][1];
+							final double v2z = vertlist[TRIANGLE[i]][2];
 							final double v1x = vertlist[TRIANGLE[i + 1]][0];
 							final double v1y = vertlist[TRIANGLE[i + 1]][1];
 							final double v1z = vertlist[TRIANGLE[i + 1]][2];
-							final double v2x = vertlist[TRIANGLE[i + 2]][0];
-							final double v2y = vertlist[TRIANGLE[i + 2]][1];
-							final double v2z = vertlist[TRIANGLE[i + 2]][2];
+							final double v0x = vertlist[TRIANGLE[i + 2]][0];
+							final double v0y = vertlist[TRIANGLE[i + 2]][1];
+							final double v0z = vertlist[TRIANGLE[i + 2]][2];
 							if (positiveArea(v0x, v0y, v0z, v1x, v1y, v1z, v2x, v2y, v2z)) {
 								output.triangles().add(x + v0x, y + v0y, z + v0z, x + v1x, y + v1y, z + v1z, x + v2x, y + v2y, z + v2z);
 							}
