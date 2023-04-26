@@ -30,13 +30,13 @@
 
 package net.imagej.mesh;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import net.imglib2.RandomAccessibleInterval;
 import net.imglib2.RealPoint;
 import net.imglib2.type.BooleanType;
 import net.imglib2.type.numeric.RealType;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Utility methods for working with {@link Mesh} objects.
@@ -52,7 +52,7 @@ public class Meshes {
      * @return a RealPoint representing the mesh's center
      */
     public static RealPoint center(final Mesh m) {
-        RealPoint p = new RealPoint(0, 0, 0);
+        final RealPoint p = new RealPoint(0, 0, 0);
         for (final Vertex v: m.vertices()) {
             p.move(v);
         }
@@ -89,8 +89,8 @@ public class Meshes {
         final Map<Long, Long> vIndexMap = new HashMap<>();
         // Copy the vertices, keeping track when indices change.
         for (final Vertex v: src.vertices()) {
-            long srcIndex = v.index();
-            long destIndex = dest.vertices().add(//
+            final long srcIndex = v.index();
+            final long destIndex = dest.vertices().add(//
                     v.x(), v.y(), v.z(), //
                     v.nx(), v.ny(), v.nz(), //
                     v.u(), v.v());
@@ -124,10 +124,10 @@ public class Meshes {
      * @param src  Source mesh, used for vertex and triangle info
      * @param dest Destination mesh, will be populated with src's info plus the calculated normals
      */
-    public static void calculateNormals(net.imagej.mesh.Mesh src, net.imagej.mesh.Mesh dest) {
+    public static void calculateNormals(final net.imagej.mesh.Mesh src, final net.imagej.mesh.Mesh dest) {
 
         // Compute the triangle normals.
-        HashMap<Long, float[]> triNormals = new HashMap<>();
+        final HashMap<Long, float[]> triNormals = new HashMap<>();
         for (final Triangle tri: src.triangles()) {
             final int v0 = (int) tri.vertex0();
             final int v1 = (int) tri.vertex1();
@@ -160,11 +160,11 @@ public class Meshes {
         }
 
         // Next, compute the normals per vertex based on face normals
-        HashMap<Long, float[]> vNormals = new HashMap<>();// Note: these are cumulative until normalized by vNbrCount
+        final HashMap<Long, float[]> vNormals = new HashMap<>();// Note: these are cumulative until normalized by vNbrCount
         float[] cumNormal, triNormal;
         for (final Triangle tri: src.triangles()) {
             triNormal = triNormals.get(tri.index());
-            for (long idx: new long[]{tri.vertex0(), tri.vertex1(), tri.vertex2()}) {
+            for (final long idx: new long[]{tri.vertex0(), tri.vertex1(), tri.vertex2()}) {
                 cumNormal = vNormals.getOrDefault(idx, new float[]{0, 0, 0});
                 cumNormal[0] += triNormal[0];
                 cumNormal[1] += triNormal[1];
@@ -179,10 +179,10 @@ public class Meshes {
         double vNormalMag;
         // Copy the vertices, keeping track when indices change.
         for (final Vertex v: src.vertices()) {
-            long srcIndex = v.index();
+            final long srcIndex = v.index();
             vNormal = vNormals.get(v.index());
             vNormalMag = Math.sqrt(Math.pow(vNormal[0], 2) + Math.pow(vNormal[1], 2) + Math.pow(vNormal[2], 2));
-            long destIndex = dest.vertices().add(//
+            final long destIndex = dest.vertices().add(//
                     v.x(), v.y(), v.z(), //
                     vNormal[0] / vNormalMag, vNormal[1] / vNormalMag, vNormal[2] / vNormalMag, //
                     v.u(), v.v());
@@ -220,7 +220,7 @@ public class Meshes {
      *                      quality. Minimum 4 and maximum 20 are recommended.
      * @return the simplified mesh The result will not include normals or uv coordinates.
      */
-    public static Mesh simplify(Mesh mesh, float target_percent, float agressiveness) {
+    public static Mesh simplify(final Mesh mesh, final float target_percent, final float agressiveness) {
         return new SimplifyMesh(mesh).simplify(target_percent, agressiveness);
     }
 
@@ -232,7 +232,7 @@ public class Meshes {
      * @param precision decimal digits to take into account when comparing mesh vertices
      * @return new mesh without duplicate vertices. The result will not include normals or uv coordinates.
      */
-    public static Mesh removeDuplicateVertices(Mesh mesh, int precision) {
+    public static Mesh removeDuplicateVertices(final Mesh mesh, final int precision) {
         return RemoveDuplicateVertices.calculate(mesh, precision);
     }
 
@@ -242,7 +242,7 @@ public class Meshes {
      * @param source The binary input image for the marching cubes algorithm.
      * @return The result mesh of the marching cubes algorithm.
      */
-    public static <T extends BooleanType<T>> Mesh marchingCubes(RandomAccessibleInterval<T> source) {
+    public static <T extends BooleanType<T>> Mesh marchingCubes(final RandomAccessibleInterval<T> source) {
         return MarchingCubesBooleanType.calculate(source);
     }
 
@@ -253,7 +253,40 @@ public class Meshes {
      * @param isoLevel The threshold to distinguish between foreground and background values.
      * @return The result mesh of the marching cubes algorithm.
      */
-    public static <T extends RealType<T>> Mesh marchingCubes(RandomAccessibleInterval<T> source, double isoLevel) {
+    public static <T extends RealType<T>> Mesh marchingCubes(final RandomAccessibleInterval<T> source, final double isoLevel) {
         return MarchingCubesRealType.calculate(source, isoLevel);
     }
+
+	/**
+	 * Returns the number of connected components in this mesh.
+	 * 
+	 * @param mesh
+	 *            the mesh.
+	 * @return the number of connected components.
+	 */
+	public static int nConnectedComponents( final Mesh mesh )
+	{
+		return MeshConnectedComponents.n( mesh );
+	}
+
+	/**
+	 * Scales the vertices position by the amount specified by the array.
+	 * 
+	 * @param mesh
+	 *            the mesh to scale.
+	 * @param pixelSizes
+	 *            a <code>double</code> array of at least 3 elements.
+	 */
+	public static void scale( final Mesh mesh, final double[] scale )
+	{
+		final Vertices vertices = mesh.vertices();
+		final long nVertices = vertices.size();
+		for ( long i = 0; i < nVertices; i++ )
+		{
+			final double x = vertices.x( i );
+			final double y = vertices.y( i );
+			final double z = vertices.z( i );
+			vertices.set( i, x * scale[ 0 ], y * scale[ 1 ], z * scale[ 2 ] );
+		}
+	}
 }
