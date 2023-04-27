@@ -2,7 +2,9 @@ package net.imagej.mesh;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 
 import gnu.trove.list.array.TDoubleArrayList;
@@ -39,9 +41,7 @@ public class ZSlicer
 		}
 
 		// Deal with intersecting triangle.
-		final Collection< Segment > segments = new ArrayList<>();
-//				new HashSet<>();
-		// new ArrayDeque<>( intersecting.size() );
+		final Collection< Segment > segments = new HashSet<>();
 		for ( int i = 0; i < intersecting.size(); i++ )
 		{
 			final long id = intersecting.getQuick( i );
@@ -59,35 +59,12 @@ public class ZSlicer
 			tris.add( triangle );
 		}
 
-//		final HashSet< Segment > pruned = new HashSet<>( segments );
-//		final ArrayList< Segment > sorted = new ArrayList<>( pruned );
-//		sorted.sort( new Comparator< Segment >()
-//		{
-//
-//			@Override
-//			public int compare( final Segment o1, final Segment o2 )
-//			{
-//				final int dx1 = Double.compare( o1.x1, o2.x1 );
-//				if ( dx1 != 0 )
-//					return dx1;
-//				final int dy1 = Double.compare( o1.y1, o2.y1 );
-//				if ( dy1 != 0 )
-//					return dy1;
-//				final int dx2 = Double.compare( o1.x2, o2.x2 );
-//				if ( dx2 != 0 )
-//					return dx2;
-//				return Double.compare( o1.y2, o2.y2 );
-//			}
-//		} );
-//		
-//		System.out.println( "Segments: " + segments.size() ); // DEBUG
-//		System.out.println( "Segments after pruning: " + sorted.size() ); // DEBUG
-//		sorted.forEach( System.out::println );
-//		System.out.println( "Triangles:" ); // DEBUG
-//		tris.forEach( System.out::println );
+		// Sort them by x then y etc.
+		final ArrayList< Segment > sorted = new ArrayList<>( segments );
+		sorted.sort( null );
 
 		// Build contours from segments.
-		final ArrayDeque< Segment > deque = new ArrayDeque<>( segments );
+		final ArrayDeque< Segment > deque = new ArrayDeque<>( sorted );
 		final List< Contour > contours = new ArrayList<>();
 		while ( !deque.isEmpty() )
 		{
@@ -97,13 +74,6 @@ public class ZSlicer
 
 			while ( contour.grow( deque ) && !contour.isClosed() )
 			{}
-		}
-
-		int i = 0;
-		for ( final Contour contour : contours )
-		{
-			System.out.println( "Contour " + ++i + ":" );
-			System.out.println( contour ); // DEBUG
 		}
 		return contours;
 	}
@@ -268,7 +238,7 @@ public class ZSlicer
 		return str.toString();
 	}
 
-	private static class Segment
+	private static class Segment implements Comparable< Segment >
 	{
 
 		private final double x1;
@@ -324,7 +294,45 @@ public class ZSlicer
 		@Override
 		public String toString()
 		{
-			return String.format( "S (%9.6f, %9.6f) -> (%9.6f, %9.6f)", x1, y1, x2, y2 );
+			return String.format( "S (%5.2f, %5.2f) -> (%5.2f, %5.2f)", x1, y1, x2, y2 );
+		}
+
+		@Override
+		public boolean equals( final Object obj )
+		{
+			if ( !( obj instanceof Segment ) )
+				return false;
+			final Segment o = ( Segment ) obj;
+			if ( x1 != o.x1 )
+				return false;
+			if ( y1 != o.y1 )
+				return false;
+			if ( x2 != o.x2 )
+				return false;
+			if ( y2 != o.y2 )
+				return false;
+			return true;
+		}
+
+		@Override
+		public int hashCode()
+		{
+			return Arrays.hashCode( new double[] { x1, x2, y1, y2 } );
+		}
+
+		@Override
+		public int compareTo( final Segment o )
+		{
+			final int dx1 = Double.compare( x1, o.x1 );
+			if ( dx1 != 0 )
+				return dx1;
+			final int dy1 = Double.compare( y1, o.y1 );
+			if ( dy1 != 0 )
+				return dy1;
+			final int dx2 = Double.compare( x2, o.x2 );
+			if ( dx2 != 0 )
+				return dx2;
+			return Double.compare( y2, o.y2 );
 		}
 	}
 
@@ -374,7 +382,7 @@ public class ZSlicer
 
 		private double matchx;
 
-		private final boolean isClosed;
+		private boolean isClosed;
 
 		private Contour( final Segment start )
 		{
@@ -408,8 +416,8 @@ public class ZSlicer
 					y.add( segment.y1 );
 					matchx = segment.x2;
 					matchy = segment.y2;
-//					if ( segment.x2 == endx && segment.y2 == endy )
-//						isClosed = true;
+					if ( segment.x2 == endx && segment.y2 == endy )
+						isClosed = true;
 					return true;
 				}
 				else if ( segment.x2 == matchx && segment.y2 == matchy )
@@ -419,8 +427,8 @@ public class ZSlicer
 					y.add( segment.y2 );
 					matchx = segment.x1;
 					matchy = segment.y1;
-//					if ( segment.x1 == endx && segment.y1 == endy )
-//						isClosed = true;
+					if ( segment.x1 == endx && segment.y1 == endy )
+						isClosed = true;
 					return true;
 				}
 			}
