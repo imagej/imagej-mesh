@@ -289,4 +289,43 @@ public class Meshes {
 			vertices.set( i, x * scale[ 0 ], y * scale[ 1 ], z * scale[ 2 ] );
 		}
 	}
+
+	/**
+	 * Computes the volume of the specified mesh.
+	 *
+	 * @return the volume in physical units.
+	 */
+	public static double volume( final Mesh mesh )
+	{
+		final Vertices vertices = mesh.vertices();
+		final Triangles triangles = mesh.triangles();
+		final long nTriangles = triangles.size();
+		double sum = 0.;
+		for ( long t = 0; t < nTriangles; t++ )
+		{
+			final long v1 = triangles.vertex0( t );
+			final long v2 = triangles.vertex1( t );
+			final long v3 = triangles.vertex2( t );
+
+			final double x1 = vertices.x( v1 );
+			final double y1 = vertices.y( v1 );
+			final double z1 = vertices.z( v1 );
+			final double x2 = vertices.x( v2 );
+			final double y2 = vertices.y( v2 );
+			final double z2 = vertices.z( v2 );
+			final double x3 = vertices.x( v3 );
+			final double y3 = vertices.y( v3 );
+			final double z3 = vertices.z( v3 );
+
+			final double v321 = x3 * y2 * z1;
+			final double v231 = x2 * y3 * z1;
+			final double v312 = x3 * y1 * z2;
+			final double v132 = x1 * y3 * z2;
+			final double v213 = x2 * y1 * z3;
+			final double v123 = x1 * y2 * z3;
+
+			sum += ( 1. / 6. ) * ( -v321 + v231 + v312 - v132 - v213 + v123 );
+		}
+		return Math.abs( sum );
+	}
 }
