@@ -1,94 +1,34 @@
-package net.imagej.mesh;
+package net.imagej.mesh.zslicer;
 
-import java.util.ArrayDeque;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
 
 import gnu.trove.list.array.TDoubleArrayList;
-import gnu.trove.list.array.TLongArrayList;
+import net.imagej.mesh.Mesh;
+import net.imagej.mesh.Triangles;
+import net.imagej.mesh.Vertices;
 
 public class ZSlicer
 {
 
-	public static List< Contour > slice( final Mesh mesh, final double z )
+	public static List< Contour > slice( final Mesh mesh, final double z, final double tolerance )
 	{
-		final Triangles triangles = mesh.triangles();
-		final Vertices vertices = mesh.vertices();
-		final TLongArrayList intersecting = new TLongArrayList();
-		final TLongArrayList parallel = new TLongArrayList();
-		for ( long f = 0; f < triangles.size(); f++ )
-		{
-			final long v0 = triangles.vertex0( f );
-			final long v1 = triangles.vertex1( f );
-			final long v2 = triangles.vertex2( f );
-
-			final double minZ = minZ( vertices, v0, v1, v2 );
-			if ( minZ > z )
-				continue;
-			final double maxZ = maxZ( vertices, v0, v1, v2 );
-			if ( maxZ < z )
-				continue;
-
-			if ( minZ == maxZ )
-			{
-				parallel.add( f );
-				continue;
-			}
-			intersecting.add( f );
-		}
-
-		// Deal with intersecting triangle.
-		final Collection< Segment > segments = new HashSet<>();
-		for ( int i = 0; i < intersecting.size(); i++ )
-		{
-			final long id = intersecting.getQuick( i );
-			final Segment segment = triangleIntersection( mesh, id, z );
-			if ( segment != null )
-				segments.add( segment );
-		}
-
-		// Deal with parallel triangles.
-		final List< Triangle > tris = new ArrayList<>( parallel.size() );
-		for ( int i = 0; i < parallel.size(); i++ )
-		{
-			final long id = parallel.getQuick( i );
-			final Triangle triangle = triangleParallel( mesh, id, z );
-			tris.add( triangle );
-		}
-
-		// Sort them by x then y etc.
-		final ArrayList< Segment > sorted = new ArrayList<>( segments );
-		sorted.sort( null );
-
-		// Build contours from segments.
-		final ArrayDeque< Segment > deque = new ArrayDeque<>( sorted );
-		final List< Contour > contours = new ArrayList<>();
-		while ( !deque.isEmpty() )
-		{
-			final Segment start = deque.pop();
-			final Contour contour = Contour.init( start );
-			contours.add( contour );
-
-			while ( contour.grow( deque ) && !contour.isClosed() )
-			{}
-		}
-		return contours;
+//		return ZSlicerRoundPositions.slice( mesh, z, tolerance );
+		return ZSlicerMatchEdges.slice( mesh, z, tolerance );
 	}
 
-	private static final double minZ( final Vertices vertices, final long v0, final long v1, final long v2 )
+	static final double minZ( final Vertices vertices, final long v0, final long v1, final long v2 )
 	{
 		return Math.min( vertices.z( v0 ), Math.min( vertices.z( v1 ), vertices.z( v2 ) ) );
 	}
 
-	private static final double maxZ( final Vertices vertices, final long v0, final long v1, final long v2 )
+	static final double maxZ( final Vertices vertices, final long v0, final long v1, final long v2 )
 	{
 		return Math.max( vertices.z( v0 ), Math.max( vertices.z( v1 ), vertices.z( v2 ) ) );
 	}
 
-	private static Triangle triangleParallel( final Mesh mesh, final long id, final double z )
+	static Triangle triangleParallel( final Mesh mesh, final long id, final double z )
 	{
 		final long v0 = mesh.triangles().vertex0( id );
 		final long v1 = mesh.triangles().vertex1( id );
@@ -104,7 +44,7 @@ public class ZSlicer
 		return new Triangle( x0, y0, x1, y1, x2, y2 );
 	}
 
-	private static Segment triangleIntersection( final Mesh mesh, final long id, final double z )
+	static Segment triangleIntersection( final Mesh mesh, final long id, final double z )
 	{
 		final long v0 = mesh.triangles().vertex0( id );
 		final long v1 = mesh.triangles().vertex1( id );
@@ -125,11 +65,15 @@ public class ZSlicer
 			// Start = v0.
 			if ( z1 == z )
 			{
+				if ( x0 == x1 && y0 == y1 )
+					return null;
 				// End = v1.
 				return new Segment( x0, y0, x1, y1 );
 			}
 			else if ( z2 == z )
 			{
+				if ( x0 == x2 && y0 == y2 )
+					return null;
 				// End = v2.
 				return new Segment( x0, y0, x2, y2 );
 			}
@@ -150,6 +94,8 @@ public class ZSlicer
 				// Start = v1.
 				if ( z2 == z )
 				{
+					if ( x2 == x1 && y2 == y1 )
+						return null;
 					// End = v2.
 					return new Segment( x1, y1, x2, y2 );
 				}
@@ -181,21 +127,27 @@ public class ZSlicer
 				final double[] ei2 = edgeIntersection( x1, y1, z1, x2, y2, z2, z );
 				if ( ei0 == null )
 				{
+					if ( ei1[ 0 ] == ei2[ 0 ] && ei1[ 1 ] == ei2[ 1 ] )
+						return null;
 					return new Segment( ei1[ 0 ], ei1[ 1 ], ei2[ 0 ], ei2[ 1 ] );
 				}
 				else if ( ei1 == null )
 				{
+					if ( ei0[ 0 ] == ei2[ 0 ] && ei0[ 1 ] == ei2[ 1 ] )
+						return null;
 					return new Segment( ei0[ 0 ], ei0[ 1 ], ei2[ 0 ], ei2[ 1 ] );
 				}
 				else
 				{
+					if ( ei1[ 0 ] == ei0[ 0 ] && ei1[ 1 ] == ei0[ 1 ] )
+						return null;
 					return new Segment( ei0[ 0 ], ei0[ 1 ], ei1[ 0 ], ei1[ 1 ] );
 				}
 			}
 		}
 	}
 
-	private static double[] edgeIntersection( final double xs, final double ys, final double zs,
+	static double[] edgeIntersection( final double xs, final double ys, final double zs,
 			final double xt, final double yt, final double zt, final double z )
 	{
 		if ( ( zs > z && zt > z ) || ( zs < z && zt < z ) )
@@ -208,7 +160,7 @@ public class ZSlicer
 		return new double[] { x, y };
 	}
 
-	public static String triangleToString( final Mesh mesh, final long id )
+	static String triangleToString( final Mesh mesh, final long id )
 	{
 		final StringBuilder str = new StringBuilder( id + ": " );
 
@@ -218,19 +170,19 @@ public class ZSlicer
 		final double x0 = vertices.x( v0 );
 		final double y0 = vertices.y( v0 );
 		final double z0 = vertices.z( v0 );
-		str.append( String.format( "(%5.1f, %5.1f, %5.1f) - ", x0, y0, z0 ) );
+		str.append( String.format( "(%f, %f, %f) - ", x0, y0, z0 ) );
 
 		final long v1 = triangles.vertex1( id );
 		final double x1 = vertices.x( v1 );
 		final double y1 = vertices.y( v1 );
 		final double z1 = vertices.z( v1 );
-		str.append( String.format( "(%5.1f, %5.1f, %5.1f) - ", x1, y1, z1 ) );
+		str.append( String.format( "(%f, %f, %f) - ", x1, y1, z1 ) );
 
 		final long v2 = triangles.vertex2( id );
 		final double x2 = vertices.x( v2 );
 		final double y2 = vertices.y( v2 );
 		final double z2 = vertices.z( v2 );
-		str.append( String.format( "(%5.1f, %5.1f, %5.1f) - ", x2, y2, z2 ) );
+		str.append( String.format( "(%f, %f, %f) - ", x2, y2, z2 ) );
 
 		str.append( String.format( "N = (%4.2f, %4.2f, %4.2f) ",
 				triangles.nx( id ), triangles.nz( id ), triangles.nz( id ) ) );
@@ -238,18 +190,18 @@ public class ZSlicer
 		return str.toString();
 	}
 
-	private static class Segment implements Comparable< Segment >
+	static class Segment implements Comparable< Segment >
 	{
 
-		private final double x1;
+		protected final double xa;
 
-		private final double y1;
+		protected final double ya;
 
-		private final double x2;
+		protected final double xb;
 
-		private final double y2;
+		protected final double yb;
 
-		private Segment( final double x1, final double y1, final double x2, final double y2 )
+		protected Segment( final double x1, final double y1, final double x2, final double y2 )
 		{
 			final double xa, xb, ya, yb;
 			if ( x1 < x2 )
@@ -282,19 +234,23 @@ public class ZSlicer
 			}
 			else
 			{
-				throw new IllegalArgumentException( "Trying to create a segment of 0-length." );
+				xa = x1;
+				ya = y1;
+				xb = x2;
+				yb = y2;
+//				throw new IllegalArgumentException( "Trying to create a segment of 0-length." );
 			}
 
-			this.x1 = xa;
-			this.y1 = ya;
-			this.x2 = xb;
-			this.y2 = yb;
+			this.xa = xa;
+			this.ya = ya;
+			this.xb = xb;
+			this.yb = yb;
 		}
 
 		@Override
 		public String toString()
 		{
-			return String.format( "S (%5.2f, %5.2f) -> (%5.2f, %5.2f)", x1, y1, x2, y2 );
+			return String.format( "S (%5.2f, %5.2f) -> (%5.2f, %5.2f)", xa, ya, xb, yb );
 		}
 
 		@Override
@@ -303,13 +259,13 @@ public class ZSlicer
 			if ( !( obj instanceof Segment ) )
 				return false;
 			final Segment o = ( Segment ) obj;
-			if ( x1 != o.x1 )
+			if ( xa != o.xa )
 				return false;
-			if ( y1 != o.y1 )
+			if ( ya != o.ya )
 				return false;
-			if ( x2 != o.x2 )
+			if ( xb != o.xb )
 				return false;
-			if ( y2 != o.y2 )
+			if ( yb != o.yb )
 				return false;
 			return true;
 		}
@@ -317,26 +273,54 @@ public class ZSlicer
 		@Override
 		public int hashCode()
 		{
-			return Arrays.hashCode( new double[] { x1, x2, y1, y2 } );
+			return Arrays.hashCode( new double[] { xa, xb, ya, yb } );
 		}
 
 		@Override
 		public int compareTo( final Segment o )
 		{
-			final int dx1 = Double.compare( x1, o.x1 );
+			final int dx1 = Double.compare( xa, o.xa );
 			if ( dx1 != 0 )
 				return dx1;
-			final int dy1 = Double.compare( y1, o.y1 );
+			final int dy1 = Double.compare( ya, o.ya );
 			if ( dy1 != 0 )
 				return dy1;
-			final int dx2 = Double.compare( x2, o.x2 );
+			final int dx2 = Double.compare( xb, o.xb );
 			if ( dx2 != 0 )
 				return dx2;
-			return Double.compare( y2, o.y2 );
+			return Double.compare( yb, o.yb );
+		}
+
+		/**
+		 * Distance from point A of the segment to the specified point.
+		 * 
+		 * @param x
+		 * @param y
+		 * @return
+		 */
+		public double sqDistToA( final double x, final double y )
+		{
+			final double dx = x - xa;
+			final double dy = y - ya;
+			return dx * dx + dy * dy;
+		}
+
+		/**
+		 * Distance from point B of the segment to the specified point.
+		 * 
+		 * @param x
+		 * @param y
+		 * @return
+		 */
+		public double sqDistToB( final double x, final double y )
+		{
+			final double dx = x - xb;
+			final double dy = y - yb;
+			return dx * dx + dy * dy;
 		}
 	}
 
-	private static class Triangle
+	static class Triangle
 	{
 		public final double x1;
 
@@ -367,35 +351,40 @@ public class ZSlicer
 		}
 	}
 
-	public static final class Contour
+	public static class Contour
 	{
 
-		public final TDoubleArrayList x = new TDoubleArrayList();
+		public final TDoubleArrayList x;
 
-		public final TDoubleArrayList y = new TDoubleArrayList();
+		public final TDoubleArrayList y;
 
-		private final double endx;
+		protected double matchy;
 
-		private final double endy;
+		protected double matchx;
 
-		private double matchy;
+		protected boolean isClosed;
 
-		private double matchx;
-
-		private boolean isClosed;
-
-		private Contour( final Segment start )
+		Contour( final TDoubleArrayList x, final TDoubleArrayList y, final boolean isClosed )
 		{
-			endx = start.x2;
-			endy = start.y2;
-			matchx = start.x1;
-			matchy = start.y1;
-			isClosed = false;
+			this.x = x;
+			this.y = y;
+			this.isClosed = isClosed;
+		}
+
+		Contour()
+		{
+			this( new TDoubleArrayList(), new TDoubleArrayList(), false );
 		}
 
 		public static Contour init( final Segment start )
 		{
-			return new Contour( start );
+			final Contour c = new Contour();
+			c.x.add( start.xa );
+			c.y.add( start.ya );
+			c.matchx = start.xb;
+			c.matchy = start.yb;
+			c.isClosed = false;
+			return c;
 		}
 
 		/**
@@ -405,34 +394,73 @@ public class ZSlicer
 		 * @param segments
 		 * @return
 		 */
-		public boolean grow( final Collection< Segment > segments )
+		public boolean grow( final Collection< Segment > segments, final double tolerance )
 		{
+			double shortestDist = Double.POSITIVE_INFINITY;
+			Segment best = null;
 			for ( final Segment segment : segments )
 			{
-				if ( segment.x1 == matchx && segment.y1 == matchy )
+				final double d2a = segment.sqDistToA( matchx, matchy );
+				if ( d2a < shortestDist )
 				{
-					segments.remove( segment );
-					x.add( segment.x1 );
-					y.add( segment.y1 );
-					matchx = segment.x2;
-					matchy = segment.y2;
-					if ( segment.x2 == endx && segment.y2 == endy )
-						isClosed = true;
-					return true;
+					shortestDist = d2a;
+					best = segment;
 				}
-				else if ( segment.x2 == matchx && segment.y2 == matchy )
+				final double d2b = segment.sqDistToB( matchx, matchy );
+				if ( d2b < shortestDist )
 				{
-					segments.remove( segment );
-					x.add( segment.x2 );
-					y.add( segment.y2 );
-					matchx = segment.x1;
-					matchy = segment.y1;
-					if ( segment.x1 == endx && segment.y1 == endy )
-						isClosed = true;
-					return true;
+					shortestDist = d2b;
+					best = segment;
 				}
 			}
+			if ( shortestDist < tolerance * tolerance )
+			{
+				if ( best.sqDistToA( matchx, matchy ) < best.sqDistToB( matchx, matchy ) )
+				{
+					segments.remove( best );
+					x.add( best.xa );
+					y.add( best.ya );
+					matchx = best.xb;
+					matchy = best.yb;
+				}
+				else
+				{
+					segments.remove( best );
+					x.add( best.xb );
+					y.add( best.yb );
+					matchx = best.xa;
+					matchy = best.ya;
+				}
+				return true;
+			}
 			return false;
+
+//			for ( final Segment segment : segments )
+//			{
+//				if ( segment.x1 == matchx && segment.y1 == matchy )
+//				{
+//					segments.remove( segment );
+//					x.add( segment.x1 );
+//					y.add( segment.y1 );
+//					matchx = segment.x2;
+//					matchy = segment.y2;
+//					if ( segment.x2 == endx && segment.y2 == endy )
+//						isClosed = true;
+//					return true;
+//				}
+//				else if ( segment.x2 == matchx && segment.y2 == matchy )
+//				{
+//					segments.remove( segment );
+//					x.add( segment.x2 );
+//					y.add( segment.y2 );
+//					matchx = segment.x1;
+//					matchy = segment.y1;
+//					if ( segment.x1 == endx && segment.y1 == endy )
+//						isClosed = true;
+//					return true;
+//				}
+//			}
+//			return false;
 		}
 
 		public boolean isClosed()
