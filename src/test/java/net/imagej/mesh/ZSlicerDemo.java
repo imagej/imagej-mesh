@@ -9,6 +9,7 @@ import io.scif.img.SCIFIOImgPlus;
 import net.imagej.ImgPlus;
 import net.imagej.axis.Axes;
 import net.imagej.mesh.nio.BufferMesh;
+import net.imagej.mesh.zslicer.ZSlicer;
 import net.imglib2.RandomAccessibleInterval;
 import net.imglib2.type.numeric.RealType;
 import net.imglib2.util.Cast;
@@ -62,7 +63,8 @@ public class ZSlicerDemo
 			System.out.println( " # " + i + ": " + cc );
 //			new PLYMeshIO().save( cc, filePath + suffix + "-" + i + ".ply" );
 
-			ZSlicer.slice( cc, z );
+			final double tolerance = 1e-3 * pixelSizes[ 0 ];
+			ZSlicer.slice( cc, z, tolerance );
 
 			break;
 		}
