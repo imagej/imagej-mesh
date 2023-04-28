@@ -7,13 +7,13 @@
  * %%
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  * 1. Redistributions of source code must retain the above copyright notice,
  *    this list of conditions and the following disclaimer.
  * 2. Redistributions in binary form must reproduce the above copyright notice,
  *    this list of conditions and the following disclaimer in the documentation
  *    and/or other materials provided with the distribution.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -30,14 +30,13 @@
 
 package net.imagej.mesh.nio;
 
-import java.nio.Buffer;
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
-import java.nio.FloatBuffer;
-import java.nio.IntBuffer;
-import java.util.function.Function;
-
 import net.imagej.mesh.Mesh;
+import net.imagej.mesh.Triangle;
+import net.imagej.mesh.Vertex;
+
+import java.nio.*;
+import java.util.Iterator;
+import java.util.function.Function;
 
 /**
  * Mesh implemented using {@link java.nio.Buffer} objects.
@@ -46,303 +45,383 @@ import net.imagej.mesh.Mesh;
  */
 public class BufferMesh implements Mesh {
 
-	private final Vertices vertices;
-	private final Triangles triangles;
+    private final Vertices vertices;
+    private final Triangles triangles;
 
-	public BufferMesh(final int vertexMax, final int triangleMax) {
-		this(vertexMax, triangleMax, true);
-	}
+    public BufferMesh(final int vertexMax, final int triangleMax) {
+        this(vertexMax, triangleMax, true);
+    }
 
-	public BufferMesh(final int vertexMax, final int triangleMax,
-		final boolean direct)
-	{
-		this(vertexMax, triangleMax, //
-			direct ? ByteBuffer::allocateDirect : ByteBuffer::allocate);
-	}
+    public BufferMesh(final int vertexMax, final int triangleMax,
+                      final boolean direct) {
+        this(vertexMax, triangleMax, //
+                direct ? ByteBuffer::allocateDirect : ByteBuffer::allocate);
+    }
 
-	public BufferMesh(final int vertexMax, final int triangleMax,
-		final Function<Integer, ByteBuffer> creator)
-	{
-		this(floats(create(creator, vertexMax * 12)), //
-			floats(create(creator, vertexMax * 12)), //
-			floats(create(creator, vertexMax * 8)), //
-			ints(create(creator, triangleMax * 12)), //
-			floats(create(creator, triangleMax * 12)));
-	}
+    public BufferMesh(final int vertexMax, final int triangleMax,
+                      final Function<Integer, ByteBuffer> creator) {
+        this(floats(create(creator, vertexMax * 12)), //
+                floats(create(creator, vertexMax * 12)), //
+                floats(create(creator, vertexMax * 8)), //
+                ints(create(creator, triangleMax * 12)), //
+                floats(create(creator, triangleMax * 12)));
+    }
 
-	public BufferMesh(final FloatBuffer verts, final FloatBuffer vNormals,
-		final FloatBuffer texCoords, final IntBuffer indices,
-		final FloatBuffer tNormals)
-	{
-		vertices = new Vertices(verts, vNormals, texCoords);
-		triangles = new Triangles(indices, tNormals);
-	}
+    public BufferMesh(final FloatBuffer verts, final FloatBuffer vNormals,
+                      final FloatBuffer texCoords, final IntBuffer indices,
+                      final FloatBuffer tNormals) {
+        vertices = new Vertices(verts, vNormals, texCoords);
+        triangles = new Triangles(indices, tNormals);
+    }
 
-	@Override
-	public Vertices vertices() {
-		return vertices;
-	}
+    @Override
+    public Vertices vertices() {
+        return vertices;
+    }
 
-	@Override
-	public Triangles triangles() {
-		return triangles;
-	}
+    @Override
+    public Triangles triangles() {
+        return triangles;
+    }
 
-	// -- Inner classes --
+    @Override
+    public Mesh createVariable() {
+        return new BufferMesh(0, 0);
+    }
 
-	public class Vertices implements net.imagej.mesh.Vertices {
+    // -- Inner classes --
 
-		private static final int V_STRIDE = 3;
-		private static final int N_STRIDE = 3;
-		private static final int T_STRIDE = 2;
+    public class Vertices implements net.imagej.mesh.Vertices {
 
-		private FloatBuffer verts;
-		private FloatBuffer normals;
-		private FloatBuffer texCoords;
+        private static final int V_STRIDE = 3;
+        private static final int N_STRIDE = 3;
+        private static final int T_STRIDE = 2;
 
-		public Vertices(final FloatBuffer verts, final FloatBuffer normals,
-			final FloatBuffer texCoords)
-		{
-			this.verts = verts;
-			this.normals = normals;
-			this.texCoords = texCoords;
-		}
+        private FloatBuffer verts;
+        private FloatBuffer normals;
+        private FloatBuffer texCoords;
 
-		public FloatBuffer verts() {
-			return verts;
-		}
+        public Vertices(final FloatBuffer verts, final FloatBuffer normals,
+                        final FloatBuffer texCoords) {
+            this.verts = verts;
+            this.normals = normals;
+            this.texCoords = texCoords;
+        }
 
-		public FloatBuffer normals() {
-			return normals;
-		}
+        public FloatBuffer verts() {
+            return verts;
+        }
 
-		public FloatBuffer texCoords() {
-			return texCoords;
-		}
+        public FloatBuffer normals() {
+            return normals;
+        }
 
-		@Override
-		public Mesh mesh() {
-			return BufferMesh.this;
-		}
+        public FloatBuffer texCoords() {
+            return texCoords;
+        }
 
-		@Override
-		public long size() {
-			return verts.limit() / V_STRIDE;
-		}
+        @Override
+        public Mesh mesh() {
+            return BufferMesh.this;
+        }
 
-		@Override
-		public float xf(long vIndex) {
-			return verts.get(safeIndex(vIndex, V_STRIDE, 0));
-		}
+        @Override
+        public long size() {
+            return verts.limit() / V_STRIDE;
+        }
 
-		@Override
-		public float yf(long vIndex) {
-			return verts.get(safeIndex(vIndex, V_STRIDE, 1));
-		}
+        @Override
+        public float xf(long vIndex) {
+            return verts.get(safeIndex(vIndex, V_STRIDE, 0));
+        }
 
-		@Override
-		public float zf(long vIndex) {
-			return verts.get(safeIndex(vIndex, V_STRIDE, 2));
-		}
+        @Override
+        public float yf(long vIndex) {
+            return verts.get(safeIndex(vIndex, V_STRIDE, 1));
+        }
 
-		@Override
-		public float nxf(long vIndex) {
-			return normals.get(safeIndex(vIndex, N_STRIDE, 0));
-		}
+        @Override
+        public float zf(long vIndex) {
+            return verts.get(safeIndex(vIndex, V_STRIDE, 2));
+        }
 
-		@Override
-		public float nyf(long vIndex) {
-			return normals.get(safeIndex(vIndex, N_STRIDE, 1));
-		}
+        @Override
+        public float nxf(long vIndex) {
+            return normals.get(safeIndex(vIndex, N_STRIDE, 0));
+        }
 
-		@Override
-		public float nzf(long vIndex) {
-			return normals.get(safeIndex(vIndex, N_STRIDE, 2));
-		}
+        @Override
+        public float nyf(long vIndex) {
+            return normals.get(safeIndex(vIndex, N_STRIDE, 1));
+        }
 
-		@Override
-		public float uf(long vIndex) {
-			return texCoords.get(safeIndex(vIndex, T_STRIDE, 0));
-		}
+        @Override
+        public float nzf(long vIndex) {
+            return normals.get(safeIndex(vIndex, N_STRIDE, 2));
+        }
 
-		@Override
-		public float vf(long vIndex) {
-			return texCoords.get(safeIndex(vIndex, T_STRIDE, 1));
-		}
+        @Override
+        public float uf(long vIndex) {
+            return texCoords.get(safeIndex(vIndex, T_STRIDE, 0));
+        }
 
-		@Override
-		public long addf(float x, float y, float z, float nx, float ny, float nz,
-			float u, float v)
-		{
-			final long index = size();
-			grow(verts, V_STRIDE);
-			verts.put(x);
-			verts.put(y);
-			verts.put(z);
-			grow(normals, N_STRIDE);
-			normals.put(nx);
-			normals.put(ny);
-			normals.put(nz);
-			grow(texCoords, T_STRIDE);
-			texCoords.put(u);
-			texCoords.put(v);
-			return index;
-		}
+        @Override
+        public float vf(long vIndex) {
+            return texCoords.get(safeIndex(vIndex, T_STRIDE, 1));
+        }
 
-		@Override
-		public void setf(long vIndex, float x, float y, float z, //
-			float nx, float ny, float nz, //
-			float u, float v)
-		{
-			verts.put(safeIndex(vIndex, V_STRIDE, 0), x);
-			verts.put(safeIndex(vIndex, V_STRIDE, 1), y);
-			verts.put(safeIndex(vIndex, V_STRIDE, 2), z);
-			normals.put(safeIndex(vIndex, N_STRIDE, 0), nx);
-			normals.put(safeIndex(vIndex, N_STRIDE, 1), ny);
-			normals.put(safeIndex(vIndex, N_STRIDE, 2), nz);
-			texCoords.put(safeIndex(vIndex, T_STRIDE, 0), u);
-			texCoords.put(safeIndex(vIndex, T_STRIDE, 1), v);
-		}
+        @Override
+        public long addf(float x, float y, float z, float nx, float ny, float nz,
+                         float u, float v) {
+            final long index = size();
+            grow(verts, V_STRIDE);
+            verts.put(x);
+            verts.put(y);
+            verts.put(z);
+            grow(normals, N_STRIDE);
+            normals.put(nx);
+            normals.put(ny);
+            normals.put(nz);
+            grow(texCoords, T_STRIDE);
+            texCoords.put(u);
+            texCoords.put(v);
+            return index;
+        }
 
-		@Override
-		public void setPositionf(final long vIndex, final float x,
-			final float y, final float z)
-		{
-			verts.put(safeIndex(vIndex, V_STRIDE, 0), x);
-			verts.put(safeIndex(vIndex, V_STRIDE, 1), y);
-			verts.put(safeIndex(vIndex, V_STRIDE, 2), z);
-		}
+        @Override
+        public void setf(long vIndex, float x, float y, float z, //
+                         float nx, float ny, float nz, //
+                         float u, float v) {
+            verts.put(safeIndex(vIndex, V_STRIDE, 0), x);
+            verts.put(safeIndex(vIndex, V_STRIDE, 1), y);
+            verts.put(safeIndex(vIndex, V_STRIDE, 2), z);
+            normals.put(safeIndex(vIndex, N_STRIDE, 0), nx);
+            normals.put(safeIndex(vIndex, N_STRIDE, 1), ny);
+            normals.put(safeIndex(vIndex, N_STRIDE, 2), nz);
+            texCoords.put(safeIndex(vIndex, T_STRIDE, 0), u);
+            texCoords.put(safeIndex(vIndex, T_STRIDE, 1), v);
+        }
 
-		@Override
-		public void setNormalf(final long vIndex, final float nx,
-			final float ny, final float nz)
-		{
-			normals.put(safeIndex(vIndex, N_STRIDE, 0), nx);
-			normals.put(safeIndex(vIndex, N_STRIDE, 1), ny);
-			normals.put(safeIndex(vIndex, N_STRIDE, 2), nz);
-		}
+        @Override
+        public void setPositionf(final long vIndex, final float x,
+                                 final float y, final float z) {
+            verts.put(safeIndex(vIndex, V_STRIDE, 0), x);
+            verts.put(safeIndex(vIndex, V_STRIDE, 1), y);
+            verts.put(safeIndex(vIndex, V_STRIDE, 2), z);
+        }
 
-		@Override
-		public void setTexturef(final long vIndex, final float u, final float v)
-		{
-			texCoords.put(safeIndex(vIndex, T_STRIDE, 0), u);
-			texCoords.put(safeIndex(vIndex, T_STRIDE, 1), v);
-		}
-	}
+        @Override
+        public void setNormalf(final long vIndex, final float nx,
+                               final float ny, final float nz) {
+            normals.put(safeIndex(vIndex, N_STRIDE, 0), nx);
+            normals.put(safeIndex(vIndex, N_STRIDE, 1), ny);
+            normals.put(safeIndex(vIndex, N_STRIDE, 2), nz);
+        }
 
-	public class Triangles implements net.imagej.mesh.Triangles {
+        @Override
+        public void setTexturef(final long vIndex, final float u, final float v) {
+            texCoords.put(safeIndex(vIndex, T_STRIDE, 0), u);
+            texCoords.put(safeIndex(vIndex, T_STRIDE, 1), v);
+        }
 
-		private static final int I_STRIDE = 3;
-		private static final int N_STRIDE = 3;
+        @Override
+        public net.imagej.mesh.Vertices createVariable() {
+            return new Vertices(null, null, null);
+        }
 
-		private IntBuffer indices;
-		private FloatBuffer normals;
+        @Override
+        public void set(net.imagej.mesh.Vertices source) {
+            if (source instanceof net.imagej.mesh.nio.BufferMesh.Vertices) {
+                set(source, ((Vertices) source).isDirect());
+            } else {
+                set(source, true);// Direct by default
+            }
+        }
 
-		public Triangles(final IntBuffer indices, final FloatBuffer normals) {
-			this.indices = indices;
-			this.normals = normals;
-		}
+        public void set(net.imagej.mesh.Vertices source, boolean isDirect) {
+            if (isDirect) {
+                verts = floats(ByteBuffer.allocateDirect((int) (source.size() * V_STRIDE * 4)));
+                normals = floats(ByteBuffer.allocateDirect((int) (source.size() * N_STRIDE * 4)));
+                texCoords = floats(ByteBuffer.allocateDirect((int) (source.size() * T_STRIDE * 4)));
+            } else {
+                verts = floats(ByteBuffer.allocate((int) (source.size() * V_STRIDE * 4)));
+                normals = floats(ByteBuffer.allocate((int) (source.size() * N_STRIDE * 4)));
+                texCoords = floats(ByteBuffer.allocate((int) (source.size() * T_STRIDE * 4)));
+            }
 
-		public IntBuffer indices() {
-			return indices;
-		}
+            Iterator<Vertex> i = source.iterator();
+            while (i.hasNext()) {
+                add(i.next());
+            }
+        }
 
-		public FloatBuffer normals() {
-			return normals;
-		}
+        public boolean isDirect() {
+            return verts.isDirect();
+        }
 
-		@Override
-		public Mesh mesh() {
-			return BufferMesh.this;
-		}
+        @Override
+        public Vertices copy() {
+            Vertices c = (Vertices) createVariable();
+            c.set(this);
+            return c;
+        }
+    }
 
-		@Override
-		public long size() {
-			return indices.limit() / I_STRIDE;
-		}
+    public class Triangles implements net.imagej.mesh.Triangles {
 
-		@Override
-		public long vertex0(long tIndex) {
-			return indices.get(safeIndex(tIndex, I_STRIDE, 0));
-		}
+        private static final int I_STRIDE = 3;
+        private static final int N_STRIDE = 3;
 
-		@Override
-		public long vertex1(long tIndex) {
-			return indices.get(safeIndex(tIndex, I_STRIDE, 1));
-		}
+        private IntBuffer indices;
+        private FloatBuffer normals;
 
-		@Override
-		public long vertex2(long tIndex) {
-			return indices.get(safeIndex(tIndex, I_STRIDE, 2));
-		}
+        public Triangles(final IntBuffer indices, final FloatBuffer normals) {
+            this.indices = indices;
+            this.normals = normals;
+        }
 
-		@Override
-		public float nxf(long tIndex) {
-			return normals.get(safeIndex(tIndex, N_STRIDE, 0));
-		}
+        public IntBuffer indices() {
+            return indices;
+        }
 
-		@Override
-		public float nyf(long tIndex) {
-			return normals.get(safeIndex(tIndex, N_STRIDE, 1));
-		}
+        public FloatBuffer normals() {
+            return normals;
+        }
 
-		@Override
-		public float nzf(long tIndex) {
-			return normals.get(safeIndex(tIndex, N_STRIDE, 2));
-		}
+        @Override
+        public Mesh mesh() {
+            return BufferMesh.this;
+        }
 
-		@Override
-		public long addf(long v0, long v1, long v2, float nx, float ny, float nz) {
-			final long index = size();
-			grow(indices, I_STRIDE);
-			indices.put(safeInt(v0));
-			indices.put(safeInt(v1));
-			indices.put(safeInt(v2));
-			grow(normals, N_STRIDE);
-			normals.put(nx);
-			normals.put(ny);
-			normals.put(nz);
-			return index;
-		}
-	}
+        @Override
+        public long size() {
+            return indices.limit() / I_STRIDE;
+        }
 
-	private static int safeIndex(final long index, final int span,
-		final int offset)
-	{
-		return safeInt(span * index + offset);
-	}
+        @Override
+        public long vertex0(long tIndex) {
+            return indices.get(safeIndex(tIndex, I_STRIDE, 0));
+        }
 
-	private static int safeInt(final long value) {
-		if (value > Integer.MAX_VALUE) {
-			throw new IndexOutOfBoundsException("Value too large: " + value);
-		}
-		return (int) value;
-	}
+        @Override
+        public long vertex1(long tIndex) {
+            return indices.get(safeIndex(tIndex, I_STRIDE, 1));
+        }
 
-	private static ByteBuffer create(final Function<Integer, ByteBuffer> creator,
-		final int length)
-	{
-		return creator.apply(length).order(ByteOrder.nativeOrder());
-	}
+        @Override
+        public long vertex2(long tIndex) {
+            return indices.get(safeIndex(tIndex, I_STRIDE, 2));
+        }
 
-	private static FloatBuffer floats(final ByteBuffer bytes) {
-		final FloatBuffer floats = bytes.asFloatBuffer();
-		// NB: The limit must be set _after_ casting to float,
-		// or else the casted buffer will have a capacity of 0!
-		floats.limit(0);
-		return floats;
-	}
+        @Override
+        public float nxf(long tIndex) {
+            return normals.get(safeIndex(tIndex, N_STRIDE, 0));
+        }
 
-	private static IntBuffer ints(final ByteBuffer bytes) {
-		final IntBuffer ints = bytes.asIntBuffer();
-		// NB: The limit must be set _after_ casting to int,
-		// or else the casted buffer will have a capacity of 0!
-		ints.limit(0);
-		return ints;
-	}
+        @Override
+        public float nyf(long tIndex) {
+            return normals.get(safeIndex(tIndex, N_STRIDE, 1));
+        }
 
-	/** Expands the buffer limit in anticipation of {@code put} operations. */
-	private static void grow(final Buffer buffer, final int step) {
-		buffer.limit(buffer.limit() + step);
-	}
+        @Override
+        public float nzf(long tIndex) {
+            return normals.get(safeIndex(tIndex, N_STRIDE, 2));
+        }
+
+        @Override
+        public long addf(long v0, long v1, long v2, float nx, float ny, float nz) {
+            final long index = size();
+            grow(indices, I_STRIDE);
+            indices.put(safeInt(v0));
+            indices.put(safeInt(v1));
+            indices.put(safeInt(v2));
+            grow(normals, N_STRIDE);
+            normals.put(nx);
+            normals.put(ny);
+            normals.put(nz);
+            return index;
+        }
+
+        @Override
+        public net.imagej.mesh.Triangles createVariable() {
+            return new Triangles(null, null);
+        }
+
+
+        @Override
+        public void set(net.imagej.mesh.Triangles source) {
+            if (source instanceof Triangles) {
+                set(source, ((Triangles) source).isDirect());
+            } else {
+                set(source, true);
+            }
+        }
+
+        public void set(net.imagej.mesh.Triangles source, boolean isDirect) {
+            if (isDirect) {
+                indices = ints(ByteBuffer.allocateDirect((int) (source.size() * I_STRIDE * 4)));
+                normals = floats(ByteBuffer.allocateDirect((int) (source.size() * N_STRIDE * 4)));
+            } else {
+                indices = ints(ByteBuffer.allocate((int) (source.size() * I_STRIDE * 4)));
+                normals = floats(ByteBuffer.allocate((int) (source.size() * N_STRIDE * 4)));
+            }
+
+            Iterator<Triangle> i = source.iterator();
+            while (i.hasNext()) {
+                add(i.next());
+            }
+        }
+
+        public boolean isDirect() {
+            return indices.isDirect();
+        }
+
+        @Override
+        public Triangles copy() {
+            Triangles c = (Triangles) createVariable();
+            c.set(this);
+            return c;
+        }
+
+    }
+
+    private static int safeIndex(final long index, final int span,
+                                 final int offset) {
+        return safeInt(span * index + offset);
+    }
+
+    private static int safeInt(final long value) {
+        if (value > Integer.MAX_VALUE) {
+            throw new IndexOutOfBoundsException("Value too large: " + value);
+        }
+        return (int) value;
+    }
+
+    private static ByteBuffer create(final Function<Integer, ByteBuffer> creator,
+                                     final int length) {
+        return creator.apply(length).order(ByteOrder.nativeOrder());
+    }
+
+    private static FloatBuffer floats(final ByteBuffer bytes) {
+        final FloatBuffer floats = bytes.asFloatBuffer();
+        // NB: The limit must be set _after_ casting to float,
+        // or else the casted buffer will have a capacity of 0!
+        floats.limit(0);
+        return floats;
+    }
+
+    private static IntBuffer ints(final ByteBuffer bytes) {
+        final IntBuffer ints = bytes.asIntBuffer();
+        // NB: The limit must be set _after_ casting to int,
+        // or else the casted buffer will have a capacity of 0!
+        ints.limit(0);
+        return ints;
+    }
+
+    /**
+     * Expands the buffer limit in anticipation of {@code put} operations.
+     */
+    private static void grow(final Buffer buffer, final int step) {
+        buffer.limit(buffer.limit() + step);
+    }
 }
