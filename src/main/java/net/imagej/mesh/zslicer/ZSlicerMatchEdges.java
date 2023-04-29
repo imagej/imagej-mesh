@@ -9,11 +9,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import gnu.trove.list.array.TDoubleArrayList;
 import gnu.trove.list.array.TLongArrayList;
-import gnu.trove.procedure.TLongProcedure;
 import net.imagej.mesh.Mesh;
 import net.imagej.mesh.Triangles;
 import net.imagej.mesh.Vertices;
@@ -37,7 +35,7 @@ public class ZSlicerMatchEdges
 	 *            physical units.
 	 * @return
 	 */
-	public static List< Contour > slice( final Mesh mesh, final double zp, final double zPixelSize )
+	public static List< ContourExt > slice( final Mesh mesh, final double zp, final double zPixelSize )
 	{
 		// Convert eps to physical size.
 		final double eps = EPS * zPixelSize;
@@ -74,7 +72,7 @@ public class ZSlicerMatchEdges
 
 		// Deal with intersecting triangle.
 		final Collection< SegmentExt > segments = new ArrayList<>();
-				// new HashSet<>();
+		// new HashSet<>();
 		final double[] cross = new double[ 3 ]; // holder for cross product.
 		for ( int i = 0; i < intersecting.size(); i++ )
 		{
@@ -84,7 +82,7 @@ public class ZSlicerMatchEdges
 				segments.add( segment );
 		}
 
-		// Sort them by x then y etc.
+		// Sort them by edge.
 		final ArrayList< SegmentExt > sorted = new ArrayList<>( segments );
 		sorted.sort( Comparator.comparing( s -> s.ea ) );
 
@@ -102,8 +100,10 @@ public class ZSlicerMatchEdges
 
 			while ( contour.grow( deque, zPixelSize ) && !contour.isClosed() )
 			{}
+
+			contour.computeOrientation();
 		}
-		return contours.stream().map( ContourExt::toContour ).collect( Collectors.toList() );
+		return contours;
 	}
 
 	private static SegmentExt triangleIntersection( final Mesh mesh, final long id, final double z, final double[] cross )
@@ -126,7 +126,10 @@ public class ZSlicerMatchEdges
 		 * Triangle orientation. Cross product between plane normal and triangle
 		 * normal.
 		 */
-		MeshUtil.cross( 0, 0, 1., mesh.triangles().nx( id ), mesh.triangles().ny( id ), mesh.triangles().nz( id ), cross );
+		final double nx = mesh.triangles().nx( id );
+		final double ny = mesh.triangles().ny( id );
+		final double nz = mesh.triangles().nz( id );
+		MeshUtil.cross( 0, 0, 1., nx, ny, nz, cross );
 
 		/*
 		 * Because we shifted the vertices position and the intersecting plane
@@ -147,43 +150,43 @@ public class ZSlicerMatchEdges
 		final long eb;
 		if ( ei0 == null ) // not v0 -> v1
 		{
-			xa = ei1[0];
-			ya = ei1[1];
-			xb = ei2[0];
-			yb = ei2[1];
-			ea = MeshUtil.edgeID( (int) v2, (int) v0 );
-			eb = MeshUtil.edgeID( (int) v1, (int) v2 );
+			xa = ei1[ 0 ];
+			ya = ei1[ 1 ];
+			xb = ei2[ 0 ];
+			yb = ei2[ 1 ];
+			ea = MeshUtil.edgeID( ( int ) v2, ( int ) v0 );
+			eb = MeshUtil.edgeID( ( int ) v1, ( int ) v2 );
 		}
 		else if ( ei1 == null ) // not v0 -> v2
 		{
-			xa = ei2[0];
-			ya = ei2[1];
-			xb = ei0[0];
-			yb = ei0[1];
-			ea = MeshUtil.edgeID( (int) v1, (int) v2 );
-			eb = MeshUtil.edgeID( (int) v0, (int) v1 );
+			xa = ei2[ 0 ];
+			ya = ei2[ 1 ];
+			xb = ei0[ 0 ];
+			yb = ei0[ 1 ];
+			ea = MeshUtil.edgeID( ( int ) v1, ( int ) v2 );
+			eb = MeshUtil.edgeID( ( int ) v0, ( int ) v1 );
 		}
 		else // not v1 -> v2
 		{
-			xa = ei0[0];
-			ya = ei0[1];
-			xb = ei1[0];
-			yb = ei1[1];
-			ea = MeshUtil.edgeID( (int) v0, (int) v1 );
-			eb = MeshUtil.edgeID( (int) v2, (int) v0 );
+			xa = ei0[ 0 ];
+			ya = ei0[ 1 ];
+			xb = ei1[ 0 ];
+			yb = ei1[ 1 ];
+			ea = MeshUtil.edgeID( ( int ) v0, ( int ) v1 );
+			eb = MeshUtil.edgeID( ( int ) v2, ( int ) v0 );
 		}
-		
-		final double dx = xb-xa;
-		final double dy = yb-ya;
+
+		final double dx = xb - xa;
+		final double dy = yb - ya;
 		final double d = MeshUtil.dotProduct( cross[ 0 ], cross[ 1 ], cross[ 2 ], dx, dy, 0 );
 		if ( d > 0 )
 		{
-			return new SegmentExt( xa, ya, ea, eb );
+			return new SegmentExt( xa, ya, ea, eb, nx, ny );
 		}
 		else
 		{
 			// Flip.
-			return new SegmentExt( xb, yb, eb, ea );
+			return new SegmentExt( xb, yb, eb, ea, nx, ny );
 		}
 	}
 
@@ -220,12 +223,20 @@ public class ZSlicerMatchEdges
 
 		private final double ya;
 
-		public SegmentExt( final double xa, final double ya, final long ea, final long eb )
+		/** Normal at that segment. */
+		private final double nx;
+
+		/** Normal at that segment. */
+		private final double ny;
+
+		public SegmentExt( final double xa, final double ya, final long ea, final long eb, final double nx, final double ny )
 		{
 			this.xa = xa;
 			this.ya = ya;
 			this.ea = ea;
 			this.eb = eb;
+			this.nx = nx;
+			this.ny = ny;
 		}
 
 		@Override
@@ -236,12 +247,18 @@ public class ZSlicerMatchEdges
 		}
 	}
 
-	private static final class ContourExt
+	public static final class ContourExt
 	{
 
-		private final TDoubleArrayList x = new TDoubleArrayList();
+		public final TDoubleArrayList x = new TDoubleArrayList();
 
-		private final TDoubleArrayList y = new TDoubleArrayList();
+		public final TDoubleArrayList y = new TDoubleArrayList();
+
+		/** Normals. */
+		private final TDoubleArrayList nx = new TDoubleArrayList();
+
+		/** Normals. */
+		private final TDoubleArrayList ny = new TDoubleArrayList();
 
 		private final TLongArrayList es = new TLongArrayList();
 
@@ -251,10 +268,14 @@ public class ZSlicerMatchEdges
 
 		private final long ende;
 
+		private boolean interior;
+
 		protected ContourExt( final SegmentExt start )
 		{
 			x.add( start.xa );
 			y.add( start.ya );
+			nx.add( start.nx );
+			ny.add( start.ny );
 			isClosed = false;
 			matche = start.eb;
 			ende = start.ea;
@@ -272,6 +293,8 @@ public class ZSlicerMatchEdges
 					es.add( segment.ea );
 					x.add( segment.xa );
 					y.add( segment.ya );
+					nx.add( segment.nx );
+					ny.add( segment.ny );
 					matche = segment.eb;
 					if ( segment.eb == ende )
 						isClosed = true;
@@ -291,6 +314,46 @@ public class ZSlicerMatchEdges
 			return new Contour( x, y, isClosed );
 		}
 
+		public boolean isInterior()
+		{
+			return interior;
+		}
+
+		private void computeOrientation()
+		{
+			// Leftmost vertex
+			double minx = x.getQuick( 0 );
+			int k = 0;
+			for ( int i = 1; i < x.size(); i++ )
+			{
+				final double xl = x.getQuick( i );
+				if ( xl < minx )
+				{
+					minx = xl;
+					k = i;
+				}
+			}
+
+			// Normal is facing where?
+			interior = nx.getQuick( k ) < 0;
+		}
+
+		public double centerX()
+		{
+			double sum = 0.;
+			for ( int i = 0; i < x.size(); i++ )
+				sum += x.getQuick( i );
+			return sum / x.size();
+		}
+
+		public double centerY()
+		{
+			double sum = 0.;
+			for ( int i = 0; i < y.size(); i++ )
+				sum += y.getQuick( i );
+			return sum / y.size();
+		}
+
 		public static ContourExt init( final SegmentExt start )
 		{
 			return new ContourExt( start );
@@ -299,18 +362,8 @@ public class ZSlicerMatchEdges
 		@Override
 		public String toString()
 		{
-			final StringBuilder str = new StringBuilder();
-			str.append( "ending at E: " + ende + '\n' );
-			es.forEach( new TLongProcedure()
-			{
-
-				@Override
-				public boolean execute( final long value )
-				{
-					str.append( "E: " + value + '\n' );
-					return true;
-				}
-			} );
+			final StringBuilder str = new StringBuilder( super.toString() );
+			str.append( String.format( "\n%d vertices, is closed: %s, is interior: %s", x.size(), isClosed, interior ) );
 			return str.toString();
 		}
 	}

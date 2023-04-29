@@ -8,11 +8,12 @@ import gnu.trove.list.array.TDoubleArrayList;
 import net.imagej.mesh.Mesh;
 import net.imagej.mesh.Triangles;
 import net.imagej.mesh.Vertices;
+import net.imagej.mesh.zslicer.ZSlicerMatchEdges.ContourExt;
 
 public class ZSlicer
 {
 
-	public static List< Contour > slice( final Mesh mesh, final double z, final double tolerance )
+	public static List< ContourExt > slice( final Mesh mesh, final double z, final double tolerance )
 	{
 //		return ZSlicerRoundPositions.slice( mesh, z, tolerance );
 		return ZSlicerMatchEdges.slice( mesh, z, tolerance );
