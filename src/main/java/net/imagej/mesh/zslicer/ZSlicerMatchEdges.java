@@ -17,6 +17,7 @@ import gnu.trove.procedure.TLongProcedure;
 import net.imagej.mesh.Mesh;
 import net.imagej.mesh.Triangles;
 import net.imagej.mesh.Vertices;
+import net.imagej.mesh.util.MeshUtil;
 import net.imagej.mesh.zslicer.ZSlicer.Contour;
 
 public class ZSlicerMatchEdges
@@ -74,10 +75,11 @@ public class ZSlicerMatchEdges
 		// Deal with intersecting triangle.
 		final Collection< SegmentExt > segments = new ArrayList<>();
 				// new HashSet<>();
+		final double[] cross = new double[ 3 ]; // holder for cross product.
 		for ( int i = 0; i < intersecting.size(); i++ )
 		{
 			final long id = intersecting.getQuick( i );
-			final SegmentExt segment = triangleIntersection( mesh, id, z );
+			final SegmentExt segment = triangleIntersection( mesh, id, z, cross );
 			if ( segment != null )
 				segments.add( segment );
 		}
@@ -104,7 +106,7 @@ public class ZSlicerMatchEdges
 		return contours.stream().map( ContourExt::toContour ).collect( Collectors.toList() );
 	}
 
-	static SegmentExt triangleIntersection( final Mesh mesh, final long id, final double z )
+	private static SegmentExt triangleIntersection( final Mesh mesh, final long id, final double z, final double[] cross )
 	{
 		final long v0 = mesh.triangles().vertex0( id );
 		final long v1 = mesh.triangles().vertex1( id );
@@ -121,6 +123,12 @@ public class ZSlicerMatchEdges
 		final double z2 = mesh.vertices().z( v2 );
 
 		/*
+		 * Triangle orientation. Cross product between plane normal and triangle
+		 * normal.
+		 */
+		MeshUtil.cross( 0, 0, 1., mesh.triangles().nx( id ), mesh.triangles().ny( id ), mesh.triangles().nz( id ), cross );
+
+		/*
 		 * Because we shifted the vertices position and the intersecting plane
 		 * position, we are sure we are not crossing any vertex.
 		 * 
@@ -131,20 +139,51 @@ public class ZSlicerMatchEdges
 		final double[] ei2 = edgeIntersection( x1, y1, z1, x2, y2, z2, z ); // v1 -> v2
 
 		// Careful about winding number
+		final double xa;
+		final double xb;
+		final double ya;
+		final double yb;
+		final long ea;
+		final long eb;
 		if ( ei0 == null ) // not v0 -> v1
 		{
-//			return new SegmentExt( ei2[ 0 ], ei2[ 1 ], ei1[ 0 ], ei1[ 1 ], ( int ) v1, ( int ) v2, ( int ) v2, ( int ) v0 );
-			return new SegmentExt( ei1[ 0 ], ei1[ 1 ], ei2[ 0 ], ei2[ 1 ], ( int ) v2, ( int ) v0, ( int ) v1, ( int ) v2 );
+			xa = ei1[0];
+			ya = ei1[1];
+			xb = ei2[0];
+			yb = ei2[1];
+			ea = MeshUtil.edgeID( (int) v2, (int) v0 );
+			eb = MeshUtil.edgeID( (int) v1, (int) v2 );
 		}
 		else if ( ei1 == null ) // not v0 -> v2
 		{
-			return new SegmentExt( ei2[ 0 ], ei2[ 1 ], ei0[ 0 ], ei0[ 1 ], ( int ) v1, ( int ) v2, ( int ) v0, ( int ) v1 );
-//			return new SegmentExt( ei0[ 0 ], ei0[ 1 ], ei2[ 0 ], ei2[ 1 ], ( int ) v0, ( int ) v1, ( int ) v1, ( int ) v2 );
+			xa = ei2[0];
+			ya = ei2[1];
+			xb = ei0[0];
+			yb = ei0[1];
+			ea = MeshUtil.edgeID( (int) v1, (int) v2 );
+			eb = MeshUtil.edgeID( (int) v0, (int) v1 );
 		}
 		else // not v1 -> v2
 		{
-//			return new SegmentExt( ei1[ 0 ], ei1[ 1 ], ei0[ 0 ], ei0[ 1 ], ( int ) v2, ( int ) v0, ( int ) v0, ( int ) v1 );
-			return new SegmentExt( ei0[ 0 ], ei0[ 1 ], ei1[ 0 ], ei1[ 1 ], ( int ) v0, ( int ) v1, ( int ) v2, ( int ) v0 );
+			xa = ei0[0];
+			ya = ei0[1];
+			xb = ei1[0];
+			yb = ei1[1];
+			ea = MeshUtil.edgeID( (int) v0, (int) v1 );
+			eb = MeshUtil.edgeID( (int) v2, (int) v0 );
+		}
+		
+		final double dx = xb-xa;
+		final double dy = yb-ya;
+		final double d = MeshUtil.dotProduct( cross[ 0 ], cross[ 1 ], cross[ 2 ], dx, dy, 0 );
+		if ( d > 0 )
+		{
+			return new SegmentExt( xa, ya, ea, eb );
+		}
+		else
+		{
+			// Flip.
+			return new SegmentExt( xb, yb, eb, ea );
 		}
 	}
 
@@ -181,18 +220,12 @@ public class ZSlicerMatchEdges
 
 		private final double ya;
 
-		private final double xb;
-
-		private final double yb;
-
-		public SegmentExt( final double x1, final double y1, final double x2, final double y2, final int e1v1, final int e1v2, final int e2v1, final int e2v2 )
+		public SegmentExt( final double xa, final double ya, final long ea, final long eb )
 		{
-			this.xa = x1;
-			this.ya = y1;
-			this.xb = x2;
-			this.yb = y2;
-			this.ea = edgeID( e1v1, e1v2 );
-			this.eb = edgeID( e2v1, e2v2 );
+			this.xa = xa;
+			this.ya = ya;
+			this.ea = ea;
+			this.eb = eb;
 		}
 
 		@Override
@@ -244,26 +277,7 @@ public class ZSlicerMatchEdges
 						isClosed = true;
 					return true;
 				}
-				else if ( segment.eb == matche )
-				{
-					segments.remove( segment );
-					es.add( segment.eb );
-					x.add( segment.xb );
-					y.add( segment.yb );
-					matche = segment.ea;
-					if ( segment.ea == ende )
-						isClosed = true;
-					return true;
-				}
 			}
-
-			System.out.println(); // DEBUG
-			System.out.println( "Could not find a matching segment for contour: " ); // DEBUG
-			System.out.println( this ); // DEBUG
-			System.out.println( "Was trying to find edge " + matche ); // DEBUG
-			System.out.println( "Among:" ); // DEBUG
-			segments.forEach( System.out::println );
-
 			return false;
 		}
 
@@ -299,33 +313,5 @@ public class ZSlicerMatchEdges
 			} );
 			return str.toString();
 		}
-	}
-
-	private static final long edgeID( final int v1, final int v2 )
-	{
-		return ( v1 < v2 ) ? concat( v1, v2 ) : concat( v2, v1 );
-	}
-
-	private static final long concat( final int i1, final int i2 )
-	{
-		final long l = ( ( ( long ) i1 ) << 32 ) | ( i2 & 0xffffffffL );
-		return l;
-	}
-
-	private static final int decat1( final long l )
-	{
-		final int i1 = ( int ) ( l >> 32 );
-		return i1;
-	}
-
-	private static final int decat2( final long l )
-	{
-		final int i2 = ( int ) l;
-		return i2;
-	}
-
-	private static String edgeStr( final long l )
-	{
-		return String.format( "E: (%d -> %d)", decat1( l ), decat2( l ) );
 	}
 }
