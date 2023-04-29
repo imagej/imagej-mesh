@@ -8,8 +8,8 @@ import io.scif.img.ImgOpener;
 import io.scif.img.SCIFIOImgPlus;
 import net.imagej.ImgPlus;
 import net.imagej.axis.Axes;
+import net.imagej.mesh.ZSlicer.Contour;
 import net.imagej.mesh.nio.BufferMesh;
-import net.imagej.mesh.zslicer.ZSlicer;
 import net.imglib2.RandomAccessibleInterval;
 import net.imglib2.type.numeric.RealType;
 import net.imglib2.util.Cast;
@@ -40,7 +40,7 @@ public class ZSlicerDemo
 
 		final double isoLevel = 250;
 		final Mesh mesh1 = Meshes.marchingCubes( smoothed, isoLevel );
-		final double z = 11.;
+		final double z = 21.;
 		runMesh( mesh1, z, pixelSizes, filePath, "-grayscale" );
 
 		System.out.println( "Finished!" );
@@ -60,24 +60,12 @@ public class ZSlicerDemo
 		for ( final BufferMesh cc : MeshConnectedComponents.iterable( mesh ) )
 		{
 			i++;
-			System.out.println( " # " + i + ": " + cc );
-//			new PLYMeshIO().save( cc, filePath + suffix + "-" + i + ".ply" );
+			System.out.println( "\n# " + i + ": " + cc );
 
-			final double tolerance = 1e-3 * pixelSizes[ 0 ];
-			ZSlicer.slice( cc, z, tolerance );
-
-			break;
+			final List< Contour > contours = ZSlicer.slice( cc, z, pixelSizes[ 2 ] );
+			System.out.println( "Slice if made of " + contours.size() + " contours:" );
+			contours.forEach( System.out::println );
 		}
-//		System.out.println( "Simplifying to 10%:" );
-//		i = 0;
-//		for ( final BufferMesh cc : MeshConnectedComponents.iterable( mesh ) )
-//		{
-//			i++;
-//			final Mesh simplified = Meshes.simplify( cc, 0.1f, 10 );
-//			System.out.println( " # " + i + ": " + simplified );
-//			new PLYMeshIO().save( simplified, filePath + suffix + "-simplified-" + i + ".ply" );
-//		}
-
 		System.out.println();
 	}
 }
