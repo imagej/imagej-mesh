@@ -1,13 +1,17 @@
 package net.imagej.mesh;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
 import gnu.trove.list.array.TDoubleArrayList;
+import gnu.trove.list.array.TIntArrayList;
 import gnu.trove.list.array.TLongArrayList;
 import net.imagej.mesh.util.MeshUtil;
+import net.imagej.mesh.util.SortArray;
+import net.imagej.mesh.util.SortBy;
 
 /**
  * Slice a mesh by a Z plane. Only works for meshes that are two-manifold
@@ -29,6 +33,144 @@ public class ZSlicer {
 
     private static final double EPS = 4e-4;
 
+    public static List<List<Contour>> slices(final Mesh mesh, final double[] zs, final double zScale) {
+
+	/*
+	 * Slice plane Z positions to odd multiples of eps.
+	 */
+	final double eps = EPS * zScale;
+	final double[] zrs = new double[zs.length];
+	for (int i = 0; i < zs.length; i++)
+	    zrs[i] = mround(zs[i], eps, 2, 1);
+
+	/*
+	 * We want to collect the indices of the triangles which minZ is below zr and
+	 * maxZ above zr. Because we have to do it for several Zs, it is worth not
+	 * iterating through all the triangles every time. The solution here resembles a
+	 * convoluted set intersection.
+	 *
+	 * We sort the triangles by minZ, and perform a binary search to find the
+	 * indices of the triangles which minZ is lower than zr (0 -> k1). Then we sort
+	 * the resulting indices by maxZ this time, and perform a binary search to find
+	 * within these indices the ones that have a maxZ higher than zr (k2 -> k1).
+	 *
+	 * After this we have an indices array, and a lower and higher bound inside this
+	 * array of triangle that cross the plane zr.
+	 */
+
+	// Collect minZ & maxZ of vertices.
+	final Triangles triangles = mesh.triangles();
+	final Vertices vertices = mesh.vertices();
+
+	final double[] minZs = new double[(int) triangles.size()];
+	final double[] maxZs = new double[(int) triangles.size()];
+	for (int t = 0; t < triangles.size(); t++) {
+	    final long v0 = triangles.vertex0(t);
+	    final long v1 = triangles.vertex1(t);
+	    final long v2 = triangles.vertex2(t);
+
+	    final double minZ = minZ(vertices, v0, v1, v2, eps);
+	    minZs[t] = minZ;
+	    final double maxZ = maxZ(vertices, v0, v1, v2, eps);
+	    maxZs[t] = maxZ;
+	}
+	final int[] indexMin = SortArray.quicksort(minZs);
+	final int[] indices = new int[indexMin.length];
+
+	/*
+	 * Now minZs is sorted by increasing values, and indexMin contains the index of
+	 * triangles in the sorted array. For instance the triangle with the smallest
+	 * minZ (first in the minZs array) as an id equal to indexMin[0].
+	 */
+
+	/*
+	 * Build sets of intersecting triangles for each z plane.
+	 */
+	final List<List<Contour>> slices = new ArrayList<>(zrs.length);
+	for (int i = 0; i < zrs.length; i++) {
+	    final double zr = zrs[i];
+
+	    // All triangles with minZ < zr
+	    int k1 = Arrays.binarySearch(minZs, zr);
+	    if (k1 < 0)
+		k1 = -(k1 + 1);
+
+	    // Write these indices into an array (so that we do not change minZs).
+	    System.arraycopy(indexMin, 0, indices, 0, k1);
+
+	    /*
+	     * All the triangles with id indices[0], ... indices[jmin-1] (jmin is not
+	     * included, either equal or larger than zr) have a minZ below zr.
+	     *
+	     * Now: search among those triangles what ones have a maxZ larger than zr. We
+	     * will sort indexMin[0 -> jmin] by maxZ.
+	     */
+
+	    // Sort indices by the maxZ of the triangle they point to.
+	    SortBy.sortBy(indices, maxZs, 0, k1 - 1);
+
+	    // Search the closest z.
+	    int k2 = SortBy.binarySearch(indices, maxZs, 0, k1, zr);
+	    if (k2 < 0)
+		k2 = -(k2 + 1);
+
+	    /*
+	     * All the triangles with id indices[k2], ... indices[k1-1] have a minZ below zr
+	     * and a maxZ above zr.
+	     */
+
+	    final List<Contour> slice = process(mesh, indices, k2, k1, zr, eps);
+	    slices.add(slice);
+	}
+	return slices;
+    }
+
+    /**
+     * Returns a slice as a list of {@link Contour}s for the triangles of the
+     * specified mesh which indices are in the specified indices array, between
+     * index start (inclusive) and end (not inclusive).
+     *
+     * @param mesh    the mesh to slice.
+     * @param indices the triangle indices.
+     * @param start   the start index in the triangles indices.
+     * @param end     the end index (not inclusive) in the triangle indices.
+     * @return a new list of {@link Contour}s.
+     */
+    private static List<Contour> process(final Mesh mesh, final int[] indices, final int start, final int end,
+	    final double zr, final double eps) {
+
+	// Deal with intersecting triangle.
+	final LinkedList<Segment> segments = new LinkedList<>();
+	for (int i = start; i < end; i++) {
+	    final int id = indices[i];
+	    final Segment segment = triangleIntersection(mesh, id, zr, eps);
+	    if (segment != null)
+		segments.add(segment);
+	}
+
+	// Sort segments by first edge.
+	Collections.sort(segments);
+
+	// Build contours from segments.
+	final List<Contour> contours = new ArrayList<>();
+	while (!segments.isEmpty()) {
+	    final Segment first = segments.pop();
+	    if (segments.isEmpty())
+		break;
+
+	    final Contour contour = Contour.init(first);
+	    while (contour.grow(segments) && !contour.isClosed()) {
+	    }
+
+	    if (contour.size() < 3)
+		continue;
+
+	    contour.computeOrientation();
+	    contours.add(contour);
+	}
+	return contours;
+    }
+
     /**
      * Slice a mesh by a Z-plane.
      *
@@ -48,7 +190,7 @@ public class ZSlicer {
 	final Triangles triangles = mesh.triangles();
 	final Vertices vertices = mesh.vertices();
 
-	final TLongArrayList intersecting = new TLongArrayList();
+	final TIntArrayList intersecting = new TIntArrayList();
 	for (long f = 0; f < triangles.size(); f++) {
 	    final long v0 = triangles.vertex0(f);
 	    final long v1 = triangles.vertex1(f);
@@ -61,39 +203,9 @@ public class ZSlicer {
 	    if (maxZ < zr)
 		continue;
 
-	    intersecting.add(f);
+	    intersecting.add((int) f);
 	}
-
-	// Deal with intersecting triangle.
-	final LinkedList<Segment> segments = new LinkedList<>();
-	for (int i = 0; i < intersecting.size(); i++) {
-	    final long id = intersecting.getQuick(i);
-	    final Segment segment = triangleIntersection(mesh, id, zr, eps);
-	    if (segment != null)
-		segments.add(segment);
-	}
-
-	// Sort segments by first edge.
-	Collections.sort(segments);
-
-	// Build contours from segments.
-	final List<Contour> contours = new ArrayList<>();
-	while (!segments.isEmpty()) {
-	    final Segment start = segments.pop();
-	    if (segments.isEmpty())
-		break;
-
-	    final Contour contour = Contour.init(start);
-	    while (contour.grow(segments) && !contour.isClosed()) {
-	    }
-
-	    if (contour.size() < 3)
-		continue;
-
-	    contour.computeOrientation();
-	    contours.add(contour);
-	}
-	return contours;
+	return process(mesh, intersecting.toArray(), 0, intersecting.size(), zr, eps);
     }
 
     private static Segment triangleIntersection(final Mesh mesh, final long id, final double z, final double eps) {
