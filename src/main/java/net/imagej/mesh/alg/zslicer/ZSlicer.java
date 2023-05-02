@@ -1,4 +1,4 @@
-package net.imagej.mesh;
+package net.imagej.mesh.alg.zslicer;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -8,7 +8,9 @@ import java.util.List;
 
 import gnu.trove.list.array.TDoubleArrayList;
 import gnu.trove.list.array.TIntArrayList;
-import gnu.trove.list.array.TLongArrayList;
+import net.imagej.mesh.Mesh;
+import net.imagej.mesh.Triangles;
+import net.imagej.mesh.Vertices;
 import net.imagej.mesh.util.MeshUtil;
 import net.imagej.mesh.util.SortArray;
 import net.imagej.mesh.util.SortBy;
@@ -31,9 +33,9 @@ import net.imagej.mesh.util.SortBy;
  */
 public class ZSlicer {
 
-    private static final double EPS = 4e-4;
+    static final double EPS = 4e-4;
 
-    public static List<List<Contour>> slices(final Mesh mesh, final double[] zs, final double zScale) {
+    public static List<Slice> slices(final Mesh mesh, final double[] zs, final double zScale) {
 
 	/*
 	 * Slice plane Z positions to odd multiples of eps.
@@ -86,7 +88,7 @@ public class ZSlicer {
 	/*
 	 * Build sets of intersecting triangles for each z plane.
 	 */
-	final List<List<Contour>> slices = new ArrayList<>(zrs.length);
+	final List<Slice> slices = new ArrayList<>(zrs.length);
 	for (int i = 0; i < zrs.length; i++) {
 	    final double zr = zrs[i];
 
@@ -119,8 +121,8 @@ public class ZSlicer {
 	     * and a maxZ above zr.
 	     */
 
-	    final List<Contour> slice = process(mesh, indices, k2, k1, zr, eps);
-	    slices.add(slice);
+	    final List<Contour> contours = process(mesh, indices, k2, k1, zr, eps);
+	    slices.add(new Slice(contours));
 	}
 	return slices;
     }
@@ -158,15 +160,57 @@ public class ZSlicer {
 	    if (segments.isEmpty())
 		break;
 
-	    final Contour contour = Contour.init(first);
-	    while (contour.grow(segments) && !contour.isClosed()) {
+	    // Contour coordinates.
+	    final TDoubleArrayList x = new TDoubleArrayList();
+	    final TDoubleArrayList y = new TDoubleArrayList();
+	    // Normals of triangles projected on XY.
+	    final TDoubleArrayList nx = new TDoubleArrayList();
+	    final TDoubleArrayList ny = new TDoubleArrayList();
+
+	    // Init.
+	    x.add(first.xa);
+	    y.add(first.ya);
+	    nx.add(first.nx);
+	    ny.add(first.ny);
+	    boolean isClosed = false;
+	    Segment match = new Segment(Double.NaN, Double.NaN, first.eb, -1, Double.NaN, Double.NaN);
+	    final long endEdge = first.ea;
+
+	    // To determine interior vs exterior.
+	    double minX = first.xa;
+	    int minXIndex = 0;
+
+	    // Grow contour.
+	    while (!isClosed) {
+		final int i = Collections.binarySearch(segments, match);
+		if (i < 0)
+		    break; // Did not find a match, stop contour growth.
+
+		final Segment segment = segments.remove(i);
+		x.add(segment.xa);
+		y.add(segment.ya);
+		nx.add(segment.nx);
+		ny.add(segment.ny);
+
+		if (segment.xa < minX) {
+		    minX = segment.xa;
+		    minXIndex = x.size() - 1;
+		}
+
+		match = new Segment(Double.NaN, Double.NaN, segment.eb, -1, Double.NaN, Double.NaN);
+		if (segment.eb == endEdge)
+		    isClosed = true;
 	    }
 
-	    if (contour.size() < 3)
+	    // Big enough?
+	    if (x.size() < 3)
 		continue;
 
-	    contour.computeOrientation();
-	    contours.add(contour);
+	    // Interior or exterior?
+	    final boolean isInterior = nx.getQuick(minXIndex) < 0;
+
+	    // Add it to the slice.
+	    contours.add(new Contour(x, y, nx, ny, isInterior));
 	}
 	return contours;
     }
@@ -182,7 +226,7 @@ public class ZSlicer {
      * @return the section of the mesh at the specified Z position, returned as a
      *         collection of {@link Contour} objects.
      */
-    public static List<Contour> slice(final Mesh mesh, final double z, final double zScale) {
+    public static Slice slice(final Mesh mesh, final double z, final double zScale) {
 	// Slice plane to odd multiples of eps.
 	final double eps = EPS * zScale;
 	final double zr = mround(z, eps, 2, 1);
@@ -205,7 +249,8 @@ public class ZSlicer {
 
 	    intersecting.add((int) f);
 	}
-	return process(mesh, intersecting.toArray(), 0, intersecting.size(), zr, eps);
+	final List<Contour> contours = process(mesh, intersecting.toArray(), 0, intersecting.size(), zr, eps);
+	return new Slice(contours);
     }
 
     private static Segment triangleIntersection(final Mesh mesh, final long id, final double z, final double eps) {
@@ -289,29 +334,29 @@ public class ZSlicer {
 	}
     }
 
-    private static final double mround(final double v, final double eps, final int mod, final int rem) {
+    static final double mround(final double v, final double eps, final int mod, final int rem) {
 	final long y = Math.round(v / (mod * eps));
 	final double z = (y * mod + rem) * eps;
 	return z;
     }
 
-    private static final class Segment implements Comparable<Segment> {
+    static final class Segment implements Comparable<Segment> {
 
-	private final long ea;
+	final long ea;
 
-	private final long eb;
+	final long eb;
 
-	private final double xa;
+	final double xa;
 
-	private final double ya;
-
-	/** Normal at that segment. */
-	private final double nx;
+	final double ya;
 
 	/** Normal at that segment. */
-	private final double ny;
+	final double nx;
 
-	private Segment(final double xa, final double ya, final long ea, final long eb, final double nx,
+	/** Normal at that segment. */
+	final double ny;
+
+	Segment(final double xa, final double ya, final long ea, final long eb, final double nx,
 		final double ny) {
 	    this.xa = xa;
 	    this.ya = ya;
@@ -329,132 +374,6 @@ public class ZSlicer {
 	@Override
 	public int compareTo(final Segment o) {
 	    return (ea < o.ea) ? -1 : (ea == o.ea) ? 0 : 1;
-	}
-    }
-
-    public static final class Contour {
-
-	private final TDoubleArrayList x = new TDoubleArrayList();
-
-	private final TDoubleArrayList y = new TDoubleArrayList();
-
-	/** Normals. */
-	private final TDoubleArrayList nx = new TDoubleArrayList();
-
-	/** Normals. */
-	private final TDoubleArrayList ny = new TDoubleArrayList();
-
-	private final TLongArrayList es = new TLongArrayList();
-
-	private boolean isClosed;
-
-	private boolean isInterior;
-
-	/** Used to search the corresponding segment. */
-	private Segment match;
-
-	private final long endEdge;
-
-	private Contour(final Segment start) {
-	    x.add(start.xa);
-	    y.add(start.ya);
-	    nx.add(start.nx);
-	    ny.add(start.ny);
-	    isClosed = false;
-	    match = new Segment(Double.NaN, Double.NaN, start.eb, -1, Double.NaN, Double.NaN);
-	    endEdge = start.ea;
-	    es.add(start.ea);
-	}
-
-	/**
-	 * Grows this contour by finding one segment from the specified list that
-	 * connect to its head. Sets {@link #isClosed()} to <code>true</code> when the
-	 * segment found connects to its tail.
-	 *
-	 * @param segments the list of segments to grow from. At most one is removed
-	 *                 from this list.
-	 * @return <code>true</code> if one segment was added to this contour.
-	 */
-	private boolean grow(final LinkedList<Segment> segments) {
-	    final int i = Collections.binarySearch(segments, match);
-	    if (i < 0)
-		return false; // Did not find a match;
-
-	    final Segment segment = segments.remove(i);
-	    es.add(segment.ea);
-	    x.add(segment.xa);
-	    y.add(segment.ya);
-	    nx.add(segment.nx);
-	    ny.add(segment.ny);
-	    match = new Segment(Double.NaN, Double.NaN, segment.eb, -1, Double.NaN, Double.NaN);
-	    if (segment.eb == endEdge)
-		isClosed = true;
-	    return true;
-	}
-
-	public boolean isClosed() {
-	    return isClosed;
-	}
-
-	public boolean isInterior() {
-	    return isInterior;
-	}
-
-	/**
-	 * Determine whether this contour surrounds the interior of the mesh or the
-	 * exterior. Sets the {@link #isInterior} field.
-	 */
-	private void computeOrientation() {
-	    // Leftmost vertex
-	    double minx = x.getQuick(0);
-	    int k = 0;
-	    for (int i = 1; i < x.size(); i++) {
-		final double xl = x.getQuick(i);
-		if (xl < minx) {
-		    minx = xl;
-		    k = i;
-		}
-	    }
-
-	    // Normal is facing where?
-	    isInterior = nx.getQuick(k) < 0;
-	}
-
-	public double centerX() {
-	    double sum = 0.;
-	    for (int i = 0; i < x.size(); i++)
-		sum += x.getQuick(i);
-	    return sum / x.size();
-	}
-
-	public double centerY() {
-	    double sum = 0.;
-	    for (int i = 0; i < y.size(); i++)
-		sum += y.getQuick(i);
-	    return sum / y.size();
-	}
-
-	private static Contour init(final Segment start) {
-	    return new Contour(start);
-	}
-
-	public int size() {
-	    return x.size();
-	}
-
-	public double x(final int i) {
-	    return x.getQuick(i);
-	}
-
-	public double y(final int i) {
-	    return y.getQuick(i);
-	}
-
-	@Override
-	public String toString() {
-	    final StringBuilder str = new StringBuilder(super.toString());
-	    str.append(String.format("\n%d vertices, is closed: %s, is interior: %s", x.size(), isClosed, isInterior));
-	    return str.toString();
 	}
     }
 

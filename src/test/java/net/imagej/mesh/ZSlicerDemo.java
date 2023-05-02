@@ -8,7 +8,8 @@ import io.scif.img.ImgOpener;
 import io.scif.img.SCIFIOImgPlus;
 import net.imagej.ImgPlus;
 import net.imagej.axis.Axes;
-import net.imagej.mesh.ZSlicer.Contour;
+import net.imagej.mesh.alg.zslicer.Slice;
+import net.imagej.mesh.alg.zslicer.ZSlicer;
 import net.imagej.mesh.nio.BufferMesh;
 import net.imglib2.RandomAccessibleInterval;
 import net.imglib2.type.numeric.RealType;
@@ -44,6 +45,7 @@ public class ZSlicerDemo {
 
     private static void runMesh(Mesh mesh, final double z, final double[] pixelSizes, final String filePath,
 	    final String suffix) throws IOException {
+
 	System.out.println("Before removing duplicates: " + mesh);
 	mesh = Meshes.removeDuplicateVertices(mesh, 2);
 	System.out.println("After removing duplicates: " + mesh);
@@ -58,13 +60,13 @@ public class ZSlicerDemo {
 	    System.out.println("\n# " + i + ": " + cc + " - " + Util.printCoordinates(Meshes.boundingBox(cc)));
 
 	    System.out.println("First method:");
-	    final List<List<Contour>> slices = ZSlicer.slices(cc, new double[] { z }, pixelSizes[2]);
-	    final List<Contour> contours1 = slices.get(0);
+	    final List<Slice> slices = ZSlicer.slices(cc, new double[] { z }, pixelSizes[2]);
+	    final Slice contours1 = slices.get(0);
 	    System.out.println("Slice if made of " + contours1.size() + " contours:");
 	    contours1.forEach(System.out::println);
 
 	    System.out.println("Second method:");
-	    final List<Contour> contours2 = ZSlicer.slice(cc, z, pixelSizes[2]);
+	    final Slice contours2 = ZSlicer.slice(cc, z, pixelSizes[2]);
 	    System.out.println("Slice if made of " + contours2.size() + " contours:");
 	    contours2.forEach(System.out::println);
 
