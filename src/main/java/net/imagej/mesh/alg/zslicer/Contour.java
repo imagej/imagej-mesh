@@ -90,4 +90,17 @@ public final class Contour {
 	str.append(String.format("\n%d vertices, is interior: %s", x.size(), isInterior));
 	return str.toString();
     }
+
+    public double area() {
+	return Math.abs(signedArea(x, y));
+    }
+
+    private static final double signedArea(final TDoubleArrayList x, final TDoubleArrayList y) {
+	final int n = x.size();
+	double a = 0.0;
+	for (int i = 0; i < n - 1; i++)
+	    a += x.getQuick(i) * y.getQuick(i + 1) - x.getQuick(i + 1) * y.getQuick(i);
+
+	return (a + x.getQuick(n - 1) * y.getQuick(0) - x.getQuick(0) * y.getQuick(n - 1)) / 2.0;
+    }
 }
