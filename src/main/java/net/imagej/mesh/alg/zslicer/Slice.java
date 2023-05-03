@@ -3,18 +3,30 @@ package net.imagej.mesh.alg.zslicer;
 import static net.imagej.mesh.alg.zslicer.ZSlicer.EPS;
 import static net.imagej.mesh.alg.zslicer.ZSlicer.mround;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.Iterator;
+import java.util.List;
 
 import gnu.trove.list.array.TDoubleArrayList;
 import net.imagej.mesh.util.SortTrove;
 
+/**
+ * Class that represents the intersection of a closed 3D mesh (manifold and
+ * two-manifold) with a plane. The slice is made of a collection of several
+ * closed {@link Contour}s. They are sorted by decreasing area.
+ *
+ * @author Jean-Yves Tinevez
+ *
+ */
 public class Slice implements Collection<Contour> {
 
-    private final Collection<Contour> contours;
+    private final List<Contour> contours;
 
     Slice(final Collection<Contour> contours) {
-	this.contours = contours;
+	this.contours = new ArrayList<>(contours);
+	this.contours.sort(Comparator.comparing(Contour::area).reversed());
     }
 
     @Override
