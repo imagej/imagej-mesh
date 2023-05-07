@@ -50,9 +50,35 @@ public interface Triangles extends Iterable<Triangle> {
     long size();
 
     /**
+     * Number of triangles in the collection as an <code>int</code> value.
+     * 
+     * @throws RuntimeException if the number of triangles exceeds
+     *                          {@link Integer#MAX_VALUE}.
+     */
+    default int isize() {
+	final long size = size();
+	if (size >= Integer.MAX_VALUE)
+	    throw new RuntimeException("Too many triangles: " + size);
+	return (int) size;
+    }
+
+    /**
      * <strong>Index</strong> of first vertex in a triangle.
      */
     long vertex0(long tIndex);
+
+    /**
+     * <strong>Index</strong> of first vertex in a triangle, as an <code>int</code>.
+     * *
+     * 
+     * @throws RuntimeException if the index exceeds {@link Integer#MAX_VALUE}.
+     */
+    default int vertex0(final int tIndex) {
+	final long vertex0 = vertex0((long) tIndex);
+	if (tIndex >= Integer.MAX_VALUE)
+	    throw new RuntimeException("Index too large: " + tIndex);
+	return (int) vertex0;
+    }
 
     /**
      * <strong>Index</strong> of second vertex in a triangle.
@@ -60,9 +86,35 @@ public interface Triangles extends Iterable<Triangle> {
     long vertex1(long tIndex);
 
     /**
+     * <strong>Index</strong> of second vertex in a triangle, as an
+     * <code>int</code>. *
+     * 
+     * @throws RuntimeException if the index exceeds {@link Integer#MAX_VALUE}.
+     */
+    default int vertex1(final int tIndex) {
+	final long vertex1 = vertex1((long) tIndex);
+	if (tIndex >= Integer.MAX_VALUE)
+	    throw new RuntimeException("Index too large: " + tIndex);
+	return (int) vertex1;
+    }
+
+    /**
      * <strong>Index</strong> of third vertex in a triangle.
      */
     long vertex2(long tIndex);
+
+    /**
+     * <strong>Index</strong> of third vertex in a triangle, as an <code>int</code>.
+     * *
+     * 
+     * @throws RuntimeException if the index exceeds {@link Integer#MAX_VALUE}.
+     */
+    default int vertex2(final int tIndex) {
+	final long vertex2 = vertex1((long) tIndex);
+	if (tIndex >= Integer.MAX_VALUE)
+	    throw new RuntimeException("Index too large: " + tIndex);
+	return (int) vertex2;
+    }
 
     /**
      * X coordinate of triangle's normal, as a float.
@@ -91,6 +143,27 @@ public interface Triangles extends Iterable<Triangle> {
      * @return Index of newly added triangle.
      */
     long addf(long v0, long v1, long v2, float nx, float ny, float nz);
+
+    /**
+     * Adds a triangle to the mesh's triangles list, using <code>int</code>s.
+     *
+     * @param v0 Index of triangle's first vertex.
+     * @param v1 Index of triangle's second vertex.
+     * @param v2 Index of triangle's third vertex.
+     * @param nx X coordinate of triangle's normal.
+     * @param ny Y coordinate of triangle's normal.
+     * @param nz Z coordinate of triangle's normal.
+     * @return Index of newly added triangle.
+     * @throws RuntimeException if the return triangle index exceeds
+     *                          {@link Integer#MAX_VALUE}.
+     */
+    default int addf(final int v0, final int v1, final int v2, final float nx, final float ny, final float nz)
+    {
+	final long t = addf((long) v0, (long) v1, (long) v2, nx, ny, nz);
+	if (t >= Integer.MAX_VALUE)
+	    throw new RuntimeException("Index too large: " + t);
+	return (int) t;
+    }
 
     /**
      * Adds a triangle to the mesh's triangles list.
@@ -129,6 +202,26 @@ public interface Triangles extends Iterable<Triangle> {
         final float nz = v10x * v20y - v10y * v20x;
 
         return addf(v0, v1, v2, nx, ny, nz);
+    }
+
+    /**
+     * Adds a triangle to the mesh's triangles list, using <code>int</code>s.
+     * <p>
+     * Normal is computed with counterclockwise (i.e., right-hand) orientation.
+     * </p>
+     *
+     * @param v0 Index of triangle's first vertex.
+     * @param v1 Index of triangle's second vertex.
+     * @param v2 Index of triangle's third vertex.
+     * @return Index of newly added triangle.
+     * @throws RuntimeException if the return triangle index exceeds
+     *                          {@link Integer#MAX_VALUE}.
+     */
+    default int addf(final int v0, final int v1, final int v2) {
+	final long t = addf((long) v0, (long) v1, (long) v2);
+	if (t >= Integer.MAX_VALUE)
+	    throw new RuntimeException("Index too large: " + t);
+	return (int) t;
     }
 
     /**
@@ -229,6 +322,24 @@ public interface Triangles extends Iterable<Triangle> {
     }
 
     /**
+     * Adds a triangle to the mesh's triangles list, using <code>int</code> indices.
+     *
+     * @param v0 Index of triangle's first vertex.
+     * @param v1 Index of triangle's second vertex.
+     * @param v2 Index of triangle's third vertex.
+     * @param nx X coordinate of triangle's normal.
+     * @param ny Y coordinate of triangle's normal.
+     * @param nz Z coordinate of triangle's normal.
+     * @return Index of newly added triangle.
+     * @throws RuntimeException if the return triangle index exceeds
+     *                          {@link Integer#MAX_VALUE}.
+     */
+    default int add(final int v0, final int v1, final int v2, //
+	    final double nx, final double ny, final double nz) {
+	return addf(v0, v1, v2, (float) nx, (float) ny, (float) nz);
+    }
+
+    /**
      * Adds a triangle to the mesh's triangles list.
      * <p>
      * Normal is computed with counterclockwise (i.e., right-hand) orientation.
@@ -266,6 +377,26 @@ public interface Triangles extends Iterable<Triangle> {
         final double nmag = Math.sqrt(Math.pow(nx, 2) + Math.pow(ny, 2) + Math.pow(nz, 2));
 
         return add(v0, v1, v2, nx / nmag, ny / nmag, nz / nmag);
+    }
+
+    /**
+     * Adds a triangle to the mesh's triangles list, using <code>int</code> indices.
+     * <p>
+     * Normal is computed with counterclockwise (i.e., right-hand) orientation.
+     * </p>
+     *
+     * @param v0 Index of triangle's first vertex.
+     * @param v1 Index of triangle's second vertex.
+     * @param v2 Index of triangle's third vertex.
+     * @return Index of newly added triangle.
+     * @throws RuntimeException if the return triangle index exceeds
+     *                          {@link Integer#MAX_VALUE}.
+     */
+    default int add(final int v0, final int v1, final int v2) {
+	final long t = add((long) v0, (long) v1, (long) v2);
+	if (t >= Integer.MAX_VALUE)
+	    throw new RuntimeException("Index too large: " + t);
+	return (int) t;
     }
 
     /**
