@@ -28,7 +28,7 @@
  * #L%
  */
 
-package net.imagej.mesh;
+package net.imagej.mesh.obj;
 
 /**
  * One triangle of a {@link Triangles} collection.

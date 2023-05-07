@@ -30,7 +30,9 @@
 package net.imagej.mesh;
 
 import io.scif.img.IO;
-import net.imagej.mesh.naive.NaiveDoubleMesh;
+import net.imagej.mesh.obj.Mesh;
+import net.imagej.mesh.obj.Triangle;
+import net.imagej.mesh.obj.naive.NaiveDoubleMesh;
 import net.imglib2.Point;
 import net.imglib2.RandomAccess;
 import net.imglib2.RandomAccessibleInterval;

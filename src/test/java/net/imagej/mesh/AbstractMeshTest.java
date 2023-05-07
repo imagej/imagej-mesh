@@ -30,8 +30,10 @@
 
 package net.imagej.mesh;
 
-import net.imagej.mesh.naive.NaiveDoubleMesh;
-import net.imagej.mesh.nio.BufferMesh;
+import net.imagej.mesh.obj.Mesh;
+import net.imagej.mesh.obj.naive.NaiveDoubleMesh;
+import net.imagej.mesh.obj.nio.BufferMesh;
+
 import org.junit.Test;
 
 import java.io.IOException;

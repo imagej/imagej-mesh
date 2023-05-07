@@ -28,16 +28,18 @@
  * #L%
  */
 
-package net.imagej.mesh;
+package net.imagej.mesh.alg;
 
-import net.imagej.mesh.naive.NaiveDoubleMesh;
+import org.apache.commons.math3.util.MathArrays;
+
+import net.imagej.mesh.obj.Mesh;
+import net.imagej.mesh.obj.naive.NaiveDoubleMesh;
 import net.imglib2.Cursor;
 import net.imglib2.RandomAccess;
 import net.imglib2.RandomAccessibleInterval;
 import net.imglib2.type.numeric.RealType;
 import net.imglib2.util.Intervals;
 import net.imglib2.view.Views;
-import org.apache.commons.math3.util.MathArrays;
 
 /**
  * This is a marching cubes implementation. It is inspired by Paul Bourke's
@@ -47,7 +49,7 @@ import org.apache.commons.math3.util.MathArrays;
  * @author Tim-Oliver Buchholz (University of Konstanz)
  * @author Tobias Pietzsch
  */
-class MarchingCubesRealType {
+public class MarchingCubesRealType {
 	private static final double[] p0 = {0, 0, 1};
 	private static final double[] p1 = {1, 0, 1};
 	private static final double[] p2 = {1, 0, 0};
@@ -98,7 +100,7 @@ class MarchingCubesRealType {
 		return (byte) (unsignedByte & 0xff);
 	}
 
-	static <T extends RealType<T>> Mesh calculate(final RandomAccessibleInterval<T> input, double isoLevel) {
+	public static <T extends RealType<T>> Mesh calculate(final RandomAccessibleInterval<T> input, double isoLevel) {
 		final double[][] vertlist = new double[12][3];
 		final double[] vertex_values = new double[8];
 		final int msx = (int) input.dimension(0);

@@ -31,7 +31,8 @@
 package net.imagej.mesh.nio;
 
 import net.imagej.mesh.AbstractMeshTest;
-import net.imagej.mesh.Mesh;
+import net.imagej.mesh.obj.Mesh;
+import net.imagej.mesh.obj.nio.BufferMesh;
 
 /**
  * Tests {@link BufferMesh}.

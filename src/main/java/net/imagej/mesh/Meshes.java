@@ -30,13 +30,20 @@
 
 package net.imagej.mesh;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import net.imagej.mesh.alg.MarchingCubesBooleanType;
+import net.imagej.mesh.alg.MarchingCubesRealType;
+import net.imagej.mesh.alg.RemoveDuplicateVertices;
+import net.imagej.mesh.alg.SimplifyMesh;
+import net.imagej.mesh.obj.Mesh;
+import net.imagej.mesh.obj.Triangle;
+import net.imagej.mesh.obj.Vertex;
 import net.imglib2.RandomAccessibleInterval;
 import net.imglib2.RealPoint;
 import net.imglib2.type.BooleanType;
 import net.imglib2.type.numeric.RealType;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Utility methods for working with {@link Mesh} objects.
@@ -52,8 +59,8 @@ public class Meshes {
      * @return a RealPoint representing the mesh's center
      */
     public static RealPoint center(final Mesh m) {
-        RealPoint p = new RealPoint(0, 0, 0);
-        for (final Vertex v: m.vertices()) {
+	final RealPoint p = new RealPoint(0, 0, 0);
+	for (final Vertex v : m.vertices()) {
             p.move(v);
         }
         for (int d = 0; d < 3; d++) {
@@ -62,12 +69,12 @@ public class Meshes {
         return p;
     }
 
-    public static float[] boundingBox(final net.imagej.mesh.Mesh mesh) {
-        final float[] boundingBox = new float[]{Float.POSITIVE_INFINITY,
+    public static float[] boundingBox(final net.imagej.mesh.obj.Mesh mesh) {
+	final float[] boundingBox = new float[] { Float.POSITIVE_INFINITY,
                 Float.POSITIVE_INFINITY, Float.POSITIVE_INFINITY, Float.NEGATIVE_INFINITY,
                 Float.NEGATIVE_INFINITY, Float.NEGATIVE_INFINITY};
-        for (final Vertex v: mesh.vertices()) {
-            final float x = v.xf(), y = v.yf(), z = v.zf();
+	for (final Vertex v : mesh.vertices()) {
+	    final float x = v.xf(), y = v.yf(), z = v.zf();
             if (x < boundingBox[0]) boundingBox[0] = x;
             if (y < boundingBox[1]) boundingBox[1] = y;
             if (z < boundingBox[2]) boundingBox[2] = z;
@@ -84,13 +91,12 @@ public class Meshes {
      * @param src  Source mesh, from which data will be copied.
      * @param dest Destination mesh, into which source will be copied.
      */
-    public static void copy(final net.imagej.mesh.Mesh src,
-                            final net.imagej.mesh.Mesh dest) {
-        final Map<Long, Long> vIndexMap = new HashMap<>();
+    public static void copy(final net.imagej.mesh.obj.Mesh src, final net.imagej.mesh.obj.Mesh dest) {
+	final Map<Long, Long> vIndexMap = new HashMap<>();
         // Copy the vertices, keeping track when indices change.
-        for (final Vertex v: src.vertices()) {
-            long srcIndex = v.index();
-            long destIndex = dest.vertices().add(//
+	for (final Vertex v : src.vertices()) {
+	    final long srcIndex = v.index();
+	    final long destIndex = dest.vertices().add(//
                     v.x(), v.y(), v.z(), //
                     v.nx(), v.ny(), v.nz(), //
                     v.u(), v.v());
@@ -106,13 +112,13 @@ public class Meshes {
             }
         }
         // Copy the triangles, taking care to use destination indices.
-        for (final Triangle tri: src.triangles()) {
-            final long v0src = tri.vertex0();
-            final long v1src = tri.vertex1();
-            final long v2src = tri.vertex2();
-            final long v0 = vIndexMap.getOrDefault(v0src, v0src);
-            final long v1 = vIndexMap.getOrDefault(v1src, v1src);
-            final long v2 = vIndexMap.getOrDefault(v2src, v2src);
+	for (final Triangle tri : src.triangles()) {
+	    final long v0src = tri.vertex0();
+	    final long v1src = tri.vertex1();
+	    final long v2src = tri.vertex2();
+	    final long v0 = vIndexMap.getOrDefault(v0src, v0src);
+	    final long v1 = vIndexMap.getOrDefault(v1src, v1src);
+	    final long v2 = vIndexMap.getOrDefault(v2src, v2src);
 
             dest.triangles().add(v0, v1, v2, tri.nx(), tri.ny(), tri.nz());
         }
@@ -124,47 +130,48 @@ public class Meshes {
      * @param src  Source mesh, used for vertex and triangle info
      * @param dest Destination mesh, will be populated with src's info plus the calculated normals
      */
-    public static void calculateNormals(net.imagej.mesh.Mesh src, net.imagej.mesh.Mesh dest) {
+    public static void calculateNormals(final net.imagej.mesh.obj.Mesh src, final net.imagej.mesh.obj.Mesh dest) {
 
         // Compute the triangle normals.
-        HashMap<Long, float[]> triNormals = new HashMap<>();
-        for (final Triangle tri: src.triangles()) {
-            final int v0 = (int) tri.vertex0();
-            final int v1 = (int) tri.vertex1();
-            final int v2 = (int) tri.vertex2();
+	final HashMap<Long, float[]> triNormals = new HashMap<>();
+	for (final Triangle tri : src.triangles()) {
+	    final int v0 = (int) tri.vertex0();
+	    final int v1 = (int) tri.vertex1();
+	    final int v2 = (int) tri.vertex2();
 
-            final float v0x = src.vertices().xf(v0);
-            final float v0y = src.vertices().yf(v0);
-            final float v0z = src.vertices().zf(v0);
-            final float v1x = src.vertices().xf(v1);
-            final float v1y = src.vertices().yf(v1);
-            final float v1z = src.vertices().zf(v1);
-            final float v2x = src.vertices().xf(v2);
-            final float v2y = src.vertices().yf(v2);
-            final float v2z = src.vertices().zf(v2);
+	    final float v0x = src.vertices().xf(v0);
+	    final float v0y = src.vertices().yf(v0);
+	    final float v0z = src.vertices().zf(v0);
+	    final float v1x = src.vertices().xf(v1);
+	    final float v1y = src.vertices().yf(v1);
+	    final float v1z = src.vertices().zf(v1);
+	    final float v2x = src.vertices().xf(v2);
+	    final float v2y = src.vertices().yf(v2);
+	    final float v2z = src.vertices().zf(v2);
 
-            final float v10x = v1x - v0x;
-            final float v10y = v1y - v0y;
-            final float v10z = v1z - v0z;
+	    final float v10x = v1x - v0x;
+	    final float v10y = v1y - v0y;
+	    final float v10z = v1z - v0z;
 
-            final float v20x = v2x - v0x;
-            final float v20y = v2y - v0y;
-            final float v20z = v2z - v0z;
+	    final float v20x = v2x - v0x;
+	    final float v20y = v2y - v0y;
+	    final float v20z = v2z - v0z;
 
-            final float nx = v10y * v20z - v10z * v20y;
-            final float ny = v10z * v20x - v10x * v20z;
-            final float nz = v10x * v20y - v10y * v20x;
-            final float nmag = (float) Math.sqrt(Math.pow(nx, 2) + Math.pow(ny, 2) + Math.pow(nz, 2));
+	    final float nx = v10y * v20z - v10z * v20y;
+	    final float ny = v10z * v20x - v10x * v20z;
+	    final float nz = v10x * v20y - v10y * v20x;
+	    final float nmag = (float) Math.sqrt(Math.pow(nx, 2) + Math.pow(ny, 2) + Math.pow(nz, 2));
 
             triNormals.put(tri.index(), new float[]{nx / nmag, ny / nmag, nz / nmag});
         }
 
         // Next, compute the normals per vertex based on face normals
-        HashMap<Long, float[]> vNormals = new HashMap<>();// Note: these are cumulative until normalized by vNbrCount
+	final HashMap<Long, float[]> vNormals = new HashMap<>();// Note: these are cumulative until normalized by
+								// vNbrCount
         float[] cumNormal, triNormal;
-        for (final Triangle tri: src.triangles()) {
+	for (final Triangle tri : src.triangles()) {
             triNormal = triNormals.get(tri.index());
-            for (long idx: new long[]{tri.vertex0(), tri.vertex1(), tri.vertex2()}) {
+	    for (final long idx : new long[] { tri.vertex0(), tri.vertex1(), tri.vertex2() }) {
                 cumNormal = vNormals.getOrDefault(idx, new float[]{0, 0, 0});
                 cumNormal[0] += triNormal[0];
                 cumNormal[1] += triNormal[1];
@@ -174,15 +181,15 @@ public class Meshes {
         }
 
         // Now populate dest
-        final Map<Long, Long> vIndexMap = new HashMap<>();
+	final Map<Long, Long> vIndexMap = new HashMap<>();
         float[] vNormal;
         double vNormalMag;
         // Copy the vertices, keeping track when indices change.
-        for (final Vertex v: src.vertices()) {
-            long srcIndex = v.index();
+	for (final Vertex v : src.vertices()) {
+	    final long srcIndex = v.index();
             vNormal = vNormals.get(v.index());
             vNormalMag = Math.sqrt(Math.pow(vNormal[0], 2) + Math.pow(vNormal[1], 2) + Math.pow(vNormal[2], 2));
-            long destIndex = dest.vertices().add(//
+	    final long destIndex = dest.vertices().add(//
                     v.x(), v.y(), v.z(), //
                     vNormal[0] / vNormalMag, vNormal[1] / vNormalMag, vNormal[2] / vNormalMag, //
                     v.u(), v.v());
@@ -198,13 +205,13 @@ public class Meshes {
             }
         }
         // Copy the triangles, taking care to use destination indices.
-        for (final Triangle tri: src.triangles()) {
-            final long v0src = tri.vertex0();
-            final long v1src = tri.vertex1();
-            final long v2src = tri.vertex2();
-            final long v0 = vIndexMap.getOrDefault(v0src, v0src);
-            final long v1 = vIndexMap.getOrDefault(v1src, v1src);
-            final long v2 = vIndexMap.getOrDefault(v2src, v2src);
+	for (final Triangle tri : src.triangles()) {
+	    final long v0src = tri.vertex0();
+	    final long v1src = tri.vertex1();
+	    final long v2src = tri.vertex2();
+	    final long v0 = vIndexMap.getOrDefault(v0src, v0src);
+	    final long v1 = vIndexMap.getOrDefault(v1src, v1src);
+	    final long v2 = vIndexMap.getOrDefault(v2src, v2src);
             triNormal = triNormals.get(tri.index());
             dest.triangles().add(v0, v1, v2, triNormal[0], triNormal[1], triNormal[2]);
         }
@@ -220,7 +227,7 @@ public class Meshes {
      *                      quality. Minimum 4 and maximum 20 are recommended.
      * @return the simplified mesh The result will not include normals or uv coordinates.
      */
-    public static Mesh simplify(Mesh mesh, float target_percent, float agressiveness) {
+    public static Mesh simplify(final Mesh mesh, final float target_percent, final float agressiveness) {
         return new SimplifyMesh(mesh).simplify(target_percent, agressiveness);
     }
 
@@ -232,7 +239,7 @@ public class Meshes {
      * @param precision decimal digits to take into account when comparing mesh vertices
      * @return new mesh without duplicate vertices. The result will not include normals or uv coordinates.
      */
-    public static Mesh removeDuplicateVertices(Mesh mesh, int precision) {
+    public static Mesh removeDuplicateVertices(final Mesh mesh, final int precision) {
         return RemoveDuplicateVertices.calculate(mesh, precision);
     }
 
@@ -242,7 +249,7 @@ public class Meshes {
      * @param source The binary input image for the marching cubes algorithm.
      * @return The result mesh of the marching cubes algorithm.
      */
-    public static <T extends BooleanType<T>> Mesh marchingCubes(RandomAccessibleInterval<T> source) {
+    public static <T extends BooleanType<T>> Mesh marchingCubes(final RandomAccessibleInterval<T> source) {
         return MarchingCubesBooleanType.calculate(source);
     }
 
@@ -253,7 +260,8 @@ public class Meshes {
      * @param isoLevel The threshold to distinguish between foreground and background values.
      * @return The result mesh of the marching cubes algorithm.
      */
-    public static <T extends RealType<T>> Mesh marchingCubes(RandomAccessibleInterval<T> source, double isoLevel) {
+    public static <T extends RealType<T>> Mesh marchingCubes(final RandomAccessibleInterval<T> source,
+	    final double isoLevel) {
         return MarchingCubesRealType.calculate(source, isoLevel);
     }
 }

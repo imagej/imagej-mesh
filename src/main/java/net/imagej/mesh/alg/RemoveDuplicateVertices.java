@@ -28,26 +28,27 @@
  * #L%
  */
 
-package net.imagej.mesh;
-
-import net.imagej.mesh.nio.BufferMesh;
-import net.imglib2.RealLocalizable;
-import net.imglib2.RealPoint;
+package net.imagej.mesh.alg;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import net.imagej.mesh.obj.Mesh;
+import net.imagej.mesh.obj.nio.BufferMesh;
+import net.imglib2.RealLocalizable;
+import net.imglib2.RealPoint;
+
 /**
  * @author Deborah Schmidt
  */
-class RemoveDuplicateVertices {
+public class RemoveDuplicateVertices {
 
-	static Mesh calculate(Mesh mesh, int precision) {
+    public static Mesh calculate(Mesh mesh, int precision) {
 		Map<String, IndexedVertex> vertices = new LinkedHashMap<>();
 		int[][] triangles = new int[(int) mesh.triangles().size()][3];
 
 		int trianglesCount = 0;
-		for (net.imagej.mesh.Triangle triangle : mesh.triangles()) {
+		for (net.imagej.mesh.obj.Triangle triangle : mesh.triangles()) {
 			RealPoint p1 = new RealPoint(triangle.v0x(), triangle.v0y(), triangle.v0z());
 			RealPoint p2 = new RealPoint(triangle.v1x(), triangle.v1y(), triangle.v1z());
 			RealPoint p3 = new RealPoint(triangle.v2x(), triangle.v2y(), triangle.v2z());

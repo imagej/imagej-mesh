@@ -28,12 +28,12 @@
  * #L%
  */
 
-package net.imagej.mesh.naive;
-
-import net.imagej.mesh.Mesh;
+package net.imagej.mesh.obj.naive;
 
 import org.scijava.util.DoubleArray;
 import org.scijava.util.IntArray;
+
+import net.imagej.mesh.obj.Mesh;
 
 public class NaiveDoubleMesh implements Mesh {
 
@@ -57,7 +57,7 @@ public class NaiveDoubleMesh implements Mesh {
 
 	// -- Inner classes --
 
-	public class Vertices implements net.imagej.mesh.Vertices {
+	public class Vertices implements net.imagej.mesh.obj.Vertices {
 
 		private final DoubleArray xs, ys, zs;
 		private final DoubleArray nxs, nys, nzs;
@@ -266,7 +266,7 @@ public class NaiveDoubleMesh implements Mesh {
 		}
 	}
 
-	public class Triangles implements net.imagej.mesh.Triangles {
+	public class Triangles implements net.imagej.mesh.obj.Triangles {
 
 		private final IntArray v0s, v1s, v2s;
 		private final DoubleArray nxs, nys, nzs;

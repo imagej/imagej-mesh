@@ -28,14 +28,16 @@
  * #L%
  */
 
-package net.imagej.mesh;
+package net.imagej.mesh.alg;
 
-import net.imagej.mesh.naive.NaiveDoubleMesh;
+import org.apache.commons.math3.util.MathArrays;
+
+import net.imagej.mesh.obj.Mesh;
+import net.imagej.mesh.obj.naive.NaiveDoubleMesh;
 import net.imglib2.Cursor;
 import net.imglib2.RandomAccessibleInterval;
 import net.imglib2.type.BooleanType;
 import net.imglib2.view.Views;
-import org.apache.commons.math3.util.MathArrays;
 
 /**
  * This is a marching cubes implementation. It is inspired by Paul Bourke's
@@ -45,7 +47,7 @@ import org.apache.commons.math3.util.MathArrays;
  * @author Tim-Oliver Buchholz (University of Konstanz)
  * @author Tobias Pietzsch
  */
-class MarchingCubesBooleanType {
+public class MarchingCubesBooleanType {
 
 	private static final double[] p0 = {0, 0, 1};
 	private static final double[] p1 = {1, 0, 1};
@@ -97,7 +99,7 @@ class MarchingCubesBooleanType {
 		return (byte) (unsignedByte & 0xff);
 	}
 
-	static <T extends BooleanType<T>> Mesh calculate(final RandomAccessibleInterval<T> input) {
+	public static <T extends BooleanType<T>> Mesh calculate(final RandomAccessibleInterval<T> input) {
 		final double[][] vertlist = new double[12][];
 
 		final int msx = (int) input.dimension(0);

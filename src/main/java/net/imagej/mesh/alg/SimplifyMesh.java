@@ -42,21 +42,22 @@
 
  */
 
-package net.imagej.mesh;
-
-import net.imagej.mesh.nio.BufferMesh;
-import net.imglib2.RealPoint;
+package net.imagej.mesh.alg;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
 
+import net.imagej.mesh.obj.Mesh;
+import net.imagej.mesh.obj.nio.BufferMesh;
+import net.imglib2.RealPoint;
+
 /**
  * @author James Khan / jayfella
  * @author Deborah Schmidt / frauzufall
  */
-class SimplifyMesh {
+public class SimplifyMesh {
 
 	static class SymmetricMatrix {
 
@@ -195,7 +196,7 @@ class SimplifyMesh {
 
 	private final Point p = new Point();
 
-	SimplifyMesh(Mesh mesh) {
+	public SimplifyMesh(Mesh mesh) {
 		this.inMesh = mesh;
 	}
 
@@ -206,7 +207,7 @@ class SimplifyMesh {
 		refs.clear();
 
 		Point[] meshVerts = new Point[(int) inMesh.vertices().size()];
-		Iterator<net.imagej.mesh.Vertex> iterator = inMesh.vertices().iterator();
+		Iterator<net.imagej.mesh.obj.Vertex> iterator = inMesh.vertices().iterator();
 		for (int i = 0; i < inMesh.vertices().size(); i++) {
 			Point simpleVertex = new Point();
 			simpleVertex.setPosition(iterator.next());
@@ -221,9 +222,9 @@ class SimplifyMesh {
 //        int index = 0;
 		int triIndex = 0;
 
-		Iterator<net.imagej.mesh.Triangle> iteratorTriangles = inMesh.triangles().iterator();
+		Iterator<net.imagej.mesh.obj.Triangle> iteratorTriangles = inMesh.triangles().iterator();
 		for (int i = 0; i < inMesh.triangles().size(); i++) {
-			net.imagej.mesh.Triangle tria = iteratorTriangles.next();
+			net.imagej.mesh.obj.Triangle tria = iteratorTriangles.next();
 			final Triangle t = new Triangle(
 					(int) tria.vertex0(),
 					(int) tria.vertex1(),
@@ -242,12 +243,14 @@ class SimplifyMesh {
 	/**
 	 * Begins the simplification process.
 	 *
-	 * @param target_percent the amount in percent to attempt to achieve. For example: 0.25f would result in creating
-	 *                       a mesh with 25% of triangles contained in the original.
-	 * @param agressiveness  sharpness to increase the threshold. 5..8 are good numbers. more iterations yield higher
-	 *                       quality. Minimum 4 and maximum 20 are recommended.
+	 * @param target_percent the amount in percent to attempt to achieve. For
+	 *                       example: 0.25f would result in creating a mesh with 25%
+	 *                       of triangles contained in the original.
+	 * @param agressiveness  sharpness to increase the threshold. 5..8 are good
+	 *                       numbers. more iterations yield higher quality. Minimum
+	 *                       4 and maximum 20 are recommended.
 	 */
-	Mesh simplify(float target_percent, double agressiveness) {
+	public Mesh simplify(float target_percent, double agressiveness) {
 
 		int target_count = (int) (inMesh.triangles().size() * target_percent);
 		return simplify(target_count, agressiveness);
