@@ -35,11 +35,13 @@ import java.util.Map;
 
 import net.imagej.mesh.alg.MarchingCubesBooleanType;
 import net.imagej.mesh.alg.MarchingCubesRealType;
+import net.imagej.mesh.alg.MeshConnectedComponents;
 import net.imagej.mesh.alg.RemoveDuplicateVertices;
 import net.imagej.mesh.alg.SimplifyMesh;
 import net.imagej.mesh.obj.Mesh;
 import net.imagej.mesh.obj.Triangle;
 import net.imagej.mesh.obj.Vertex;
+import net.imagej.mesh.obj.nio.BufferMesh;
 import net.imglib2.RandomAccessibleInterval;
 import net.imglib2.RealPoint;
 import net.imglib2.type.BooleanType;
@@ -263,5 +265,25 @@ public class Meshes {
     public static <T extends RealType<T>> Mesh marchingCubes(final RandomAccessibleInterval<T> source,
 	    final double isoLevel) {
         return MarchingCubesRealType.calculate(source, isoLevel);
+    }
+
+    /**
+     * Returns the number of connected components in the specified mesh.
+     * 
+     * @param mesh the mesh.
+     * @return the number of connected components.
+     */
+    public static int nConnectedComponents(final Mesh mesh) {
+	return MeshConnectedComponents.n(mesh);
+    }
+
+    /**
+     * Returns an iterable over the connected components of the specified mesh.
+     * 
+     * @param mesh the mesh.
+     * @return an iterable.
+     */
+    public static Iterable<BufferMesh> connectedComponents(final Mesh mesh) {
+	return MeshConnectedComponents.iterable(mesh);
     }
 }
