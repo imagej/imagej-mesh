@@ -165,7 +165,7 @@ public class MeshesTest {
 
 	private static Img<FloatType> getTestImage3D() {
 		final URL url = MeshesTest.class.getResource("/3d_geometric_features_testlabel.tif");
-		return IO.openFloatImgs(url.getPath()).get(0).getImg();
+		return IO.openAllFloat(url.getPath()).get(0).getImg();
 	}
 
 	private static Mesh getMesh() {

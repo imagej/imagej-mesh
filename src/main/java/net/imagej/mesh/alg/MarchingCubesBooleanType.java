@@ -104,10 +104,10 @@ public class MarchingCubesBooleanType {
 
 		final int msx = (int) input.dimension(0);
 		final int msy = (int) input.dimension(1);
-		final int msz = (int) input.dimension(2);
+//		final int msz = (int) input.dimension(2);
 		final int isx = msx + 2;
 		final int isy = msy + 2;
-		final int isz = msz + 2;
+//		final int isz = msz + 2;
 		final byte[] mask = mask(input);
 
 		Mesh output = new NaiveDoubleMesh();
