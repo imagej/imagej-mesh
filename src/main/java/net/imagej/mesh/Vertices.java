@@ -45,6 +45,19 @@ public interface Vertices extends Iterable<Vertex> {
 	/** Number of vertices in the collection. */
 	long size();
 
+	/**
+	 * Number of vertices in the collection as an <code>int</code> value.
+	 * 
+	 * @throws RuntimeException if the number of vertices exceed
+	 *                          {@link Integer#MAX_VALUE}.
+	 */
+	default int isize() {
+	    final long size = size();
+	    if (size >= Integer.MAX_VALUE)
+		throw new RuntimeException("Too many vertices: " + size);
+	    return (int) size;
+	}
+
 	/** X position of a vertex, as a float. */
 	float xf(long vIndex);
 
@@ -85,6 +98,30 @@ public interface Vertices extends Iterable<Vertex> {
 	long addf(float x, float y, float z, //
 		float nx, float ny, float nz, //
 		float u, float v);
+
+	/**
+	 * Adds a vertex, restrictig the number of vertices to be an <code>int</code>.
+	 *
+	 * @param x  X position of the vertex.
+	 * @param y  Y position of the vertex.
+	 * @param z  Z position of the vertex.
+	 * @param nx X coordinate of the vertex's normal.
+	 * @param ny Y coordinate of the vertex's normal.
+	 * @param nz Z coordinate of the vertex's normal.
+	 * @param u  U value of vertex texture coordinate.
+	 * @param v  V value of vertex texture coordinate.
+	 * @return Index of newly added vertex.
+	 * @throws RuntimeException if the number of vertices exceed
+	 *                          {@link Integer#MAX_VALUE}.
+	 */
+	default int addfi(float x, float y, float z, //
+		float nx, float ny, float nz, //
+		float u, float v) {
+	    long vi = addf(x, y, z, nx, ny, nz, u, v);
+	    if (vi >= Integer.MAX_VALUE)
+		throw new RuntimeException("Too many vertices: " + vi);
+	    return (int) vi;
+	}
 
 	/**
 	 * Overwrites a vertex's position, normal and texture coordinates.
@@ -142,6 +179,19 @@ public interface Vertices extends Iterable<Vertex> {
 	 */
 	default long addf(final float x, final float y, final float z) {
 		return addf(x, y, z, 0, 0, 0, 0, 0);
+	}
+
+	/**
+	 * Adds a vertex, restricting the number of vertices to be an <code>int</code>.
+	 *
+	 * @param x X position of the vertex.
+	 * @param y Y position of the vertex.
+	 * @param z Z position of the vertex.
+	 * @return Index of newly added vertex.
+	 * @throws RuntimeException if the number of vertices exceed Integer.MAX_VALUE.
+	 */
+	default int addfi(final float x, final float y, final float z) {
+	    return addfi(x, y, z, 0, 0, 0, 0, 0);
 	}
 
 	/**
@@ -212,6 +262,21 @@ public interface Vertices extends Iterable<Vertex> {
 	}
 
 	/**
+	 * Adds a vertex, restricting the size of the vertices collection to
+	 * <code>int</code>.
+	 *
+	 * @param x X coordinate of the vertex.
+	 * @param y Y coordinate of the vertex.
+	 * @param z Z coordinate of the vertex.
+	 * @return Index of newly added vertex.
+	 * @throws RuntimeException if the number of vertices exceed
+	 *                          {@link Integer#MAX_VALUE}.
+	 */
+	default int addi(final double x, final double y, final double z) {
+	    return addfi((float) x, (float) y, (float) z);
+	}
+
+	/**
 	 * Adds a vertex.
 	 *
 	 * @param x X position of the vertex.
@@ -231,6 +296,30 @@ public interface Vertices extends Iterable<Vertex> {
 		return addf((float) x, (float) y, (float) z, //
 			(float) nx, (float) ny, (float) nz, //
 			(float) u, (float) v);
+	}
+
+	/**
+	 * Adds a vertex, restricting the size of the vertices collection to
+	 * <code>int</code>.
+	 *
+	 * @param x  X position of the vertex.
+	 * @param y  Y position of the vertex.
+	 * @param z  Z position of the vertex.
+	 * @param nx X coordinate of the vertex's normal.
+	 * @param ny Y coordinate of the vertex's normal.
+	 * @param nz Z coordinate of the vertex's normal.
+	 * @param u  U value of vertex texture coordinate.
+	 * @param v  V value of vertex texture coordinate.
+	 * @return Index of newly added vertex.
+	 * @throws RuntimeException if the number of vertices exceed
+	 *                          {@link Integer#MAX_VALUE}.
+	 */
+	default int addi(double x, double y, double z, //
+		double nx, double ny, double nz, //
+		double u, double v) {
+	    return addfi((float) x, (float) y, (float) z, //
+		    (float) nx, (float) ny, (float) nz, //
+		    (float) u, (float) v);
 	}
 
 	/**
