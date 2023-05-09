@@ -56,10 +56,13 @@ public class MeshCursor<T> implements Cursor<T> {
     private final Map<Integer, Slice> sliceMap;
 
     public MeshCursor(final RandomAccess<T> ra, final Mesh mesh, final double[] cal) {
+	this(ra, mesh, cal, Meshes.boundingBox(mesh));
+    }
+
+    public MeshCursor(final RandomAccess<T> ra, final Mesh mesh, final double[] cal, final RealInterval boundingBox) {
 	this.ra = ra;
 	this.mesh = mesh;
 	this.cal = cal;
-	final RealInterval boundingBox = Meshes.boundingBox(mesh);
 	this.minX = (int) Math.floor(boundingBox.realMin(0) / cal[0]);
 	this.maxX = (int) Math.ceil(boundingBox.realMax(0) / cal[0]);
 	this.minY = (int) Math.floor(boundingBox.realMin(1) / cal[1]);
