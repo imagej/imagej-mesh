@@ -463,21 +463,27 @@ public interface Triangles extends Iterable<Triangle> {
 
     @Override
     default Iterator<Triangle> iterator() {
-        return new Iterator<Triangle>() {
+	return new Iterator<Triangle>() {
 
-            private long index = -1;
+	    private long index = -1;
 
-            private Triangle triangle = new Triangle() {
+	    private Triangle triangle = new Triangle() {
 
-                @Override
-                public Mesh mesh() {
-                    return Triangles.this.mesh();
-                }
+		@Override
+		public Mesh mesh() {
+		    return Triangles.this.mesh();
+		  }
 
                 @Override
                 public long index() {
                     return index;
                 }
+
+		@Override
+		public String toString() {
+		    return String.format("T%d (%.2f, %.2f, %.2f) - (%.2f, %.2f, %.2f)- (%.2f, %.2f, %.2f)", index,
+			    v0x(), v0y(), v0z(), v1x(), v1y(), v1z(), v2x(), v2y(), v2z());
+		}
             };
 
             @Override
