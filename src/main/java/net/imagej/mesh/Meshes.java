@@ -36,6 +36,7 @@ import java.util.Map;
 import net.imagej.mesh.alg.MarchingCubesBooleanType;
 import net.imagej.mesh.alg.MarchingCubesRealType;
 import net.imagej.mesh.alg.MeshConnectedComponents;
+import net.imagej.mesh.alg.MeshIterable;
 import net.imagej.mesh.alg.RemoveDuplicateVertices;
 import net.imagej.mesh.alg.SimplifyMesh;
 import net.imagej.mesh.obj.Mesh;
@@ -44,6 +45,8 @@ import net.imagej.mesh.obj.Vertex;
 import net.imagej.mesh.obj.Vertices;
 import net.imagej.mesh.obj.nio.BufferMesh;
 import net.imglib2.FinalRealInterval;
+import net.imglib2.IterableInterval;
+import net.imglib2.RandomAccessible;
 import net.imglib2.RandomAccessibleInterval;
 import net.imglib2.RealInterval;
 import net.imglib2.RealPoint;
@@ -317,5 +320,15 @@ public class Meshes {
 	    final double z = vertices.z(i);
 	    vertices.set(i, x * scale[0], y * scale[1], z * scale[2]);
 	}
+    }
+
+    public static <T> IterableInterval<T> iterable(final RandomAccessible<T> ra, final Mesh mesh,
+	    final double[] calibration) {
+	return iterable(ra, mesh, calibration, boundingBox(mesh));
+    }
+
+    public static <T> IterableInterval<T> iterable(final RandomAccessible<T> ra, final Mesh mesh,
+	    final double[] calibration, final RealInterval boundingBox) {
+	return new MeshIterable<>(ra, mesh, calibration, boundingBox);
     }
 }
