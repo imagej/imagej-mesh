@@ -41,9 +41,6 @@ public class ZSlicer {
 	 * Slice plane Z positions to odd multiples of eps.
 	 */
 	final double eps = EPS * zScale;
-	final double[] zrs = new double[zs.length];
-	for (int i = 0; i < zs.length; i++)
-	    zrs[i] = mround(zs[i], eps, 2, 1);
 
 	/*
 	 * We want to collect the indices of the triangles which minZ is below zr and
@@ -64,17 +61,15 @@ public class ZSlicer {
 	final Triangles triangles = mesh.triangles();
 	final Vertices vertices = mesh.vertices();
 
-	final double[] minZs = new double[(int) triangles.size()];
-	final double[] maxZs = new double[(int) triangles.size()];
-	for (int t = 0; t < triangles.size(); t++) {
+	final double[] minZs = new double[triangles.isize()];
+	final double[] maxZs = new double[triangles.isize()];
+	for (int t = 0; t < triangles.isize(); t++) {
 	    final long v0 = triangles.vertex0(t);
 	    final long v1 = triangles.vertex1(t);
 	    final long v2 = triangles.vertex2(t);
 
-	    final double minZ = minZ(vertices, v0, v1, v2, eps);
-	    minZs[t] = minZ;
-	    final double maxZ = maxZ(vertices, v0, v1, v2, eps);
-	    maxZs[t] = maxZ;
+	    minZs[t] = minZ(vertices, v0, v1, v2, eps);
+	    maxZs[t] = maxZ(vertices, v0, v1, v2, eps);
 	}
 	final int[] indexMin = SortArray.quicksort(minZs);
 	final int[] indices = new int[indexMin.length];
@@ -88,9 +83,9 @@ public class ZSlicer {
 	/*
 	 * Build sets of intersecting triangles for each z plane.
 	 */
-	final List<Slice> slices = new ArrayList<>(zrs.length);
-	for (int i = 0; i < zrs.length; i++) {
-	    final double zr = zrs[i];
+	final List<Slice> slices = new ArrayList<>(zs.length);
+	for (int i = 0; i < zs.length; i++) {
+	    final double zr = mround(zs[i], eps, 2, 1);
 
 	    // All triangles with minZ < zr
 	    int k1 = Arrays.binarySearch(minZs, zr);
@@ -235,7 +230,7 @@ public class ZSlicer {
 	final Vertices vertices = mesh.vertices();
 
 	final TIntArrayList intersecting = new TIntArrayList();
-	for (long f = 0; f < triangles.size(); f++) {
+	for (int f = 0; f < triangles.isize(); f++) {
 	    final long v0 = triangles.vertex0(f);
 	    final long v1 = triangles.vertex1(f);
 	    final long v2 = triangles.vertex2(f);
@@ -247,7 +242,7 @@ public class ZSlicer {
 	    if (maxZ < zr)
 		continue;
 
-	    intersecting.add((int) f);
+	    intersecting.add(f);
 	}
 	final List<Contour> contours = process(mesh, intersecting.toArray(), 0, intersecting.size(), zr, eps);
 	return new Slice(contours);
@@ -258,12 +253,12 @@ public class ZSlicer {
 	final long v1 = mesh.triangles().vertex1(id);
 	final long v2 = mesh.triangles().vertex2(id);
 
-	final double x0 = mround(mesh.vertices().x(v0), eps, 2, 0);
-	final double x1 = mround(mesh.vertices().x(v1), eps, 2, 0);
-	final double x2 = mround(mesh.vertices().x(v2), eps, 2, 0);
-	final double y0 = mround(mesh.vertices().y(v0), eps, 2, 0);
-	final double y1 = mround(mesh.vertices().y(v1), eps, 2, 0);
-	final double y2 = mround(mesh.vertices().y(v2), eps, 2, 0);
+	final double x0 = mesh.vertices().x(v0);
+	final double x1 = mesh.vertices().x(v1);
+	final double x2 = mesh.vertices().x(v2);
+	final double y0 = mesh.vertices().y(v0);
+	final double y1 = mesh.vertices().y(v1);
+	final double y2 = mesh.vertices().y(v2);
 	final double z0 = mround(mesh.vertices().z(v0), eps, 2, 0);
 	final double z1 = mround(mesh.vertices().z(v1), eps, 2, 0);
 	final double z2 = mround(mesh.vertices().z(v2), eps, 2, 0);
