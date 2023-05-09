@@ -110,7 +110,7 @@ public interface Triangles extends Iterable<Triangle> {
      * @throws RuntimeException if the index exceeds {@link Integer#MAX_VALUE}.
      */
     default int vertex2(final int tIndex) {
-	final long vertex2 = vertex1((long) tIndex);
+	final long vertex2 = vertex2((long) tIndex);
 	if (tIndex >= Integer.MAX_VALUE)
 	    throw new RuntimeException("Index too large: " + tIndex);
 	return (int) vertex2;
