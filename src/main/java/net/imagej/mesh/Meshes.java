@@ -33,6 +33,7 @@ package net.imagej.mesh;
 import java.util.HashMap;
 import java.util.Map;
 
+import net.imagej.mesh.nio.BufferMesh;
 import net.imglib2.RandomAccessibleInterval;
 import net.imglib2.RealPoint;
 import net.imglib2.type.BooleanType;
@@ -327,5 +328,60 @@ public class Meshes {
 			sum += ( 1. / 6. ) * ( -v321 + v231 + v312 - v132 - v213 + v123 );
 		}
 		return Math.abs( sum );
+	}
+
+	public static BufferMesh merge( final Iterable< Mesh > meshes )
+	{
+		int nVertices = 0;
+		int nTriangles = 0;
+		for ( final Mesh mesh : meshes )
+		{
+			nVertices += mesh.vertices().size();
+			nTriangles += mesh.triangles().size();
+		}
+
+		final BufferMesh out = new BufferMesh( nVertices, nTriangles );
+		final net.imagej.mesh.nio.BufferMesh.Vertices vOut = out.vertices();
+		final net.imagej.mesh.nio.BufferMesh.Triangles tOut = out.triangles();
+
+		for ( final Mesh mesh : meshes )
+		{
+			// Add vertices.
+			final Vertices vIn = mesh.vertices();
+			final int[] inToOutMap = new int[ ( int ) vIn.size() ];
+			for ( int i = 0; i < vIn.size(); i++ )
+			{
+				final float xf = vIn.xf( i );
+				final float yf = vIn.yf( i );
+				final float zf = vIn.zf( i );
+				final float nxf = vIn.nxf( i );
+				final float nyf = vIn.nyf( i );
+				final float nzf = vIn.nzf( i );
+				final float uf = vIn.uf( i );
+				final float vf = vIn.vf( i );
+				final int vo = ( int ) vOut.addf( xf, yf, zf, nxf, nyf, nzf, uf, vf );
+				inToOutMap[ i ] = vo;
+			}
+
+			// Add triangles.
+			final Triangles tIn = mesh.triangles();
+			for ( int i = 0; i < tIn.size(); i++ )
+			{
+				final int v0In = ( int ) tIn.vertex0( i );
+				final int v1In = ( int ) tIn.vertex1( i );
+				final int v2In = ( int ) tIn.vertex2( i );
+				final float nxf = tIn.nxf( i );
+				final float nyf = tIn.nyf( i );
+				final float nzf = tIn.nzf( i );
+
+				final int v0Out = inToOutMap[ v0In ];
+				final int v1Out = inToOutMap[ v1In ];
+				final int v2Out = inToOutMap[ v2In ];
+
+				tOut.addf( v0Out, v1Out, v2Out, nxf, nyf, nzf );
+			}
+		}
+
+		return out;
 	}
 }
