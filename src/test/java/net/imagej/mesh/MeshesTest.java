@@ -145,6 +145,65 @@ public class MeshesTest {
 		assertTrue(!expectedFacets.hasNext() && !actualFacets.hasNext());
 	}
 
+	@Test
+	public void testSimplify() {
+		Mesh mesh = new NaiveDoubleMesh();
+
+		// 0 1 2 3 4 5 6 7 8
+		// x   x   x   x   x
+		//   x   x   x   x
+		//     x   x   x
+		//       x   x
+		//         x
+
+		mesh.vertices().add(0, 0, 0);
+		mesh.vertices().add(2, 0, 0);
+		mesh.vertices().add(4, 0, 0);
+		mesh.vertices().add(6, 0, 0);
+		mesh.vertices().add(8, 0, 0);
+
+		mesh.vertices().add(1, 1, 0);
+		mesh.vertices().add(3, 1, 0);
+		mesh.vertices().add(5, 1, 0);
+		mesh.vertices().add(7, 1, 0);
+
+		mesh.vertices().add(2, 2, 0);
+		mesh.vertices().add(4, 2, 0);
+		mesh.vertices().add(6, 2, 0);
+
+		mesh.vertices().add(3, 3, 0);
+		mesh.vertices().add(5, 3, 0);
+
+		mesh.vertices().add(4, 4, 0);
+
+		mesh.triangles().add(0, 5, 1);
+		mesh.triangles().add(1, 6, 2);
+		mesh.triangles().add(2, 7, 3);
+		mesh.triangles().add(3, 8, 4);
+
+		mesh.triangles().add(5, 9, 6);
+		mesh.triangles().add(6, 10, 7);
+		mesh.triangles().add(7, 11, 8);
+
+		mesh.triangles().add(9, 12, 10);
+		mesh.triangles().add(10, 13, 11);
+
+		mesh.triangles().add(12, 14, 13);
+		
+		// Now add a few superfluous triangles.
+		mesh.triangles().add(0, 14, 8);
+		mesh.triangles().add(0, 9, 2);
+		mesh.triangles().add(2, 11, 4);
+		mesh.triangles().add(9, 14, 11);
+
+		Mesh simplified = Meshes.simplify(mesh, 0.8f, 4f);
+		
+		System.out.println(mesh.vertices().size());
+		System.out.println(mesh.triangles().size());
+		System.out.println(simplified.vertices().size());
+		System.out.println(simplified.triangles().size());
+	}
+
 	private static Mesh createMeshWithNoise() {
 		Mesh mesh = new NaiveDoubleMesh();
 
