@@ -5,6 +5,7 @@ import java.util.Random;
 
 import net.imagej.mesh.Mesh;
 import net.imagej.mesh.Meshes;
+import net.imagej.mesh.alg.TaubinSmoothing.TaubinWeightType;
 import net.imagej.mesh.io.ply.PLYMeshIO;
 import net.imglib2.FinalInterval;
 import net.imglib2.img.Img;
@@ -40,7 +41,8 @@ public class TaubinSmoothingDemo {
 
 	new PLYMeshIO().save(mesh, "samples/BeforeSmooth.ply");
 	new PLYMeshIO().save(TaubinSmoothing.smooth(mesh), "samples/SmoothedBit.ply");
-	new PLYMeshIO().save(TaubinSmoothing.smooth(mesh, 50, 0.5, -0.53), "samples/SmoothedMore.ply");
+	new PLYMeshIO().save(TaubinSmoothing.smooth(mesh, 10, 0.5, -0.53, TaubinWeightType.NAIVE),
+		"samples/SmoothedMore.ply");
     }
 
 }

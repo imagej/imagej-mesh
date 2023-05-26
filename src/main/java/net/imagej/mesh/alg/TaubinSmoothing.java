@@ -15,14 +15,33 @@ import net.imagej.mesh.nio.BufferMesh;
  * https://github.com/mikolalysenko/taubin-smooth/blob/master/smooth.js
  * 
  * @author Jean-Yves Tinevez
+ * @see <a href="https://doi.org/10.1109/ICCV.1995.466848">Taubin, G. “Curve and
+ *      Surface Smoothing without Shrinkage.” In Proceedings of IEEE
+ *      International Conference on Computer Vision, 852–57, 1995.</a>
  *
  */
 public class TaubinSmoothing {
 
+    /**
+     * Smooth the specified mesh using the Taubin smoothing algorithm, with default
+     * parameters.
+     * 
+     * @param mesh the mesh to smooth.
+     * @return a new smoothed mesh.
+     */
     public static final BufferMesh smooth(final Mesh mesh) {
 	return smooth(mesh, 10, 0.1);
     }
 
+    /**
+     * Smooth the specified mesh using the Taubin smoothing algorithm, using
+     * cotangent weights.
+     * 
+     * @param mesh     the mesh to smooth.
+     * @param iters    the number of iterations to apply. Typical values: 10.
+     * @param passBand the spatial frequency to use for smoothing. For instance 0.1.
+     * @return a new smoothed mesh.
+     */
     public static final BufferMesh smooth(final Mesh mesh, final int iters, final double passBand) {
 	final double A = -1.;
 	final double B = passBand;
@@ -35,10 +54,24 @@ public class TaubinSmoothing {
 	final double lambda = Math.max(r0, r1);
 	final double mu = Math.min(r0, r1);
 
-	return smooth(mesh, iters, lambda, mu);
+	return smooth(mesh, iters, lambda, mu, TaubinWeightType.COTANGENT);
     }
 
-    public static final BufferMesh smooth(final Mesh mesh, final int iters, final double lambda, final double mu) {
+    /**
+     * Smooth the specified mesh using the Taubin smoothing algorithm.
+     * 
+     * @param mesh       the mesh to smooth.
+     * @param iters      the number of iterations to apply. Typical values: 10.
+     * @param lambda     the value of the lambda step in Taubin smoothing. Positive,
+     *                   typical values are around 0.5;
+     * @param mu         the value of the mu step in Taubin smoothing. Negative,
+     *                   typical values are around -0.5.
+     * @param weightType the type of weights to use when summing contribution from
+     *                   neighbor edges.
+     * @return a new smoothed mesh.
+     */
+    public static final BufferMesh smooth(final Mesh mesh, final int iters, final double lambda, final double mu,
+	    final TaubinWeightType weightType) {
 	final int nvs = (int) mesh.vertices().size();
 	final int nts = (int) mesh.triangles().size();
 	final BufferMesh meshA = new BufferMesh(nvs, nts);
@@ -48,14 +81,27 @@ public class TaubinSmoothing {
 
 	final double[] trace = new double[nvs];
 
-	for (int i = 0; i < iters; ++i) {
-	    smoothStep(mesh.triangles(), meshA, meshB, trace, lambda);
-	    smoothStep(mesh.triangles(), meshB, meshA, trace, mu);
+	switch (weightType) {
+	case COTANGENT:
+	    for (int i = 0; i < iters; ++i) {
+		smoothStepCotangent(mesh.triangles(), meshA, meshB, trace, lambda);
+		smoothStepCotangent(mesh.triangles(), meshB, meshA, trace, mu);
+	    }
+	    break;
+	case NAIVE:
+	    for (int i = 0; i < iters; ++i) {
+		smoothStepNaive(mesh.triangles(), meshA, meshB, trace, lambda);
+		smoothStepNaive(mesh.triangles(), meshB, meshA, trace, mu);
+	    }
+	    break;
+	default:
+	    throw new IllegalArgumentException("Unhandled weight type: " + weightType);
 	}
+
 	return meshA;
     }
 
-    private static void smoothStep(final Triangles triangles, final BufferMesh source, final BufferMesh target,
+    private static void smoothStepCotangent(final Triangles triangles, final BufferMesh source, final BufferMesh target,
 	    final double[] trace, final double weigth) {
 
 	final int nvs = (int) source.vertices().size();
@@ -97,13 +143,9 @@ public class TaubinSmoothing {
 	    final double cay = cy - ay;
 	    final double caz = cz - az;
 
-	    final double area = 0.5 * hypot(
-		    aby * caz - abz * cay, 
-		    abz * cax - abx * caz, 
-		    abx * cay - aby * cax);
+	    final double area = 0.5 * hypot(aby * caz - abz * cay, abz * cax - abx * caz, abx * cay - aby * cax);
 	    if (area < 1e-8)
 		continue;
-
 
 	    final double w = -0.5 / area;
 	    final double wa = w * (abx * cax + aby * cay + abz * caz);
@@ -114,17 +156,63 @@ public class TaubinSmoothing {
 	    trace[ib] += wc + wa;
 	    trace[ic] += wa + wb;
 
-//	    accumulate(ob, c, wa)
 	    accumulate(target.vertices(), ib, source.vertices(), ic, wa);
-//	    accumulate(oc, b, wa)
 	    accumulate(target.vertices(), ic, source.vertices(), ib, wa);
-//	    accumulate(oc, a, wb)
 	    accumulate(target.vertices(), ic, source.vertices(), ia, wb);
-//	    accumulate(oa, c, wb)
 	    accumulate(target.vertices(), ia, source.vertices(), ic, wb);
-//	    accumulate(oa, b, wc)
 	    accumulate(target.vertices(), ia, source.vertices(), ib, wc);
-//	    accumulate(ob, a, wc)
+	    accumulate(target.vertices(), ib, source.vertices(), ia, wc);
+	}
+
+	for (int i = 0; i < nvs; i++) {
+	    final double ox = target.vertices().x(i);
+	    final double oy = target.vertices().y(i);
+	    final double oz = target.vertices().z(i);
+	    final double ix = source.vertices().x(i);
+	    final double iy = source.vertices().y(i);
+	    final double iz = source.vertices().z(i);
+	    final double tr = trace[i];
+
+	    target.vertices().set(i, 
+		    ix + weigth * (ox / tr - ix), 
+		    iy + weigth * (oy / tr - iy),
+		    iz + weigth * (oz / tr - iz));
+	}
+    }
+
+    private static void smoothStepNaive(final Triangles triangles, final BufferMesh source, final BufferMesh target,
+	    final double[] trace, final double weigth) {
+
+	final int nvs = (int) source.vertices().size();
+	final int nts = (int) source.triangles().size();
+
+	// Zero target.
+	for (int i = 0; i < nvs; i++)
+	    target.vertices().set(i, 0., 0., 0.);
+
+	// Zero trace.
+	Arrays.fill(trace, 0.);
+
+	for (int i = 0; i < nts; ++i) {
+
+	    final int ia = (int) source.triangles().vertex0(i);
+	    final int ib = (int) source.triangles().vertex1(i);
+	    final int ic = (int) source.triangles().vertex2(i);
+
+	    final double w = 0.5;
+	    final double wa = w;
+	    final double wb = w;
+	    final double wc = w;
+
+	    trace[ia] += wb + wc;
+	    trace[ib] += wc + wa;
+	    trace[ic] += wa + wb;
+
+	    accumulate(target.vertices(), ib, source.vertices(), ic, wa);
+	    accumulate(target.vertices(), ic, source.vertices(), ib, wa);
+	    accumulate(target.vertices(), ic, source.vertices(), ia, wb);
+	    accumulate(target.vertices(), ia, source.vertices(), ic, wb);
+	    accumulate(target.vertices(), ia, source.vertices(), ib, wc);
 	    accumulate(target.vertices(), ib, source.vertices(), ia, wc);
 	}
 
@@ -140,7 +228,7 @@ public class TaubinSmoothing {
 	    target.vertices().set(i, 
 		    ix + weigth * (ox / tr - ix),
 		    iy + weigth * (oy / tr - iy),
-		    iz + weigth * (oz / tr - iz) );
+		    iz + weigth * (oz / tr - iz));
 	}
     }
 
@@ -161,4 +249,23 @@ public class TaubinSmoothing {
     private static final double hypot(final double x, final double y, final double z) {
 	return Math.sqrt(x * x + y * y + z * z);
     }
+
+    /**
+     * The weight to use when accumlating contribution for neighborhood edges in
+     * Taubin smoothing.
+     */
+    public enum TaubinWeightType {
+
+	/**
+	 * Use cotangent of the 2 triangles around an edge when adding the contribution
+	 * of one edge.
+	 */
+	COTANGENT,
+	/**
+	 * Use identical weight for all edges.
+	 */
+	NAIVE;
+
+    }
+
 }
