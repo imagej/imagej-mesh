@@ -11,7 +11,7 @@
 
 	<groupId>net.imagej</groupId>
 	<artifactId>imagej-mesh</artifactId>
-	<version>0.8.2-SNAPSHOT</version>
+	<version>0.8.2</version>
 
 	<name>ImageJ Mesh</name>
 	<description>3D mesh structures for ImageJ.</description>
@@ -92,7 +92,7 @@
 	<scm>
 		<connection>scm:git:https://github.com/imagej/imagej-mesh</connection>
 		<developerConnection>scm:git:git@github.com:imagej/imagej-mesh</developerConnection>
-		<tag>HEAD</tag>
+		<tag>imagej-mesh-0.8.2</tag>
 		<url>https://github.com/imagej/imagej-mesh</url>
 	</scm>
 	<issueManagement>
