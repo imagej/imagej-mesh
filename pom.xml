@@ -114,6 +114,8 @@ Board of Regents of the University of Wisconsin-Madison.</license.copyrightOwner
 		<!-- NB: Deploy releases to the SciJava Maven repository. -->
 		<releaseProfiles>sign,deploy-to-scijava</releaseProfiles>
 
+		<imglib2.version>7.1.0</imglib2.version>
+		<imglib2-roi.version>0.15.0</imglib2-roi.version>
 	</properties>
 
 	<repositories>
