@@ -2,7 +2,7 @@
  * #%L
  * 3D mesh structures for ImageJ.
  * %%
- * Copyright (C) 2016 - 2020 University of Idaho, Royal Veterinary College, and
+ * Copyright (C) 2016 - 2024 University of Idaho, Royal Veterinary College, and
  * Board of Regents of the University of Wisconsin-Madison.
  * %%
  * Redistribution and use in source and binary forms, with or without
