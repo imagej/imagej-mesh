@@ -361,4 +361,21 @@ public interface Triangles extends Iterable<Triangle> {
             }
         };
     }
+
+    default Triangles copy() {
+        Triangles tris = this.createVariable();
+        Iterator<Triangle> i = this.iterator();
+        while (i.hasNext()) {
+            tris.add(i.next());
+        }
+        return tris;
+    }
+
+    default void add(Triangle next) {
+        add(next.vertex0(), next.vertex1(), next.vertex2(), next.nx(), next.ny(), next.nz());
+    }
+
+    Triangles createVariable();
+
+    void set(Triangles copy);
 }

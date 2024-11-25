@@ -144,7 +144,12 @@ public abstract class AbstractMeshTest {
                 t2v0x, t2v0y, t2v0z, //
                 t3nx, t3ny, t3nz);
 
-
+        // Test copying
+        Mesh duplicate = mesh.copy();
+        assertEquals(mesh.vertices().size(), duplicate.vertices().size());
+        assertEquals(mesh.triangles().size(), duplicate.triangles().size());
+        assertEquals(mesh.triangles().vertex0(t1), duplicate.triangles().vertex0(t1));
+        assertEquals(mesh.triangles().vertex2(t2), duplicate.triangles().vertex2(t2));
     }
 
     @Test
@@ -153,13 +158,13 @@ public abstract class AbstractMeshTest {
         Mesh inputMesh = new NaiveDoubleMesh();
         inputMesh.vertices().add(1, 1, 1);
         inputMesh.vertices().add(1, -1, 1);
-        inputMesh.vertices().add(1,0,-1);
+        inputMesh.vertices().add(1, 0, -1);
         inputMesh.triangles().add(0, 1, 2, 1, 0, 0);
 
         Mesh lazyInputMesh = new NaiveDoubleMesh();
         lazyInputMesh.vertices().add(1, 1, 1);
         lazyInputMesh.vertices().add(1, -1, 1);
-        lazyInputMesh.vertices().add(1,0,-1);
+        lazyInputMesh.vertices().add(1, 0, -1);
         lazyInputMesh.triangles().add(0, 1, 2);
 
         Mesh outMesh = new BufferMesh((int) inputMesh.vertices().size(), (int) inputMesh.triangles().size());
@@ -167,14 +172,14 @@ public abstract class AbstractMeshTest {
 
         for (int idx = 0; idx < inputMesh.triangles().size(); idx++) {
             // calculateNormals test
-            assertTriangleNormal(inputMesh,0, outMesh.triangles().nx(idx), outMesh.triangles().ny(idx), outMesh.triangles().nz(idx));
+            assertTriangleNormal(inputMesh, 0, outMesh.triangles().nx(idx), outMesh.triangles().ny(idx), outMesh.triangles().nz(idx));
             // Add triangles automatic normals calc test
-            assertTriangleNormal(inputMesh,0, lazyInputMesh.triangles().nx(idx), lazyInputMesh.triangles().ny(idx), lazyInputMesh.triangles().nz(idx));
+            assertTriangleNormal(inputMesh, 0, lazyInputMesh.triangles().nx(idx), lazyInputMesh.triangles().ny(idx), lazyInputMesh.triangles().nz(idx));
         }
     }
 
     private void assertTriangleNormal(Mesh mesh, long tIndex, //
-                                    double nx, double ny, double nz) {
+                                      double nx, double ny, double nz) {
         // We know that our normal calculation does normalization, let's pre-normalize input normals
         double mx = mesh.triangles().nx(tIndex);
         double my = mesh.triangles().ny(tIndex);
