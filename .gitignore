@@ -3,7 +3,11 @@
 
 # Eclipse #
 /.classpath
+/.factorypath
 /.project
 /.settings/
 
 *.iml
+
+# IntelliJ #
+/.idea/
